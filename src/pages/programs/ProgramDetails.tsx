@@ -111,8 +111,8 @@ const ProgramDetails = () => {
   }
 
   const filteredPrograms = programs.filter(p => 
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.programId.toLowerCase().includes(searchTerm.toLowerCase())
+    (p.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+    (p.programId?.toLowerCase() || '').includes(searchTerm.toLowerCase())
   )
 
   return (

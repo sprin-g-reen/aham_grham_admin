@@ -77,7 +77,7 @@ const data = {
     },
     {
       title: "Event Details",
-      url: "dashboard/event-details/1",
+      url: "dashboard/event-details",
       icon: Eye,
     },
     {
