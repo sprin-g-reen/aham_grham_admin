@@ -119,7 +119,7 @@ export const router = createBrowserRouter (
         {path: "dashboard/overview", element: <EcommerceDashboard /> },
         {path: "dashboard/landing-page", element: <LandingPage /> },
         {path: "dashboard/programs", element: <ProgramsPage /> },
-        {path: "dashboard/program-details/:id", element: <ProgramDetails /> },
+        {path: "dashboard/program-details", element: <ProgramDetails /> },
         {path: "dashboard/events", element: <EventsPage /> },
         {path: "dashboard/event-details/:id", element: <EventDetails /> },
         

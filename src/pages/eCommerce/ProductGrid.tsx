@@ -1,5 +1,7 @@
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { Link } from "react-router-dom"
+import axios from "axios"
+import { toast } from "sonner"
 import {
   Card,
   CardContent,
@@ -29,66 +31,72 @@ import {
   List,
 } from "lucide-react"
 
-
-const products = [
-  {
-    id: 1,
-    name: "Natural Shampoo",
-    category: "Cosmetics",
-    stock: "In Stock",
-    sku: "NS-001",
-    price: "$25",
-    status: "Published",
-    image: "/pulse-ui/products/01.png",
-  },
-  {
-    id: 2,
-    name: "Natural Pepper",
-    category: "Cooking Products",
-    stock: "In Stock",
-    sku: "NP-002",
-    price: "$15",
-    status: "Published",
-    image: "/pulse-ui/products/02.png",
-  },
-  {
-    id: 3,
-    name: "Coconut Oil",
-    category: "Cooking Products",
-    stock: "In Stock",
-    sku: "CO-003",
-    price: "$20",
-    status: "Published",
-    image: "/pulse-ui/products/03.png",
-  },
-];
-
-
-const statusVariant = (status: string) => {
-  switch (status) {
-    case "Published":
-      return "bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400 border-green-500/30"
-    case "Draft":
-      return "bg-yellow-100 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400 border-yellow-500/30"
-    case "Inactive":
-      return "bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400 border-red-500/30"
-    default:
-      return "bg-muted text-muted-foreground"
-  }
+interface Product {
+  _id: string
+  name: string
+  category: string
+  price: number
+  image: string
+  isMostSelling: boolean
+  description: string
+  offer: string
+  sku?: string
+  tax?: string
+  stockStatus?: string
 }
 
-const PAGE_SIZE = 8
+const UPLOADS_URL = 'http://localhost:5000/uploads';
+const PAGE_SIZE = 8;
 
 export default function ProductGrid() {
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
-  const [selected, setSelected] = useState<number[]>([])
-  // Mock product data (used for demo CRUD actions like delete)
-  const [data, setData] = useState<Product[]>(products)
+  const [selected, setSelected] = useState<string[]>([])
+  const [data, setData] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/products')
+      setData(response.data || [])
+    } catch (error) {
+      toast.error("Failed to fetch products")
+      setData([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchProducts()
+  }, [])
+
+  const deleteProduct = async (id: string) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/products/${id}`)
+      toast.success("Product deleted")
+      fetchProducts()
+    } catch (error) {
+      toast.error("Failed to delete product")
+    }
+  }
+
+  const toggleMostSelling = async (product: Product) => {
+    try {
+      await axios.put(`http://localhost:5000/api/products/${product._id}`, {
+        isMostSelling: !product.isMostSelling
+      })
+      toast.success(product.isMostSelling ? "Removed from Most Selling" : "Added to Most Selling")
+      fetchProducts()
+    } catch (error) {
+      toast.error("Failed to update product status")
+    }
+  }
 
   const filtered = useMemo(() => {
+    if (!data) return []
     return data.filter(p =>
-      `${p.name} ${p.category} ${p.status}`
+      `${p.name} ${p.category}`
         .toLowerCase()
         .includes(search.toLowerCase())
     )
@@ -96,14 +104,14 @@ export default function ProductGrid() {
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
 
- const safePage = Math.min(page, totalPages)
+  const safePage = Math.min(page, totalPages)
 
   const paginated = filtered.slice(
     (safePage - 1) * PAGE_SIZE,
     safePage * PAGE_SIZE
   )
 
-  const toggleOne = (id: number) => {
+  const toggleOne = (id: string) => {
     setSelected(prev =>
       prev.includes(id)
         ? prev.filter(i => i !== id)
@@ -301,15 +309,12 @@ export default function ProductGrid() {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {paginated.map(product => (
               <ProductGridCard
-                key={product.id}
+                key={product._id}
                 product={product}
-                selected={selected.includes(product.id)}
-                onSelect={() => toggleOne(product.id)}
-                onDelete={() =>
-                  setData(prev =>
-                    prev.filter(p => p.id !== product.id)
-                  )
-                }
+                selected={selected.includes(product._id)}
+                onSelect={() => toggleOne(product._id)}
+                onDelete={() => deleteProduct(product._id)}
+                onToggleMostSelling={() => toggleMostSelling(product)}
               />
             ))}
           </div>
@@ -345,22 +350,12 @@ export default function ProductGrid() {
 
 
 /* PRODUCT CARD */
-type Product = {
-  id: number
-  name: string
-  category: string
-  stock: string
-  sku: string
-  price: string
-  status: string
-  image: string
-}
-
-type Props = {
+type ProductProps = {
   product: Product
   selected: boolean
   onSelect: () => void
   onDelete: () => void
+  onToggleMostSelling: () => void
 }
 
 function ProductGridCard({
@@ -368,7 +363,8 @@ function ProductGridCard({
   selected,
   onSelect,
   onDelete,
-}: Props) {
+  onToggleMostSelling,
+}: ProductProps) {
   return (
     <Card className="group overflow-hidden transition hover:shadow-lg border hover:border-primary cursor-pointer shadow-none hover:shadow-primary/10">
       <CardContent className="p-4 space-y-4">
@@ -385,14 +381,16 @@ function ProductGridCard({
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>View</DropdownMenuItem>
-              <DropdownMenuItem>Edit</DropdownMenuItem>
+              <DropdownMenuItem onClick={onToggleMostSelling}>
+                {product.isMostSelling ? "Unfeature" : "Feature (Most Selling)"}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => toast.info("Full update feature coming soon!")}>Update</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-red-600"
                 onClick={onDelete}
               >
-                Delete 
+                Remove 
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -401,34 +399,25 @@ function ProductGridCard({
         {/* Image */}
         <div className="aspect-square rounded-xl bg-muted overflow-hidden">
           <img
-            src={product.image}
+            src={product.image && product.image !== 'no-photo.jpg' ? `${UPLOADS_URL}/${product.image}` : 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80'}
             alt={product.name}
-            className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300 p-4"
+            className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300 p-2"
           />
         </div>
 
         {/* Info */}
-        <div>
-          <h4 className="font-semibold leading-tight">
-            {product.name}
-          </h4>
-          <p className="text-sm text-muted-foreground">
-            {product.category}
-          </p>
+        <div className="space-y-1">
+          <div className="flex justify-between items-start">
+             <h4 className="font-semibold leading-tight">{product.name}</h4>
+             <span className="font-bold text-primary">₹{product.price}</span>
+          </div>
+          <p className="text-sm text-muted-foreground">{product.category}</p>
         </div>
 
-        {/* Meta */}
-        <div className="flex items-center justify-between">
-          <span className="font-semibold">{product.price}</span>
-          <Badge className={statusVariant(product.status)} variant= "outline">
-            {product.status}
-          </Badge>
-        </div>
-
-        {/* Footer */}
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>SKU: {product.sku}</span>
-          <span>{product.stock}</span>
+        {/* Footer Actions */}
+        <div className="grid grid-cols-2 gap-2 pt-2">
+           <Button variant="outline" size="sm" onClick={() => toast.info("Update feature coming soon!")}>Update</Button>
+           <Button variant="destructive" size="sm" onClick={onDelete}>Remove</Button>
         </div>
       </CardContent>
     </Card>

@@ -1,4 +1,6 @@
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
+import axios from "axios"
+import { toast } from "sonner"
 import {
   Card,
   CardContent,
@@ -47,46 +49,41 @@ const statusClass = (status: string) =>
     : "bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400 border-red-500/30"
 
  type Category = {
-  id: number
+  _id: string
   name: string
   description: string
-  products: number
-  earnings: string
   status: string
-  image: string
+  slug: string
 }
 
 export default function CategoryList() {
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
   const [open, setOpen] = useState(false)
+  const [editId, setEditId] = useState<string | null>(null)
  
-  const [categoryList, setCategoryList] = useState<Category[]>([
-    {
-      id: 1,
-      name: "Cosmetics",
-      description: "Shampoos, soaps, and other cosmetic products",
-      products: 1,
-      earnings: "$1,200",
-      status: "Active",
-      image: "/pulse-ui/products/01.png",
-    },
-    {
-      id: 2,
-      name: "Cooking Products",
-      description: "Oils, spices, and cooking essentials",
-      products: 2,
-      earnings: "$2,450",
-      status: "Active",
-      image: "/pulse-ui/products/02.png",
-    },
-  ])
-  const [selected, setSelected] = useState<number[]>([])
-  const PAGE_SIZE = 5
+  const [categoryList, setCategoryList] = useState<Category[]>([])
+  const [loading, setLoading] = useState(false)
+
+  const fetchCategories = async () => {
+    try {
+      const { data } = await axios.get('http://localhost:5000/api/categories')
+      setCategoryList(data)
+    } catch (error) {
+      toast.error("Failed to fetch categories")
+    }
+  }
+
+  useEffect(() => {
+    fetchCategories()
+  }, [])
+
+  const [selected, setSelected] = useState<string[]>([])
+  const PAGE_SIZE = 10
 
   const filtered = useMemo(() => {
     return categoryList.filter((c) =>
-      `${c.name} ${c.description} ${c.status} ${c.earnings}`
+      `${c.name} ${c.description} ${c.status}`
         .toLowerCase()
         .includes(search.toLowerCase())
     )
@@ -104,54 +101,88 @@ export default function CategoryList() {
     if (selected.length === paginated.length) {
       setSelected([])
     } else {
-      setSelected(paginated.map((cat) => cat.id))
+      setSelected(paginated.map((cat) => cat._id))
     }
   }
 
-  const handleSelectOne = (id: number) => {
+  const handleSelectOne = (id: string) => {
     setSelected((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     )
   }
 
-  const handleDeleteSelected = () => {
-    setCategoryList((prev) =>
-      prev.filter((cat) => !selected.includes(cat.id))
-    )
-    setSelected([])
+  const deleteCategory = async (id: string) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/categories/${id}`)
+      toast.success("Category deleted")
+      fetchCategories()
+    } catch (error) {
+      toast.error("Failed to delete category")
+    }
+  }
+
+  const handleEdit = (cat: Category) => {
+    setEditId(cat._id)
+    setForm({
+      name: cat.name,
+      description: cat.description || "",
+      status: cat.status || "Active",
+    })
+    setOpen(true)
+  }
+
+  const handleDeleteSelected = async () => {
+    try {
+      for (const id of selected) {
+        await axios.delete(`http://localhost:5000/api/categories/${id}`)
+      }
+      toast.success("Selected categories deleted")
+      setSelected([])
+      fetchCategories()
+    } catch (error) {
+      toast.error("Failed to delete some categories")
+    }
   }
 
   const isAllSelected =
   paginated.length > 0 &&
-  paginated.every(cat => selected.includes(cat.id))
+  paginated.every(cat => selected.includes(cat._id))
 
   const [form, setForm] = useState({
-  name: "",
-  description: "",
-  products: "",
-  earnings: "",
-  status: "",
-})
+    name: "",
+    description: "",
+    status: "Active",
+  })
 
-const validate = () => {
-  const errors: Record<string, string> = {}
-
-  if (!form.name) errors.name = "Required"
-  if (!form.description) errors.description = "Required"
-
-  return errors
-}
-
-const handleSubmit = () => {
-  const errors = validate()
-
-  if (Object.keys(errors).length > 0) {
-    console.log(errors)
-    return
+  const validate = () => {
+    const errors: Record<string, string> = {}
+    if (!form.name) errors.name = "Required"
+    return errors
   }
 
-  // proceed
-}
+  const handleSubmit = async () => {
+    const errors = validate()
+    if (Object.keys(errors).length > 0) return
+
+    setLoading(true)
+    try {
+      if (editId) {
+        await axios.put(`http://localhost:5000/api/categories/${editId}`, form)
+        toast.success("Category updated")
+      } else {
+        await axios.post('http://localhost:5000/api/categories', form)
+        toast.success("Category created")
+      }
+      setOpen(false)
+      setEditId(null)
+      setForm({ name: "", description: "", status: "Active" })
+      fetchCategories()
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to save category")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <Card>
@@ -206,11 +237,8 @@ const handleSubmit = () => {
                     onCheckedChange={handleSelectAll}
                   />
                 </TableHead>
-                <TableHead>Image</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Description</TableHead>
-                <TableHead>Products</TableHead>
-                <TableHead>Earnings</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -218,19 +246,11 @@ const handleSubmit = () => {
 
             <TableBody>
               {paginated.map((cat) => (
-                <TableRow key={cat.id}>
+                <TableRow key={cat._id}>
                   <TableCell>
                     <Checkbox
-                      checked={selected.includes(cat.id)}
-                      onCheckedChange={() => handleSelectOne(cat.id)}
-                    />
-                  </TableCell>
-
-                  <TableCell>
-                    <img
-                      src={cat.image}
-                      alt={cat.name}
-                      className="h-10 w-10 rounded-full border object-cover p-1 bg-muted/50"
+                      checked={selected.includes(cat._id)}
+                      onCheckedChange={() => handleSelectOne(cat._id)}
                     />
                   </TableCell>
 
@@ -238,9 +258,7 @@ const handleSubmit = () => {
                     {cat.name}
                   </TableCell>
 
-                  <TableCell>{cat.description}</TableCell>
-                  <TableCell>{cat.products}</TableCell>
-                  <TableCell>{cat.earnings}</TableCell>
+                  <TableCell>{cat.description || '-'}</TableCell>
 
                   <TableCell>
                     <Badge className={statusClass(cat.status)} variant="outline">
@@ -261,36 +279,14 @@ const handleSubmit = () => {
                       </DropdownMenuTrigger>
 
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => {
-                            console.log("View category", cat.id)
-                          }}
-                        >
-                          <UserIcon className="mr-2 h-4 w-4" />
-                          View
-                        </DropdownMenuItem>
-
-                        <DropdownMenuItem
-                          onClick={() => {
-                            console.log("Edit category", cat.id)
-                          }}
-                        >
+                        <DropdownMenuItem onClick={() => handleEdit(cat)}>
                           <SettingsIcon className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
-
                         <DropdownMenuSeparator />
-
                         <DropdownMenuItem
                           className="text-red-600 focus:text-red-600"
-                          onClick={() => {
-                            setCategoryList(prev =>
-                              prev.filter(c => c.id !== cat.id)
-                            )
-                            setSelected(prev =>
-                              prev.filter(id => id !== cat.id)
-                            )
-                          }}
+                          onClick={() => deleteCategory(cat._id)}
                         >
                           <LogOutIcon className="mr-2 h-4 w-4" />
                           Delete
@@ -334,7 +330,7 @@ const handleSubmit = () => {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="right" className="w-[420px]">
           <SheetHeader>
-            <SheetTitle>Add New Category</SheetTitle>
+            <SheetTitle>{editId ? "Edit Category" : "Add New Category"}</SheetTitle>
           </SheetHeader>
 
           <div className="mt-6 space-y-4">
@@ -357,52 +353,13 @@ const handleSubmit = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Products</Label>
-                <Input
-                  type="number"
-                  value={form.products}
-                  onChange={(e) => setForm({ ...form, products: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Total Earnings</Label>
-                <Input
-                  value={form.earnings}
-                  onChange={(e) => setForm({ ...form, earnings: e.target.value })}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select
-                  onValueChange={(value) =>
-                    setForm({ ...form, status: value })
-                  }
-                >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Category Image</Label>
-              <Input type="file" />
-            </div>
-
             <div className="flex justify-end gap-2 pt-4">
               <Button variant="outline" onClick={() => setOpen(false)}>
                 Discard
               </Button>
-              <Button onClick={handleSubmit}>Save Category</Button>
+              <Button onClick={handleSubmit} disabled={loading}>
+                {loading ? "Saving..." : "Save Category"}
+              </Button>
             </div>
           </div>
         </SheetContent>

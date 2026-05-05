@@ -1,122 +1,253 @@
-import React from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Users, UserCheck, UserMinus, Search, Filter } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+import { toast } from 'sonner'
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { 
+  Trash2, 
+  Edit, 
+  Filter, 
+  Search,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from 'lucide-react'
+
+// Note: Assuming Dialog components are available from your UI library
+// If they are separate components, we'd import them specifically.
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { 
+  Dialog as ShadcnDialog, 
+  DialogContent as ShadcnContent, 
+  DialogHeader as ShadcnHeader, 
+  DialogTitle as ShadcnTitle,
+  DialogFooter as ShadcnFooter 
+} from "@/components/ui/dialog"
 
 const ProgramDetails = () => {
-  const { id } = useParams()
+  const [programs, setPrograms] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
+  
+  // Edit State
+  const [editingProgram, setEditingProgram] = useState<any>(null)
+  const [editForm, setEditForm] = useState({
+    name: '',
+    programId: '',
+    bookingPrice: '',
+    description: ''
+  })
+  const [editFile, setEditFile] = useState<File | null>(null)
+  const [isUpdateLoading, setIsUpdateLoading] = useState(false)
 
-  // Placeholder data for users
-  const registrations = [
-    { id: 'USR-001', name: 'Alice Johnson', number: '+1 234 567 8901', status: 'Registered' },
-    { id: 'USR-002', name: 'Bob Smith', number: '+1 234 567 8902', status: 'Registered' },
-    { id: 'USR-003', name: 'Charlie Brown', number: '+1 234 567 8903', status: 'Canceled' },
-    { id: 'USR-004', name: 'Diana Prince', number: '+1 234 567 8904', status: 'Registered' },
-    { id: 'USR-005', name: 'Ethan Hunt', number: '+1 234 567 8905', status: 'Canceled' },
-  ]
+  const fetchData = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/programs')
+      setPrograms(response.data)
+    } catch (error) {
+      toast.error("Failed to fetch programs")
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  const registeredCount = registrations.filter(r => r.status === 'Registered').length
-  const canceledCount = registrations.filter(r => r.status === 'Canceled').length
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  const handleDelete = async (id: string) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/programs/${id}`)
+      toast.success("Program deleted")
+      fetchData()
+    } catch (error) {
+      toast.error("Failed to delete program")
+    }
+  }
+
+  const handleEditClick = (program: any) => {
+    setEditingProgram(program)
+    setEditForm({
+      name: program.name,
+      programId: program.programId,
+      bookingPrice: program.bookingPrice.toString(),
+      description: program.description || ''
+    })
+    setEditFile(null)
+  }
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editForm.name || !editForm.programId || !editForm.bookingPrice) {
+      toast.error("Please fill required fields")
+      return
+    }
+
+    setIsUpdateLoading(true)
+    try {
+      const formData = new FormData()
+      formData.append('name', editForm.name)
+      formData.append('programId', editForm.programId)
+      formData.append('bookingPrice', editForm.bookingPrice)
+      formData.append('description', editForm.description)
+      if (editFile) {
+        formData.append('image', editFile)
+      }
+
+      await axios.put(`http://localhost:5000/api/programs/${editingProgram._id}`, formData)
+      toast.success("Program updated successfully")
+      setEditingProgram(null)
+      fetchData()
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to update program")
+    } finally {
+      setIsUpdateLoading(false)
+    }
+  }
+
+  const filteredPrograms = programs.filter(p => 
+    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.programId.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <Link to="/dashboard/programs" className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors w-fit">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Program List
-        </Link>
+    <div className="p-6 space-y-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Program Details</h1>
+          <p className="text-muted-foreground">Manage and view all your active yoga programs.</p>
+        </div>
+        <div className="flex gap-2 w-full md:w-auto">
+          <div className="relative flex-1 md:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input 
+              placeholder="Search program..." 
+              className="pl-9"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <Button variant="outline" size="icon">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+          </Button>
+        </div>
       </div>
 
-      <div className="flex flex-col gap-8">
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Program Details: Intensive Bootcamp #{id}</h1>
-            <p className="text-muted-foreground">Detailed overview of registrations and attendee status.</p>
-          </div>
-          <div className="flex gap-3">
-            <button className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2">
-              <Users className="h-4 w-4" /> Manage All
-            </button>
-          </div>
-        </div>
+      <div className="grid gap-4">
+        {loading ? (
+          <div className="text-center py-12">Loading programs...</div>
+        ) : filteredPrograms.length === 0 ? (
+          <p className="text-muted-foreground text-center py-12 border rounded-xl border-dashed">
+            {searchTerm ? "No programs match your search." : "No programs found."}
+          </p>
+        ) : (
+          filteredPrograms.map((prog) => (
+            <Card key={prog._id} className="overflow-hidden hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-6 p-6">
+                <div className="flex-grow min-w-0">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="font-bold text-xl truncate">{prog.name}</h3>
+                    <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-semibold uppercase">
+                      {prog.programId}
+                    </span>
+                  </div>
+                  <div className="flex gap-4 text-xs mt-2">
+                    <div className="flex items-center gap-1.5 text-primary font-bold">
+                      <span>₹{prog.bookingPrice}</span>
+                    </div>
+                    <span className="text-muted-foreground">Created: {new Date(prog.createdAt).toLocaleDateString()}</span>
+                  </div>
+                </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-card p-6 rounded-2xl border border-border flex items-center gap-4 shadow-sm">
-            <div className="h-12 w-12 rounded-full bg-green-500/10 flex items-center justify-center text-green-600">
-              <UserCheck className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Registered</p>
-              <p className="text-3xl font-bold">{registeredCount}</p>
-            </div>
-          </div>
-          <div className="bg-card p-6 rounded-2xl border border-border flex items-center gap-4 shadow-sm">
-            <div className="h-12 w-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-600">
-              <UserMinus className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Canceled</p>
-              <p className="text-3xl font-bold">{canceledCount}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Users Table Section */}
-        <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-muted/20">
-            <h2 className="text-lg font-semibold">Registration Details</h2>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <div className="relative flex-1 sm:flex-initial">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input 
-                  type="text" 
-                  placeholder="Search user..." 
-                  className="pl-9 pr-4 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary w-full"
-                />
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex items-center gap-2 hover:bg-primary/5 hover:text-primary border-muted"
+                    onClick={() => handleEditClick(prog)}
+                  >
+                    <Edit className="h-4 w-4" />
+                    Update
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    className="text-red-500 hover:text-red-600 hover:bg-red-50 border-muted"
+                    onClick={() => handleDelete(prog._id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <button className="p-2 border border-border rounded-lg hover:bg-muted transition-colors">
-                <Filter className="h-4 w-4 text-muted-foreground" />
-              </button>
-            </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-muted/30 text-xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border">
-                  <th className="px-6 py-4">User ID</th>
-                  <th className="px-6 py-4">Name</th>
-                  <th className="px-6 py-4">Number</th>
-                  <th className="px-6 py-4 text-center">Status</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {registrations.map((user) => (
-                  <tr key={user.id} className="hover:bg-muted/10 transition-colors">
-                    <td className="px-6 py-4 text-sm font-mono text-muted-foreground">{user.id}</td>
-                    <td className="px-6 py-4 text-sm font-medium">{user.name}</td>
-                    <td className="px-6 py-4 text-sm">{user.number}</td>
-                    <td className="px-6 py-4 text-center">
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${
-                        user.status === 'Registered' 
-                        ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400' 
-                        : 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400'
-                      }`}>
-                        {user.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <button className="text-xs font-medium text-primary hover:underline">Edit</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+            </Card>
+          ))
+        )}
       </div>
+
+      {/* UPDATE MODAL */}
+      <ShadcnDialog open={!!editingProgram} onOpenChange={() => setEditingProgram(null)}>
+        <ShadcnContent className="sm:max-w-[500px]">
+          <ShadcnHeader>
+            <ShadcnTitle>Update Program</ShadcnTitle>
+          </ShadcnHeader>
+          <form onSubmit={handleUpdate} className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-name">Program Name</Label>
+              <Input 
+                id="edit-name" 
+                value={editForm.name}
+                onChange={(e) => setEditForm({...editForm, name: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-id">Program ID</Label>
+              <Input 
+                id="edit-id" 
+                value={editForm.programId}
+                onChange={(e) => setEditForm({...editForm, programId: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-price">Booking Price (₹)</Label>
+              <Input 
+                id="edit-price" 
+                type="number"
+                value={editForm.bookingPrice}
+                onChange={(e) => setEditForm({...editForm, bookingPrice: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-desc">Description</Label>
+              <Textarea 
+                id="edit-desc" 
+                className="min-h-[100px]"
+                value={editForm.description}
+                onChange={(e) => setEditForm({...editForm, description: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-image">Update Image (Optional)</Label>
+              <Input 
+                id="edit-image" 
+                type="file" 
+                accept="image/*"
+                onChange={(e) => setEditFile(e.target.files?.[0] || null)}
+              />
+            </div>
+            <ShadcnFooter className="pt-4">
+              <Button type="button" variant="ghost" onClick={() => setEditingProgram(null)}>Cancel</Button>
+              <Button type="submit" disabled={isUpdateLoading}>
+                {isUpdateLoading ? "Updating..." : "Save Changes"}
+              </Button>
+            </ShadcnFooter>
+          </form>
+        </ShadcnContent>
+      </ShadcnDialog>
     </div>
   )
 }

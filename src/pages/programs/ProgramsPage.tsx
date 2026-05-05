@@ -1,26 +1,153 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+import { toast } from 'sonner'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { Trash2 } from 'lucide-react'
 
 const ProgramsPage = () => {
+  const [programs, setPrograms] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
+  const [form, setForm] = useState({
+    name: '',
+    programId: '',
+    bookingPrice: '',
+    description: '',
+  })
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+
+  const fetchData = async () => {
+    try {
+      const [programsRes] = await Promise.all([
+        axios.get('http://localhost:5000/api/programs')
+      ])
+      setPrograms(programsRes.data)
+    } catch (error) {
+      console.error("Failed to fetch data")
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!form.name || !form.programId || !form.bookingPrice || !form.description) {
+      toast.error("Please fill all fields")
+      return
+    }
+
+    setLoading(true)
+    try {
+      const formData = new FormData()
+      formData.append('name', form.name)
+      formData.append('programId', form.programId)
+      formData.append('bookingPrice', form.bookingPrice)
+      formData.append('description', form.description)
+      if (selectedFile) {
+        formData.append('image', selectedFile)
+      }
+
+      await axios.post('http://localhost:5000/api/programs', formData)
+      toast.success("Program added successfully")
+      setForm({ name: '', programId: '', bookingPrice: '', description: '' })
+      setSelectedFile(null)
+      fetchData()
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to add program")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/programs/${id}`)
+      toast.success("Program deleted")
+      fetchData()
+    } catch (error) {
+      toast.error("Failed to delete program")
+    }
+  }
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Program List</h1>
-      <p className="text-muted-foreground">Manage your programs here.</p>
-      
-      <div className="grid gap-6 mt-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* Placeholder cards */}
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-card p-4 rounded-xl border border-border shadow-sm">
-            <h3 className="font-semibold text-lg">Program {i}</h3>
-            <p className="text-sm text-muted-foreground mt-2">Description for program {i}. This is a placeholder.</p>
-            <Link 
-              to={`/dashboard/program-details/${i}`}
-              className="mt-4 inline-block text-primary text-sm font-medium hover:underline"
-            >
-              View Details
-            </Link>
-          </div>
-        ))}
+    <div className="p-6 space-y-8">
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-bold">Add Program</h1>
+        <p className="text-muted-foreground">Create and manage your yoga programs and sessions.</p>
+      </div>
+
+      <div className="max-w-2xl mx-auto">
+        {/* ADD PROGRAM FORM */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Program Details</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Program Name</Label>
+                <Input 
+                  id="name" 
+                  placeholder="e.g. Morning Hatha Yoga" 
+                  value={form.name}
+                  onChange={(e) => setForm({...form, name: e.target.value})}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="programId">Program ID</Label>
+                <Input 
+                  id="programId" 
+                  placeholder="e.g. PROG-001" 
+                  value={form.programId}
+                  onChange={(e) => setForm({...form, programId: e.target.value})}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="price">Booking Price (₹)</Label>
+                <Input 
+                  id="price" 
+                  type="number" 
+                  placeholder="0.00" 
+                  value={form.bookingPrice}
+                  onChange={(e) => setForm({...form, bookingPrice: e.target.value})}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea 
+                  id="description" 
+                  placeholder="Describe the yoga program..." 
+                  className="min-h-[100px]"
+                  value={form.description}
+                  onChange={(e) => setForm({...form, description: e.target.value})}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="image">Program Image</Label>
+                <Input 
+                  id="image" 
+                  type="file" 
+                  accept="image/*"
+                  onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                />
+              </div>
+
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Adding..." : "Add Program"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

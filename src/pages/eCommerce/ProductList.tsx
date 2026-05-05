@@ -1,7 +1,9 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { Link } from "react-router-dom"
+import axios from "axios"
+import { toast } from "sonner"
 import {
   Card,
   CardContent,
@@ -54,79 +56,78 @@ import {
 
 // Define a proper interface for the product
 interface Product {
-  id: number
+  _id: string
   name: string
   category: string
-  stock: string
-  sku: string
-  price: string
-  status: string
+  price: number
   image: string
+  isMostSelling: boolean
+  description: string
+  offer: string
+  sku?: string
+  tax?: string
+  stockStatus?: string
 }
 
-const products: Product[] = [
-  {
-    id: 1,
-    name: "Natural Shampoo",
-    category: "Cosmetics",
-    stock: "In Stock",
-    sku: "NS-001",
-    price: "$25",
-    status: "Published",
-    image: "/pulse-ui/products/01.png",
-  },
-  {
-    id: 2,
-    name: "Natural Pepper",
-    category: "Cooking Products",
-    stock: "In Stock",
-    sku: "NP-002",
-    price: "$15",
-    status: "Published",
-    image: "/pulse-ui/products/02.png",
-  },
-  {
-    id: 3,
-    name: "Coconut Oil",
-    category: "Cooking Products",
-    stock: "In Stock",
-    sku: "CO-003",
-    price: "$20",
-    status: "Published",
-    image: "/pulse-ui/products/03.png",
-  },
-];
-
-
-const statusVariant = (status: string) => {
-  switch (status) {
-    case "Published":
-      return "bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400 border-green-500/30"
-    case "Draft":
-      return "bg-yellow-100 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400 border-yellow-500/30"
-    case "Inactive":
-      return "bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400 border-red-500/30"
-    default:
-      return "bg-muted text-muted-foreground"
-  }
-}
+const UPLOADS_URL = 'http://localhost:5000/uploads';
 
 export default function ProductList() {
-   const [search, setSearch] = useState("")
-   const [pageState, setPageState] = useState(1)
-   const [selected, setSelected] = useState<number[]>([])
-   const [ordersData, setOrdersData] = useState<Product[]>(products)
+  const [search, setSearch] = useState("")
+  const [pageState, setPageState] = useState(1)
+  const [selected, setSelected] = useState<string[]>([])
+  const [ordersData, setOrdersData] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
 
-   const PAGE_SIZE = 5
+  const PAGE_SIZE = 10
 
-    // 🔍 Search filter
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/products')
+      setOrdersData(response.data || [])
+    } catch (error) {
+      toast.error("Failed to fetch products")
+      setOrdersData([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchProducts()
+  }, [])
+
+  const deleteProduct = async (id: string) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/products/${id}`)
+      toast.success("Product deleted")
+      fetchProducts()
+    } catch (error) {
+      toast.error("Failed to delete product")
+    }
+  }
+
+  const toggleMostSelling = async (product: Product) => {
+    try {
+      await axios.put(`http://localhost:5000/api/products/${product._id}`, {
+        isMostSelling: !product.isMostSelling
+      })
+      toast.success(product.isMostSelling ? "Removed from Most Selling" : "Added to Most Selling")
+      fetchProducts()
+    } catch (error) {
+      toast.error("Failed to update product status")
+    }
+  }
+
+  // 🔍 Search filter
   const filteredOrders = useMemo(() => {
+    if (!ordersData) return []
     return ordersData.filter((order) =>
-      `${order.name} ${order.category} ${order.status}`
+      `${order.name} ${order.category}`
         .toLowerCase()
         .includes(search.toLowerCase())
     )
   }, [search, ordersData])
+
 
   // Calculation for safe pagination without useEffect
   const totalPages = Math.max(1, Math.ceil(filteredOrders.length / PAGE_SIZE))
@@ -139,10 +140,10 @@ export default function ProductList() {
 
   // ☑️ Checkbox logic
   const toggleAll = (checked: boolean) => {
-    setSelected(checked ? paginatedProducts.map(p => p.id) : [])
+    setSelected(checked ? paginatedProducts.map(p => p._id) : [])
   }
   
-  const toggleOne = (id: number) => {
+  const toggleOne = (id: string) => {
     setSelected(prev =>
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     )
@@ -246,80 +247,24 @@ export default function ProductList() {
 
               <div className="flex gap-2">
                 <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    const selectedRows = ordersData.filter(p =>
-                      selected.includes(p.id)
-                    )
-                    exportToCSV(selectedRows)
-                  }}
+                   size="sm"
+                   variant="destructive"
+                   onClick={async () => {
+                     for (const id of selected) {
+                        await deleteProduct(id)
+                     }
+                     setSelected([])
+                   }}
                 >
-                  Export
-                </Button>
-
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => {
-                    setOrdersData(prev =>
-                      prev.filter(product => !selected.includes(product.id))
-                    )
-                    setSelected([])
-                  }}
-                >
-                  Delete
+                  Delete Selected
                 </Button>
               </div>
             </div>
           )}
 
-          {/* FILTERS */}
-          <div className="flex flex-wrap gap-3 justify-between items-center">
-            <div className="flex gap-3 flex-wrap">
-              <Input type="date" className="w-[160px]" />
-
-              <Select>
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="published">Published</SelectItem>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select>
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cosmetics">Cosmetics</SelectItem>
-                  <SelectItem value="cooking">Cooking Products</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex gap-2">
-              <Link to="/ecommerce/product-grid">
-                <Button size="sm" variant="outline">
-                  <LayoutGrid className="mr-1 h-4 w-4" />
-                  Product Grid
-                </Button>
-              </Link>
-              <Link to="/ecommerce/add-product">
-                <Button size="sm">
-                  <Plus className="mr-1 h-5 w-5" />
-                  Add Product
-                </Button>
-              </Link>
-            </div>
-          </div>
-
           {/* TABLE */}
           <div className="relative w-full overflow-x-auto">
-            <Table className="min-w-[900px]">
+            <Table className="min-w-[800px]">
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-10">
@@ -332,29 +277,28 @@ export default function ProductList() {
                   />
                   </TableHead>
                   <TableHead>Product</TableHead>
+                  <TableHead>Product ID</TableHead>
                   <TableHead>Category</TableHead>
-                  <TableHead>Stock</TableHead>
-                  <TableHead>SKU</TableHead>
                   <TableHead>Price</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Featured</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
 
               <TableBody>
                 {paginatedProducts.map((product) => (
-                  <TableRow key={product.id}>
+                  <TableRow key={product._id}>
                     <TableCell>
                       <Checkbox
-                      checked={selected.includes(product.id)}
-                      onCheckedChange={() => toggleOne(product.id)}
+                      checked={selected.includes(product._id)}
+                      onCheckedChange={() => toggleOne(product._id)}
                     />
                     </TableCell>
 
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <img
-                          src={product.image}
+                          src={product.image && product.image !== 'no-photo.jpg' ? `${UPLOADS_URL}/${product.image}` : 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80'}
                           alt={product.name}
                           className="h-10 w-10 rounded-full border object-cover p-1 bg-muted/50"
                         />
@@ -362,66 +306,42 @@ export default function ProductList() {
                       </div>
                     </TableCell>
 
+                    <TableCell>{product.sku || 'N/A'}</TableCell>
+
                     <TableCell>{product.category}</TableCell>
-                    <TableCell>{product.stock}</TableCell>
-                    <TableCell>{product.sku}</TableCell>
-                    <TableCell>{product.price}</TableCell>
+                    <TableCell>₹{product.price}</TableCell>
 
                     <TableCell>
-                      <Badge className={statusVariant(product.status)} variant="outline">
-                        {product.status}
+                      <Badge className={product.isMostSelling ? "bg-blue-100 text-blue-600 dark:bg-blue-500/20" : "bg-muted text-muted-foreground"} variant="outline">
+                        {product.isMostSelling ? "Most Selling" : "Normal"}
                       </Badge>
                     </TableCell>
 
                     <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8 rounded-full border-gray-300 dark:border-gray-700"
+                       <div className="flex justify-end gap-2">
+                           <Button 
+                            variant={product.isMostSelling ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => toggleMostSelling(product)}
+                            className={product.isMostSelling ? "bg-orange-500 hover:bg-orange-600 text-white" : ""}
                           >
-                            <MoreVertical className="h-4 w-4" />
+                             {product.isMostSelling ? "Featured" : "Feature"}
                           </Button>
-                        </DropdownMenuTrigger>
-
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => {
-                              console.log("View product", product.id)
-                            }}
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => toast.info("Full update feature coming soon!")}
                           >
-                            <UserIcon className="mr-2 h-4 w-4" />
-                            View
-                          </DropdownMenuItem>
-
-                          <DropdownMenuItem
-                            onClick={() => {
-                              console.log("Edit product", product.id)
-                            }}
+                             Update
+                          </Button>
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            onClick={() => deleteProduct(product._id)}
                           >
-                            <SettingsIcon className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-
-                          <DropdownMenuSeparator />
-
-                          <DropdownMenuItem
-                            className="text-red-600 focus:text-red-600"
-                            onClick={() => {
-                              setOrdersData(prev =>
-                                prev.filter(p => p.id !== product.id)
-                              )
-                              setSelected(prev =>
-                                prev.filter(id => id !== product.id)
-                              )
-                            }}
-                          >
-                            <LogOutIcon className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                             Remove
+                          </Button>
+                       </div>
                     </TableCell>
                   </TableRow>
                 ))}

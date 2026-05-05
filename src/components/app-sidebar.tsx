@@ -61,13 +61,13 @@ const data = {
       icon: Gauge,
     },
     {
-      title: "Program List",
+      title: "Add Program",
       url: "dashboard/programs",
       icon: Library,
     },
     {
       title: "Program Details",
-      url: "dashboard/program-details/1",
+      url: "dashboard/program-details",
       icon: Eye,
     },
     {
