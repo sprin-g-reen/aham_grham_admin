@@ -19,8 +19,8 @@ const ProgramsPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.name || !form.programId || !form.bookingPrice || !form.description) {
-      toast.error("Please fill required fields")
+    if (!form.name || !form.programId || !form.bookingPrice || !form.description || !selectedFile) {
+      toast.error("All fields are required, including the program image.")
       return
     }
 
@@ -64,6 +64,7 @@ const ProgramsPage = () => {
                 <Label htmlFor="name">Program Name</Label>
                 <Input 
                   id="name" 
+                  required
                   placeholder="e.g. Morning Hatha Yoga" 
                   value={form.name}
                   onChange={(e) => setForm({...form, name: e.target.value})}
@@ -74,6 +75,7 @@ const ProgramsPage = () => {
                 <Label htmlFor="programId">Program ID</Label>
                 <Input 
                   id="programId" 
+                  required
                   placeholder="e.g. PROG-001" 
                   value={form.programId}
                   onChange={(e) => setForm({...form, programId: e.target.value})}
@@ -85,6 +87,7 @@ const ProgramsPage = () => {
                 <Input 
                   id="price" 
                   type="number" 
+                  required
                   placeholder="0.00" 
                   value={form.bookingPrice}
                   onChange={(e) => setForm({...form, bookingPrice: e.target.value})}
@@ -95,6 +98,7 @@ const ProgramsPage = () => {
                 <Label htmlFor="description">Description</Label>
                 <Textarea 
                   id="description" 
+                  required
                   placeholder="Describe the yoga program..." 
                   className="min-h-[100px]"
                   value={form.description}
@@ -107,6 +111,7 @@ const ProgramsPage = () => {
                 <Input 
                   id="image" 
                   type="file" 
+                  required
                   accept="image/*"
                   onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
                 />

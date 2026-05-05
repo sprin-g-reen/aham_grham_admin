@@ -192,7 +192,8 @@ const ProgramDetails = () => {
             <div className="space-y-2">
               <Label htmlFor="edit-name">Program Name</Label>
               <Input 
-                id="edit-name" 
+                id="edit-name"
+                required
                 value={editForm.name}
                 onChange={(e) => setEditForm({...editForm, name: e.target.value})}
               />
@@ -200,7 +201,8 @@ const ProgramDetails = () => {
             <div className="space-y-2">
               <Label htmlFor="edit-id">Program ID</Label>
               <Input 
-                id="edit-id" 
+                id="edit-id"
+                required
                 value={editForm.programId}
                 onChange={(e) => setEditForm({...editForm, programId: e.target.value})}
               />
@@ -210,6 +212,7 @@ const ProgramDetails = () => {
               <Input 
                 id="edit-price" 
                 type="number"
+                required
                 value={editForm.bookingPrice}
                 onChange={(e) => setEditForm({...editForm, bookingPrice: e.target.value})}
               />
@@ -218,6 +221,7 @@ const ProgramDetails = () => {
               <Label htmlFor="edit-desc">Description</Label>
               <Textarea 
                 id="edit-desc" 
+                required
                 className="min-h-[100px]"
                 value={editForm.description}
                 onChange={(e) => setEditForm({...editForm, description: e.target.value})}

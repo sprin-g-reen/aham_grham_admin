@@ -33,6 +33,7 @@ const EventDetails = () => {
     eventId: '',
     bookingPrice: '',
     description: '',
+    about: '',
     category: ''
   })
   const [editFile, setEditFile] = useState<File | null>(null)
@@ -70,6 +71,7 @@ const EventDetails = () => {
       eventId: event.eventId,
       bookingPrice: event.bookingPrice.toString(),
       description: event.description || '',
+      about: event.about || '',
       category: event.category || 'Main Event'
     })
     setEditFile(null)
@@ -77,8 +79,9 @@ const EventDetails = () => {
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!editForm.name || !editForm.eventId || !editForm.bookingPrice || !editForm.description) {
-      toast.error("Please fill all fields")
+    const isHighlight = editForm.category === 'Highlight'
+    if (!editForm.name || !editForm.eventId || !editForm.category || (!isHighlight && (!editForm.bookingPrice || !editForm.about)) || !editForm.description) {
+      toast.error("Please fill all required fields, including 'What it is all about'.")
       return
     }
 
@@ -89,9 +92,18 @@ const EventDetails = () => {
       formData.append('eventId', editForm.eventId)
       formData.append('bookingPrice', editForm.bookingPrice)
       formData.append('description', editForm.description)
+      formData.append('about', editForm.about)
       formData.append('category', editForm.category)
       if (editFile) {
-        formData.append('image', editFile)
+        if (isHighlight) {
+          if (editFile.type.startsWith('video/')) {
+            formData.append('video', editFile)
+          } else {
+            formData.append('image', editFile)
+          }
+        } else {
+          formData.append('image', editFile)
+        }
       }
 
       await axios.put(`http://localhost:5000/api/events/${editingEvent._id}`, formData)
@@ -153,7 +165,7 @@ const EventDetails = () => {
                   </div>
                   <div className="flex gap-4 text-xs mt-2">
                     <div className="flex items-center gap-1.5 text-primary font-bold">
-                      <span>₹{ev.bookingPrice}</span>
+                      {ev.category !== 'Highlight' && <span>₹{ev.bookingPrice}</span>}
                     </div>
                     <span className="text-muted-foreground">Created: {new Date(ev.createdAt).toLocaleDateString()}</span>
                   </div>
@@ -195,6 +207,7 @@ const EventDetails = () => {
               <Label htmlFor="edit-name">Event Name</Label>
               <Input 
                 id="edit-name" 
+                required
                 value={editForm.name}
                 onChange={(e) => setEditForm({...editForm, name: e.target.value})}
               />
@@ -203,19 +216,23 @@ const EventDetails = () => {
               <Label htmlFor="edit-id">Event ID</Label>
               <Input 
                 id="edit-id" 
+                required
                 value={editForm.eventId}
                 onChange={(e) => setEditForm({...editForm, eventId: e.target.value})}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-price">Booking Price (₹)</Label>
-              <Input 
-                id="edit-price" 
-                type="number"
-                value={editForm.bookingPrice}
-                onChange={(e) => setEditForm({...editForm, bookingPrice: e.target.value})}
-              />
-            </div>
+            {editForm.category !== 'Highlight' && (
+              <div className="space-y-2">
+                <Label htmlFor="edit-price">Booking Price (₹)</Label>
+                <Input 
+                  id="edit-price" 
+                  type="number"
+                  required
+                  value={editForm.bookingPrice}
+                  onChange={(e) => setEditForm({...editForm, bookingPrice: e.target.value})}
+                />
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="edit-category">Category</Label>
               <select 
@@ -231,20 +248,36 @@ const EventDetails = () => {
               </select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-desc">Description</Label>
+              <Label htmlFor="edit-desc">Short Description</Label>
               <Textarea 
                 id="edit-desc" 
-                className="min-h-[100px]"
+                required
+                className="min-h-[80px]"
                 value={editForm.description}
                 onChange={(e) => setEditForm({...editForm, description: e.target.value})}
               />
             </div>
+            {editForm.category !== 'Highlight' && (
+              <div className="space-y-2">
+                <Label htmlFor="edit-about">What it is all about</Label>
+                <Textarea 
+                  id="edit-about" 
+                  required
+                  placeholder="Provide detailed information about the event..." 
+                  className="min-h-[120px]"
+                  value={editForm.about}
+                  onChange={(e) => setEditForm({...editForm, about: e.target.value})}
+                />
+              </div>
+            )}
             <div className="space-y-2">
-              <Label htmlFor="edit-image">Update Image (Optional)</Label>
+              <Label htmlFor="edit-media">
+                {editForm.category === 'Highlight' ? 'Update Highlight Media (Image or Video)' : 'Update Image (Optional)'}
+              </Label>
               <Input 
-                id="edit-image" 
+                id="edit-media" 
                 type="file" 
-                accept="image/*"
+                accept={editForm.category === 'Highlight' ? 'image/*,video/*' : 'image/*'}
                 onChange={(e) => setEditFile(e.target.files?.[0] || null)}
               />
             </div>

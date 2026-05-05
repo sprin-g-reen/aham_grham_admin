@@ -71,7 +71,7 @@ const data = {
       icon: Eye,
     },
     {
-      title: "Event List",
+      title: "Add Event",
       url: "dashboard/events",
       icon: Calendar,
     },

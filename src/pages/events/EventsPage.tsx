@@ -14,14 +14,16 @@ const EventsPage = () => {
     eventId: '',
     bookingPrice: '',
     description: '',
-    category: 'Main Event',
+    about: '',
+    category: '',
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.name || !form.eventId || !form.bookingPrice || !form.description) {
-      toast.error("Please fill required fields")
+    const isHighlight = form.category === 'Highlight'
+    if (!form.name || !form.eventId || !form.category || (!isHighlight && (!form.bookingPrice || !form.about)) || !form.description || !selectedFile) {
+      toast.error(`All fields are required, including Category and ${isHighlight ? 'Highlight Media' : 'Event Image'}.`)
       return
     }
 
@@ -32,14 +34,24 @@ const EventsPage = () => {
       formData.append('eventId', form.eventId)
       formData.append('bookingPrice', form.bookingPrice)
       formData.append('description', form.description)
+      formData.append('about', form.about)
       formData.append('category', form.category)
       if (selectedFile) {
-        formData.append('image', selectedFile)
+        if (isHighlight) {
+          // Detect if it's a video or image
+          if (selectedFile.type.startsWith('video/')) {
+            formData.append('video', selectedFile)
+          } else {
+            formData.append('image', selectedFile)
+          }
+        } else {
+          formData.append('image', selectedFile)
+        }
       }
 
       await axios.post('http://localhost:5000/api/events', formData)
       toast.success("Event added successfully")
-      setForm({ name: '', eventId: '', bookingPrice: '', description: '', category: 'Main Event' })
+      setForm({ name: '', eventId: '', bookingPrice: '', description: '', about: '', category: '' })
       setSelectedFile(null)
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to add event")
@@ -66,6 +78,7 @@ const EventsPage = () => {
                 <Label htmlFor="name">Event Name</Label>
                 <Input 
                   id="name" 
+                  required
                   placeholder="e.g. Summer Solstice Retreat" 
                   value={form.name}
                   onChange={(e) => setForm({...form, name: e.target.value})}
@@ -76,22 +89,26 @@ const EventsPage = () => {
                 <Label htmlFor="eventId">Event ID</Label>
                 <Input 
                   id="eventId" 
+                  required
                   placeholder="e.g. EVNT-001" 
                   value={form.eventId}
                   onChange={(e) => setForm({...form, eventId: e.target.value})}
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="price">Booking Price (₹)</Label>
-                <Input 
-                  id="price" 
-                  type="number" 
-                  placeholder="0.00" 
-                  value={form.bookingPrice}
-                  onChange={(e) => setForm({...form, bookingPrice: e.target.value})}
-                />
-              </div>
+              {form.category !== 'Highlight' && (
+                <div className="space-y-2">
+                  <Label htmlFor="price">Booking Price (₹)</Label>
+                  <Input 
+                    id="price" 
+                    type="number" 
+                    required
+                    placeholder="0.00" 
+                    value={form.bookingPrice}
+                    onChange={(e) => setForm({...form, bookingPrice: e.target.value})}
+                  />
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="category">Category</Label>
@@ -100,7 +117,9 @@ const EventsPage = () => {
                   className="w-full p-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary"
                   value={form.category}
                   onChange={(e) => setForm({...form, category: e.target.value})}
+                  required
                 >
+                  <option value="" disabled>Select Category</option>
                   <option value="Main Event">Main Event</option>
                   <option value="Workshop">Workshop</option>
                   <option value="Highlight">Highlight</option>
@@ -109,22 +128,40 @@ const EventsPage = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">Short Description</Label>
                 <Textarea 
                   id="description" 
-                  placeholder="Describe the event..." 
-                  className="min-h-[100px]"
+                  required
+                  placeholder="A brief summary of the event..." 
+                  className="min-h-[80px]"
                   value={form.description}
                   onChange={(e) => setForm({...form, description: e.target.value})}
                 />
               </div>
 
+              {form.category !== 'Highlight' && (
+                <div className="space-y-2">
+                  <Label htmlFor="about">What it is all about</Label>
+                  <Textarea 
+                    id="about" 
+                    required
+                    placeholder="Provide detailed information about the event..." 
+                    className="min-h-[120px]"
+                    value={form.about}
+                    onChange={(e) => setForm({...form, about: e.target.value})}
+                  />
+                </div>
+              )}
+
               <div className="space-y-2">
-                <Label htmlFor="image">Event Image</Label>
+                <Label htmlFor="media">
+                  {form.category === 'Highlight' ? 'Highlight Media (Image or Video)' : 'Event Image'}
+                </Label>
                 <Input 
-                  id="image" 
+                  id="media" 
                   type="file" 
-                  accept="image/*"
+                  required
+                  accept={form.category === 'Highlight' ? 'image/*,video/*' : 'image/*'}
                   onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
                 />
               </div>
