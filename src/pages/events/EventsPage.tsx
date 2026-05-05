@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { Button } from "@/components/ui/button"
@@ -6,36 +6,22 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
-import { Trash2 } from 'lucide-react'
 
 const EventsPage = () => {
-  const [events, setEvents] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({
     name: '',
     eventId: '',
     bookingPrice: '',
     description: '',
+    category: 'Main Event',
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-
-  const fetchData = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/api/events')
-      setEvents(response.data)
-    } catch (error) {
-      console.error("Failed to fetch events")
-    }
-  }
-
-  useEffect(() => {
-    fetchData()
-  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.name || !form.eventId || !form.bookingPrice || !form.description) {
-      toast.error("Please fill all fields")
+      toast.error("Please fill required fields")
       return
     }
 
@@ -46,15 +32,15 @@ const EventsPage = () => {
       formData.append('eventId', form.eventId)
       formData.append('bookingPrice', form.bookingPrice)
       formData.append('description', form.description)
+      formData.append('category', form.category)
       if (selectedFile) {
         formData.append('image', selectedFile)
       }
 
       await axios.post('http://localhost:5000/api/events', formData)
       toast.success("Event added successfully")
-      setForm({ name: '', eventId: '', bookingPrice: '', description: '' })
+      setForm({ name: '', eventId: '', bookingPrice: '', description: '', category: 'Main Event' })
       setSelectedFile(null)
-      fetchData()
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to add event")
     } finally {
@@ -62,25 +48,14 @@ const EventsPage = () => {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    try {
-      await axios.delete(`http://localhost:5000/api/events/${id}`)
-      toast.success("Event deleted")
-      fetchData()
-    } catch (error) {
-      toast.error("Failed to delete event")
-    }
-  }
-
   return (
     <div className="p-6 space-y-8">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold">Add Event</h1>
-        <p className="text-muted-foreground">Create and manage your special events and meetups.</p>
+        <p className="text-muted-foreground">Create a new special event or meetup.</p>
       </div>
 
       <div className="max-w-2xl mx-auto">
-        {/* ADD EVENT FORM */}
         <Card>
           <CardHeader>
             <CardTitle>Event Details</CardTitle>
@@ -116,6 +91,21 @@ const EventsPage = () => {
                   value={form.bookingPrice}
                   onChange={(e) => setForm({...form, bookingPrice: e.target.value})}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <select 
+                  id="category"
+                  className="w-full p-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                  value={form.category}
+                  onChange={(e) => setForm({...form, category: e.target.value})}
+                >
+                  <option value="Main Event">Main Event</option>
+                  <option value="Workshop">Workshop</option>
+                  <option value="Highlight">Highlight</option>
+                  <option value="Upcoming Event">Upcoming Event</option>
+                </select>
               </div>
 
               <div className="space-y-2">

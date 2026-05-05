@@ -1,16 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Trash2 } from 'lucide-react'
 
 const ProgramsPage = () => {
-  const [programs, setPrograms] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({
     name: '',
@@ -20,25 +17,10 @@ const ProgramsPage = () => {
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
-  const fetchData = async () => {
-    try {
-      const [programsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/programs')
-      ])
-      setPrograms(programsRes.data)
-    } catch (error) {
-      console.error("Failed to fetch data")
-    }
-  }
-
-  useEffect(() => {
-    fetchData()
-  }, [])
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.name || !form.programId || !form.bookingPrice || !form.description) {
-      toast.error("Please fill all fields")
+      toast.error("Please fill required fields")
       return
     }
 
@@ -57,7 +39,6 @@ const ProgramsPage = () => {
       toast.success("Program added successfully")
       setForm({ name: '', programId: '', bookingPrice: '', description: '' })
       setSelectedFile(null)
-      fetchData()
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to add program")
     } finally {
@@ -65,25 +46,14 @@ const ProgramsPage = () => {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    try {
-      await axios.delete(`http://localhost:5000/api/programs/${id}`)
-      toast.success("Program deleted")
-      fetchData()
-    } catch (error) {
-      toast.error("Failed to delete program")
-    }
-  }
-
   return (
     <div className="p-6 space-y-8">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold">Add Program</h1>
-        <p className="text-muted-foreground">Create and manage your yoga programs and sessions.</p>
+        <p className="text-muted-foreground">Create a new yoga program or session.</p>
       </div>
 
       <div className="max-w-2xl mx-auto">
-        {/* ADD PROGRAM FORM */}
         <Card>
           <CardHeader>
             <CardTitle>Program Details</CardTitle>

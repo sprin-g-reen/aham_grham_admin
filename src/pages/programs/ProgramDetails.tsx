@@ -10,17 +10,10 @@ import {
   Trash2, 
   Edit, 
   Filter, 
-  Search,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
+  Search
 } from 'lucide-react'
 
 // Note: Assuming Dialog components are available from your UI library
-// If they are separate components, we'd import them specifically.
-import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { 
   Dialog as ShadcnDialog, 
   DialogContent as ShadcnContent, 

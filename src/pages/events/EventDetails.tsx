@@ -10,8 +10,7 @@ import {
   Trash2, 
   Edit, 
   Filter, 
-  Search,
-  Dialog,
+  Search
 } from 'lucide-react'
 
 import { 
@@ -33,7 +32,8 @@ const EventDetails = () => {
     name: '',
     eventId: '',
     bookingPrice: '',
-    description: ''
+    description: '',
+    category: ''
   })
   const [editFile, setEditFile] = useState<File | null>(null)
   const [isUpdateLoading, setIsUpdateLoading] = useState(false)
@@ -69,7 +69,8 @@ const EventDetails = () => {
       name: event.name,
       eventId: event.eventId,
       bookingPrice: event.bookingPrice.toString(),
-      description: event.description || ''
+      description: event.description || '',
+      category: event.category || 'Main Event'
     })
     setEditFile(null)
   }
@@ -88,6 +89,7 @@ const EventDetails = () => {
       formData.append('eventId', editForm.eventId)
       formData.append('bookingPrice', editForm.bookingPrice)
       formData.append('description', editForm.description)
+      formData.append('category', editForm.category)
       if (editFile) {
         formData.append('image', editFile)
       }
@@ -213,6 +215,20 @@ const EventDetails = () => {
                 value={editForm.bookingPrice}
                 onChange={(e) => setEditForm({...editForm, bookingPrice: e.target.value})}
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-category">Category</Label>
+              <select 
+                id="edit-category"
+                className="w-full p-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                value={editForm.category}
+                onChange={(e) => setEditForm({...editForm, category: e.target.value})}
+              >
+                <option value="Main Event">Main Event</option>
+                <option value="Workshop">Workshop</option>
+                <option value="Highlight">Highlight</option>
+                <option value="Upcoming Event">Upcoming Event</option>
+              </select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="edit-desc">Description</Label>
