@@ -28,6 +28,7 @@ const TestimonialsPage = () => {
     content: '',
   })
   const [addFile, setAddFile] = useState<File | null>(null)
+  const [addFileInputKey, setAddFileInputKey] = useState(Date.now())
 
   // States for Updating
   const [isUpdateOpen, setIsUpdateOpen] = useState(false)
@@ -75,6 +76,7 @@ const TestimonialsPage = () => {
       toast.success("Testimonial added successfully")
       setAddForm({ name: '', testimonialId: '', role: '', content: '' })
       setAddFile(null)
+      setAddFileInputKey(Date.now())
       fetchTestimonials()
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to add testimonial")
@@ -119,7 +121,6 @@ const TestimonialsPage = () => {
   }
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this testimonial?")) return
     try {
       await axios.delete(`http://localhost:5000/api/testimonials/${id}`)
       toast.success("Testimonial deleted")
@@ -197,6 +198,7 @@ const TestimonialsPage = () => {
                 <Label htmlFor="add-image">Client Photo (Optional)</Label>
                 <Input 
                   id="add-image" 
+                  key={addFileInputKey}
                   type="file" 
                   accept="image/*"
                   onChange={(e) => setAddFile(e.target.files?.[0] || null)}

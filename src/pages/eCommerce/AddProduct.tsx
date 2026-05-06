@@ -72,6 +72,7 @@ export default function AddProduct() {
   const [loading, setLoading] = useState(false)
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [uploaderKey, setUploaderKey] = useState(Date.now())
   const handleSubmit = async () => {
     const validationErrors = validate()
 
@@ -121,6 +122,7 @@ export default function AddProduct() {
       })
       setSelectedFile(null)
       setErrors({})
+      setUploaderKey(Date.now())
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to create product")
     } finally {
@@ -164,7 +166,7 @@ export default function AddProduct() {
             <GeneralInfoCard form={form} setForm={setForm} errors={errors} setErrors={setErrors} categories={categoriesData} />
             <PricingCard form={form} setForm={setForm} errors={errors} setErrors={setErrors} />
             <InventoryCard form={form} setForm={setForm} errors={errors} setErrors={setErrors} />
-            <ProductImageUploader onFileSelect={setSelectedFile} />
+            <ProductImageUploader key={uploaderKey} onFileSelect={setSelectedFile} />
           </div>
           {/* RIGHT SIDEBAR */}
           <div className="space-y-6">

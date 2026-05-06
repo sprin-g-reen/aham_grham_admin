@@ -164,7 +164,7 @@ export default function ProductList() {
 
   // 📤 Export to CSV
   const exportToCSV = (rows: Product[]) => {
-    const headers = ["Name", "Category", "Stock", "SKU", "Price", "Status"]
+    const headers = ["Name", "Category", "Stock Status", "SKU", "Price"]
 
     const csvContent = [
       headers.join(","),
@@ -172,10 +172,9 @@ export default function ProductList() {
         [
           row.name,
           row.category,
-          row.stock,
-          row.sku,
+          row.stockStatus || "N/A",
+          row.sku || "N/A",
           row.price,
-          row.status,
         ].join(",")
       ),
     ].join("\n")

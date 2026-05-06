@@ -84,6 +84,8 @@ import EventDetails from "@/pages/events/EventDetails"
 import TestimonialsPage from "@/pages/testimonials/TestimonialsPage"
 import AboutPage from "@/pages/about/AboutPage"
 import HeroPage from "@/pages/hero/HeroPage"
+import CentersPage from "@/pages/centers/CentersPage"
+import AiTagsPage from "@/pages/aitags/AiTagsPage"
 
 export const router = createBrowserRouter (
   [
@@ -128,6 +130,8 @@ export const router = createBrowserRouter (
         {path: "dashboard/testimonials", element: <TestimonialsPage /> },
         {path: "dashboard/about", element: <AboutPage /> },
         {path: "dashboard/hero", element: <HeroPage /> },
+        {path: "dashboard/centers", element: <CentersPage /> },
+        {path: "dashboard/aitags", element: <AiTagsPage /> },
         
         {path: "dashboard/charts", element: <ChartsPage /> },
         {path: "docs", element: <Documentation /> },

@@ -16,6 +16,7 @@ const ProgramsPage = () => {
     description: '',
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [fileInputKey, setFileInputKey] = useState(Date.now())
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,6 +40,7 @@ const ProgramsPage = () => {
       toast.success("Program added successfully")
       setForm({ name: '', programId: '', bookingPrice: '', description: '' })
       setSelectedFile(null)
+      setFileInputKey(Date.now())
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to add program")
     } finally {
@@ -110,6 +112,7 @@ const ProgramsPage = () => {
                 <Label htmlFor="image">Program Image</Label>
                 <Input 
                   id="image" 
+                  key={fileInputKey}
                   type="file" 
                   required
                   accept="image/*"

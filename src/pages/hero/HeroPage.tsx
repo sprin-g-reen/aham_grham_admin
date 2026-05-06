@@ -114,21 +114,13 @@ const HeroPage = () => {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6">
                   <div className="space-y-2">
                     <Label className="text-sm font-semibold">Kicker (Small Text Above Title)</Label>
                     <Input 
                       placeholder="e.g. Experience Stillness"
                       value={heroData.kicker}
                       onChange={(e) => setHeroData({...heroData, kicker: e.target.value})}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm font-semibold">Button Text</Label>
-                    <Input 
-                      placeholder="e.g. Explore Our Path"
-                      value={heroData.buttonText}
-                      onChange={(e) => setHeroData({...heroData, buttonText: e.target.value})}
                     />
                   </div>
                 </div>

@@ -19,6 +19,7 @@ const EventsPage = () => {
     isBlog: false
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [fileInputKey, setFileInputKey] = useState(Date.now())
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -55,6 +56,7 @@ const EventsPage = () => {
       toast.success("Event added successfully")
       setForm({ name: '', eventId: '', bookingPrice: '', description: '', about: '', category: '', isBlog: false })
       setSelectedFile(null)
+      setFileInputKey(Date.now())
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to add event")
     } finally {
@@ -161,6 +163,7 @@ const EventsPage = () => {
                 </Label>
                 <Input 
                   id="media" 
+                  key={fileInputKey}
                   type="file" 
                   required
                   accept={form.category === 'Highlight' ? 'image/*,video/*' : 'image/*'}

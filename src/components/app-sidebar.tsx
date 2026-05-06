@@ -98,6 +98,16 @@ const data = {
       icon: Sparkles,
     },
     {
+      title: "Our Centers",
+      url: "dashboard/centers",
+      icon: Landmark,
+    },
+    {
+      title: "AI Tags",
+      url: "dashboard/aitags",
+      icon: Code,
+    },
+    {
       title: "Product List",
       url: "eCommerce/product-list",
       icon: ShoppingCart,
