@@ -175,6 +175,22 @@ const EventDetails = () => {
                   <Button 
                     variant="outline" 
                     size="sm" 
+                    className={`flex items-center gap-2 hover:bg-primary/5 hover:text-primary border-muted ${ev.isBlog ? 'bg-orange-50 text-orange-600 border-orange-200' : ''}`}
+                    onClick={async () => {
+                      try {
+                        await axios.patch(`http://localhost:5000/api/events/${ev._id}/toggle-blog`)
+                        toast.success(ev.isBlog ? "Removed from Blog" : "Added to Blog")
+                        fetchData()
+                      } catch (error) {
+                        toast.error("Failed to update blog status")
+                      }
+                    }}
+                  >
+                    {ev.isBlog ? "Remove from Blog" : "Add to Blog"}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
                     className="flex items-center gap-2 hover:bg-primary/5 hover:text-primary border-muted"
                     onClick={() => handleEditClick(ev)}
                   >

@@ -16,6 +16,7 @@ const EventsPage = () => {
     description: '',
     about: '',
     category: '',
+    isBlog: false
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
@@ -36,6 +37,7 @@ const EventsPage = () => {
       formData.append('description', form.description)
       formData.append('about', form.about)
       formData.append('category', form.category)
+      formData.append('isBlog', String(form.isBlog))
       if (selectedFile) {
         if (isHighlight) {
           // Detect if it's a video or image
@@ -51,7 +53,7 @@ const EventsPage = () => {
 
       await axios.post('http://localhost:5000/api/events', formData)
       toast.success("Event added successfully")
-      setForm({ name: '', eventId: '', bookingPrice: '', description: '', about: '', category: '' })
+      setForm({ name: '', eventId: '', bookingPrice: '', description: '', about: '', category: '', isBlog: false })
       setSelectedFile(null)
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to add event")
@@ -164,6 +166,19 @@ const EventsPage = () => {
                   accept={form.category === 'Highlight' ? 'image/*,video/*' : 'image/*'}
                   onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
                 />
+              </div>
+
+              <div className="flex items-center space-x-2 py-2">
+                <input 
+                  id="isBlog" 
+                  type="checkbox" 
+                  className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                  checked={form.isBlog}
+                  onChange={(e) => setForm({...form, isBlog: e.target.checked})}
+                />
+                <Label htmlFor="isBlog" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Show this event in the website Blog section
+                </Label>
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>
