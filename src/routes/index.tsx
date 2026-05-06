@@ -83,6 +83,7 @@ import ProgramDetails from "@/pages/programs/ProgramDetails"
 import EventDetails from "@/pages/events/EventDetails"
 import TestimonialsPage from "@/pages/testimonials/TestimonialsPage"
 import AboutPage from "@/pages/about/AboutPage"
+import HeroPage from "@/pages/hero/HeroPage"
 
 export const router = createBrowserRouter (
   [
@@ -126,6 +127,7 @@ export const router = createBrowserRouter (
         {path: "dashboard/event-details", element: <EventDetails /> },
         {path: "dashboard/testimonials", element: <TestimonialsPage /> },
         {path: "dashboard/about", element: <AboutPage /> },
+        {path: "dashboard/hero", element: <HeroPage /> },
         
         {path: "dashboard/charts", element: <ChartsPage /> },
         {path: "docs", element: <Documentation /> },

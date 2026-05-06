@@ -26,7 +26,8 @@ import {
   Library,
   Calendar,
   Eye,
-  MessageSquareQuote
+  MessageSquareQuote,
+  Sparkles
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -90,6 +91,11 @@ const data = {
       title: "About Us",
       url: "dashboard/about",
       icon: BookOpen,
+    },
+    {
+      title: "Hero Section",
+      url: "dashboard/hero",
+      icon: Sparkles,
     },
     {
       title: "Product List",
