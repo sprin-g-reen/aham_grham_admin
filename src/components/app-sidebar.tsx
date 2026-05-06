@@ -25,7 +25,8 @@ import {
   Droplet,
   Library,
   Calendar,
-  Eye
+  Eye,
+  MessageSquareQuote
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -79,6 +80,16 @@ const data = {
       title: "Event Details",
       url: "dashboard/event-details",
       icon: Eye,
+    },
+    {
+      title: "Add Testimonials",
+      url: "dashboard/testimonials",
+      icon: MessageSquareQuote,
+    },
+    {
+      title: "About Us",
+      url: "dashboard/about",
+      icon: BookOpen,
     },
     {
       title: "Product List",

@@ -81,6 +81,8 @@ import ProgramsPage from "@/pages/programs/ProgramsPage"
 import EventsPage from "@/pages/events/EventsPage"
 import ProgramDetails from "@/pages/programs/ProgramDetails"
 import EventDetails from "@/pages/events/EventDetails"
+import TestimonialsPage from "@/pages/testimonials/TestimonialsPage"
+import AboutPage from "@/pages/about/AboutPage"
 
 export const router = createBrowserRouter (
   [
@@ -122,6 +124,8 @@ export const router = createBrowserRouter (
         {path: "dashboard/program-details", element: <ProgramDetails /> },
         {path: "dashboard/events", element: <EventsPage /> },
         {path: "dashboard/event-details", element: <EventDetails /> },
+        {path: "dashboard/testimonials", element: <TestimonialsPage /> },
+        {path: "dashboard/about", element: <AboutPage /> },
         
         {path: "dashboard/charts", element: <ChartsPage /> },
         {path: "docs", element: <Documentation /> },

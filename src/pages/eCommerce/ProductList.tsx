@@ -62,6 +62,7 @@ interface Product {
   price: number
   image: string
   isMostSelling: boolean
+  isServicePage: boolean
   description: string
   offer: string
   sku?: string
@@ -115,6 +116,18 @@ export default function ProductList() {
       fetchProducts()
     } catch (error) {
       toast.error("Failed to update product status")
+    }
+  }
+
+  const toggleServicePage = async (product: Product) => {
+    try {
+      await axios.put(`http://localhost:5000/api/products/${product._id}`, {
+        isServicePage: !product.isServicePage
+      })
+      toast.success(product.isServicePage ? "Removed from Services" : "Added to Services")
+      fetchProducts()
+    } catch (error) {
+      toast.error("Failed to update service status")
     }
   }
 
@@ -281,6 +294,7 @@ export default function ProductList() {
                   <TableHead>Category</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>Featured</TableHead>
+                  <TableHead>Services</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -317,16 +331,30 @@ export default function ProductList() {
                       </Badge>
                     </TableCell>
 
+                    <TableCell>
+                      <Badge className={product.isServicePage ? "bg-purple-100 text-purple-600 dark:bg-purple-500/20" : "bg-muted text-muted-foreground"} variant="outline">
+                        {product.isServicePage ? "On Services" : "Off"}
+                      </Badge>
+                    </TableCell>
+
                     <TableCell className="text-right">
                        <div className="flex justify-end gap-2">
                            <Button 
-                            variant={product.isMostSelling ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => toggleMostSelling(product)}
-                            className={product.isMostSelling ? "bg-orange-500 hover:bg-orange-600 text-white" : ""}
-                          >
-                             {product.isMostSelling ? "Featured" : "Feature"}
-                          </Button>
+                             variant={product.isMostSelling ? "default" : "outline"}
+                             size="sm"
+                             onClick={() => toggleMostSelling(product)}
+                             className={product.isMostSelling ? "bg-orange-500 hover:bg-orange-600 text-white" : ""}
+                           >
+                              {product.isMostSelling ? "Featured" : "Feature"}
+                           </Button>
+                           <Button 
+                             variant={product.isServicePage ? "default" : "outline"}
+                             size="sm"
+                             onClick={() => toggleServicePage(product)}
+                             className={product.isServicePage ? "bg-purple-500 hover:bg-purple-600 text-white" : ""}
+                           >
+                              {product.isServicePage ? "On Services" : "To Service"}
+                           </Button>
                           <Button 
                             variant="outline" 
                             size="sm"
