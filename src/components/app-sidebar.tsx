@@ -108,6 +108,11 @@ const data = {
       icon: Code,
     },
     {
+      title: "Footer Section",
+      url: "dashboard/footer",
+      icon: LayoutGrid,
+    },
+    {
       title: "Product List",
       url: "eCommerce/product-list",
       icon: ShoppingCart,
