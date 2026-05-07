@@ -74,14 +74,6 @@ const ContentController = () => {
       color: "text-indigo-500",
       bg: "bg-indigo-500/10",
       path: "/eCommerce/product-list"
-    },
-    {
-      title: "Media Manager",
-      description: "Centralized access to all uploaded assets and images.",
-      icon: ImageIcon,
-      color: "text-rose-500",
-      bg: "bg-rose-500/10",
-      path: "/forms/file-upload"
     }
   ];
 
