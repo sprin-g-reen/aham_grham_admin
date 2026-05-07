@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
-import { Save, Sparkles, Layout, ChevronDown } from 'lucide-react'
+import { Save, Sparkles, Layout } from 'lucide-react'
 import {
   Select,
   SelectContent,

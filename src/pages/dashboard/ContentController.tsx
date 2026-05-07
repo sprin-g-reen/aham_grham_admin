@@ -14,13 +14,22 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { FileText } from 'lucide-react';
 
 const ContentController = () => {
   const navigate = useNavigate();
 
   const controlSections = [
     {
-      title: "Hero Management",
+      title: "Page Content",
       description: "Customize top banners, titles, and backgrounds for all main pages.",
       icon: Sparkles,
       color: "text-blue-500",

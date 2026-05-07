@@ -93,7 +93,7 @@ const data = {
       icon: BookOpen,
     },
     {
-      title: "Hero Section",
+      title: "Page Content",
       url: "dashboard/hero",
       icon: Sparkles,
     },
