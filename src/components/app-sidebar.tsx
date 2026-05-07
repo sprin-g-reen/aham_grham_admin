@@ -108,6 +108,11 @@ const data = {
       icon: Code,
     },
     {
+      title: "Content Controller",
+      url: "dashboard/content-controller",
+      icon: Settings2,
+    },
+    {
       title: "Footer Section",
       url: "dashboard/footer",
       icon: LayoutGrid,

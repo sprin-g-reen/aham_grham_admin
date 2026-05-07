@@ -87,6 +87,7 @@ import HeroPage from "@/pages/hero/HeroPage"
 import CentersPage from "@/pages/centers/CentersPage"
 import AiTagsPage from "@/pages/aitags/AiTagsPage"
 import FooterPage from "@/pages/footer/FooterPage"
+import ContentController from "@/pages/dashboard/ContentController"
 
 export const router = createBrowserRouter (
   [
@@ -134,6 +135,7 @@ export const router = createBrowserRouter (
         {path: "dashboard/centers", element: <CentersPage /> },
         {path: "dashboard/aitags", element: <AiTagsPage /> },
         {path: "dashboard/footer", element: <FooterPage /> },
+        {path: "dashboard/content-controller", element: <ContentController /> },
         
         {path: "dashboard/charts", element: <ChartsPage /> },
         {path: "docs", element: <Documentation /> },
