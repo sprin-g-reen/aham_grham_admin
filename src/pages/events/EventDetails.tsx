@@ -10,7 +10,8 @@ import {
   Trash2, 
   Edit, 
   Filter, 
-  Search
+  Search,
+  Plus
 } from 'lucide-react'
 
 import { 
@@ -38,6 +39,20 @@ const EventDetails = () => {
   })
   const [editFile, setEditFile] = useState<File | null>(null)
   const [isUpdateLoading, setIsUpdateLoading] = useState(false)
+
+  // Add State
+  const [isAddOpen, setIsAddOpen] = useState(false)
+  const [addForm, setAddForm] = useState({
+    name: '',
+    eventId: '',
+    bookingPrice: '',
+    description: '',
+    about: '',
+    category: '',
+    isBlog: false
+  })
+  const [addFile, setAddFile] = useState<File | null>(null)
+  const [isAddLoading, setIsAddLoading] = useState(false)
 
   const fetchData = async () => {
     try {
@@ -117,6 +132,49 @@ const EventDetails = () => {
     }
   }
 
+  const handleAddSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const isHighlight = addForm.category === 'Highlight'
+    if (!addForm.name || !addForm.eventId || !addForm.category || (!isHighlight && (!addForm.bookingPrice || !addForm.about)) || !addForm.description || !addFile) {
+      toast.error(`All fields are required, including Category and ${isHighlight ? 'Highlight Media' : 'Event Image'}.`)
+      return
+    }
+
+    setIsAddLoading(true)
+    try {
+      const formData = new FormData()
+      formData.append('name', addForm.name)
+      formData.append('eventId', addForm.eventId)
+      formData.append('bookingPrice', addForm.bookingPrice)
+      formData.append('description', addForm.description)
+      formData.append('about', addForm.about)
+      formData.append('category', addForm.category)
+      formData.append('isBlog', String(addForm.isBlog))
+      if (addFile) {
+        if (isHighlight) {
+          if (addFile.type.startsWith('video/')) {
+            formData.append('video', addFile)
+          } else {
+            formData.append('image', addFile)
+          }
+        } else {
+          formData.append('image', addFile)
+        }
+      }
+
+      await axios.post('http://localhost:5000/api/events', formData)
+      toast.success("Event added successfully")
+      setAddForm({ name: '', eventId: '', bookingPrice: '', description: '', about: '', category: '', isBlog: false })
+      setAddFile(null)
+      setIsAddOpen(false)
+      fetchData()
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to add event")
+    } finally {
+      setIsAddLoading(false)
+    }
+  }
+
   const filteredEvents = events.filter(e => 
     (e.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
     (e.eventId?.toLowerCase() || '').includes(searchTerm.toLowerCase())
@@ -126,7 +184,7 @@ const EventDetails = () => {
     <div className="p-6 space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Event Details</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Events</h1>
           <p className="text-muted-foreground">Manage and view all your active events and meetups.</p>
         </div>
         <div className="flex gap-2 w-full md:w-auto">
@@ -141,6 +199,10 @@ const EventDetails = () => {
           </div>
           <Button variant="outline" size="icon">
             <Filter className="h-4 w-4 text-muted-foreground" />
+          </Button>
+          <Button onClick={() => setIsAddOpen(true)} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Add Event
           </Button>
         </div>
       </div>
@@ -218,81 +280,91 @@ const EventDetails = () => {
           <ShadcnHeader>
             <ShadcnTitle>Update Event</ShadcnTitle>
           </ShadcnHeader>
-          <form onSubmit={handleUpdate} className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-name">Event Name</Label>
-              <Input 
-                id="edit-name" 
-                required
-                value={editForm.name}
-                onChange={(e) => setEditForm({...editForm, name: e.target.value})}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-id">Event ID</Label>
-              <Input 
-                id="edit-id" 
-                required
-                value={editForm.eventId}
-                onChange={(e) => setEditForm({...editForm, eventId: e.target.value})}
-              />
-            </div>
-            {editForm.category !== 'Highlight' && (
-              <div className="space-y-2">
-                <Label htmlFor="edit-price">Booking Price (₹)</Label>
+          <form onSubmit={handleUpdate} className="space-y-3 py-2">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <Label htmlFor="edit-name" className="text-xs">Event Name</Label>
                 <Input 
-                  id="edit-price" 
-                  type="number"
+                  id="edit-name" 
                   required
-                  value={editForm.bookingPrice}
-                  onChange={(e) => setEditForm({...editForm, bookingPrice: e.target.value})}
+                  className="h-9"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({...editForm, name: e.target.value})}
                 />
               </div>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="edit-category">Category</Label>
-              <select 
-                id="edit-category"
-                className="w-full p-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                value={editForm.category}
-                onChange={(e) => setEditForm({...editForm, category: e.target.value})}
-              >
-                <option value="Main Event">Main Event</option>
-                <option value="Workshop">Workshop</option>
-                <option value="Highlight">Highlight</option>
-                <option value="Upcoming Event">Upcoming Event</option>
-              </select>
+              <div className="space-y-1">
+                <Label htmlFor="edit-id" className="text-xs">Event ID</Label>
+                <Input 
+                  id="edit-id" 
+                  required
+                  className="h-9"
+                  value={editForm.eventId}
+                  onChange={(e) => setEditForm({...editForm, eventId: e.target.value})}
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-desc">Short Description</Label>
+
+            <div className="grid grid-cols-2 gap-4">
+              {editForm.category !== 'Highlight' && (
+                <div className="space-y-1">
+                  <Label htmlFor="edit-price" className="text-xs">Booking Price (₹)</Label>
+                  <Input 
+                    id="edit-price" 
+                    type="number"
+                    required
+                    className="h-9"
+                    value={editForm.bookingPrice}
+                    onChange={(e) => setEditForm({...editForm, bookingPrice: e.target.value})}
+                  />
+                </div>
+              )}
+              <div className="space-y-1">
+                <Label htmlFor="edit-category" className="text-xs">Category</Label>
+                <select 
+                  id="edit-category"
+                  className="w-full h-9 p-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  value={editForm.category}
+                  onChange={(e) => setEditForm({...editForm, category: e.target.value})}
+                >
+                  <option value="Main Event">Main Event</option>
+                  <option value="Workshop">Workshop</option>
+                  <option value="Highlight">Highlight</option>
+                  <option value="Upcoming Event">Upcoming Event</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="edit-desc" className="text-xs">Short Description</Label>
               <Textarea 
                 id="edit-desc" 
                 required
-                className="min-h-[80px]"
+                className="min-h-[60px] text-sm"
                 value={editForm.description}
                 onChange={(e) => setEditForm({...editForm, description: e.target.value})}
               />
             </div>
             {editForm.category !== 'Highlight' && (
-              <div className="space-y-2">
-                <Label htmlFor="edit-about">What it is all about</Label>
+              <div className="space-y-1">
+                <Label htmlFor="edit-about" className="text-xs">What it is all about</Label>
                 <Textarea 
                   id="edit-about" 
                   required
-                  placeholder="Provide detailed information about the event..." 
-                  className="min-h-[120px]"
+                  placeholder="Detailed info..." 
+                  className="min-h-[80px] text-sm"
                   value={editForm.about}
                   onChange={(e) => setEditForm({...editForm, about: e.target.value})}
                 />
               </div>
             )}
-            <div className="space-y-2">
-              <Label htmlFor="edit-media">
-                {editForm.category === 'Highlight' ? 'Update Highlight Media (Image or Video)' : 'Update Image (Optional)'}
+            <div className="space-y-1">
+              <Label htmlFor="edit-media" className="text-xs">
+                {editForm.category === 'Highlight' ? 'Highlight Media' : 'Update Image'}
               </Label>
               <Input 
                 id="edit-media" 
                 type="file" 
+                className="h-9 text-xs"
                 accept={editForm.category === 'Highlight' ? 'image/*,video/*' : 'image/*'}
                 onChange={(e) => setEditFile(e.target.files?.[0] || null)}
               />
@@ -301,6 +373,134 @@ const EventDetails = () => {
               <Button type="button" variant="ghost" onClick={() => setEditingEvent(null)}>Cancel</Button>
               <Button type="submit" disabled={isUpdateLoading}>
                 {isUpdateLoading ? "Updating..." : "Save Changes"}
+              </Button>
+            </ShadcnFooter>
+          </form>
+        </ShadcnContent>
+      </ShadcnDialog>
+
+      {/* ADD MODAL */}
+      <ShadcnDialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+        <ShadcnContent className="sm:max-w-[500px]">
+          <ShadcnHeader>
+            <ShadcnTitle>Add New Event</ShadcnTitle>
+          </ShadcnHeader>
+          <form onSubmit={handleAddSubmit} className="space-y-3 py-2">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <Label htmlFor="add-name" className="text-xs">Event Name</Label>
+                <Input 
+                  id="add-name" 
+                  required
+                  className="h-9"
+                  placeholder="e.g. Retreat" 
+                  value={addForm.name}
+                  onChange={(e) => setAddForm({...addForm, name: e.target.value})}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="add-id" className="text-xs">Event ID</Label>
+                <Input 
+                  id="add-id" 
+                  required
+                  className="h-9"
+                  placeholder="e.g. EVNT-001" 
+                  value={addForm.eventId}
+                  onChange={(e) => setAddForm({...addForm, eventId: e.target.value})}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              {addForm.category !== 'Highlight' && (
+                <div className="space-y-1">
+                  <Label htmlFor="add-price" className="text-xs">Booking Price (₹)</Label>
+                  <Input 
+                    id="add-price" 
+                    type="number"
+                    required
+                    className="h-9"
+                    placeholder="0.00" 
+                    value={addForm.bookingPrice}
+                    onChange={(e) => setAddForm({...addForm, bookingPrice: e.target.value})}
+                  />
+                </div>
+              )}
+              <div className="space-y-1">
+                <Label htmlFor="add-category" className="text-xs">Category</Label>
+                <select 
+                  id="add-category"
+                  className="w-full h-9 p-2 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  value={addForm.category}
+                  onChange={(e) => setAddForm({...addForm, category: e.target.value})}
+                  required
+                >
+                  <option value="" disabled>Select Category</option>
+                  <option value="Main Event">Main Event</option>
+                  <option value="Workshop">Workshop</option>
+                  <option value="Highlight">Highlight</option>
+                  <option value="Upcoming Event">Upcoming Event</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="add-desc" className="text-xs">Short Description</Label>
+              <Textarea 
+                id="add-desc" 
+                required
+                placeholder="A brief summary..." 
+                className="min-h-[60px] text-sm"
+                value={addForm.description}
+                onChange={(e) => setAddForm({...addForm, description: e.target.value})}
+              />
+            </div>
+
+            {addForm.category !== 'Highlight' && (
+              <div className="space-y-1">
+                <Label htmlFor="add-about" className="text-xs">What it is all about</Label>
+                <Textarea 
+                  id="add-about" 
+                  required
+                  placeholder="Detailed info..." 
+                  className="min-h-[80px] text-sm"
+                  value={addForm.about}
+                  onChange={(e) => setAddForm({...addForm, about: e.target.value})}
+                />
+              </div>
+            )}
+
+            <div className="space-y-1">
+              <Label htmlFor="add-media" className="text-xs">
+                {addForm.category === 'Highlight' ? 'Highlight Media' : 'Event Image'}
+              </Label>
+              <Input 
+                id="add-media" 
+                type="file" 
+                required
+                className="h-9 text-xs"
+                accept={addForm.category === 'Highlight' ? 'image/*,video/*' : 'image/*'}
+                onChange={(e) => setAddFile(e.target.files?.[0] || null)}
+              />
+            </div>
+
+            <div className="flex items-center space-x-2 py-1">
+              <input 
+                id="add-isBlog" 
+                type="checkbox" 
+                className="h-3 w-3 rounded border-gray-300 text-primary focus:ring-primary"
+                checked={addForm.isBlog}
+                onChange={(e) => setAddForm({...addForm, isBlog: e.target.checked})}
+              />
+              <Label htmlFor="add-isBlog" className="text-[10px] font-medium leading-none">
+                Show in Blog section
+              </Label>
+            </div>
+
+            <ShadcnFooter className="pt-2">
+              <Button type="button" variant="ghost" size="sm" onClick={() => setIsAddOpen(false)}>Cancel</Button>
+              <Button type="submit" size="sm" disabled={isAddLoading}>
+                {isAddLoading ? "Adding..." : "Add Event"}
               </Button>
             </ShadcnFooter>
           </form>

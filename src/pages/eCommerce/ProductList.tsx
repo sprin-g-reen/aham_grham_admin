@@ -229,23 +229,37 @@ export default function ProductList() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between border-b py-4 flex-wrap gap-3">
           <div>
-          <CardTitle className="text-lg mb-0">Products List</CardTitle>
+          <CardTitle className="text-lg mb-0">Products Management</CardTitle>
           <CardDescription>
-            Latest product purchases
+            View, manage and organize your digital apothecary.
           </CardDescription>
           </div>
-          {/* Search */}
-          <div className="relative mb-0 max-w-lg w-[280px]">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search orders..."
-              className="pl-9"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value)
-                setPageState(1) 
-              }}
-            />
+          <div className="flex items-center gap-3">
+            {/* Search */}
+            <div className="relative mb-0 max-w-lg w-[280px]">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search products..."
+                className="pl-9"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value)
+                  setPageState(1) 
+                }}
+              />
+            </div>
+            <Link to="/eCommerce/product-grid">
+              <Button variant="outline" className="gap-2 border-primary/20 hover:bg-primary/5">
+                <LayoutGrid size={16} />
+                Product Grid
+              </Button>
+            </Link>
+            <Link to="/eCommerce/add-product">
+              <Button className="gap-2 shadow-md">
+                <Plus size={16} />
+                Add Product
+              </Button>
+            </Link>
           </div>
         </CardHeader>
 

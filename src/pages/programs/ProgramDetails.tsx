@@ -10,7 +10,8 @@ import {
   Trash2, 
   Edit, 
   Filter, 
-  Search
+  Search,
+  Plus
 } from 'lucide-react'
 
 // Note: Assuming Dialog components are available from your UI library
@@ -37,6 +38,17 @@ const ProgramDetails = () => {
   })
   const [editFile, setEditFile] = useState<File | null>(null)
   const [isUpdateLoading, setIsUpdateLoading] = useState(false)
+  
+  // Add State
+  const [isAddOpen, setIsAddOpen] = useState(false)
+  const [addForm, setAddForm] = useState({
+    name: '',
+    programId: '',
+    bookingPrice: '',
+    description: ''
+  })
+  const [addFile, setAddFile] = useState<File | null>(null)
+  const [isAddLoading, setIsAddLoading] = useState(false)
 
   const fetchData = async () => {
     try {
@@ -103,6 +115,37 @@ const ProgramDetails = () => {
     }
   }
 
+  const handleAddSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!addForm.name || !addForm.programId || !addForm.bookingPrice || !addForm.description || !addFile) {
+      toast.error("All fields are required, including the program image.")
+      return
+    }
+
+    setIsAddLoading(true)
+    try {
+      const formData = new FormData()
+      formData.append('name', addForm.name)
+      formData.append('programId', addForm.programId)
+      formData.append('bookingPrice', addForm.bookingPrice)
+      formData.append('description', addForm.description)
+      if (addFile) {
+        formData.append('image', addFile)
+      }
+
+      await axios.post('http://localhost:5000/api/programs', formData)
+      toast.success("Program added successfully")
+      setAddForm({ name: '', programId: '', bookingPrice: '', description: '' })
+      setAddFile(null)
+      setIsAddOpen(false)
+      fetchData()
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to add program")
+    } finally {
+      setIsAddLoading(false)
+    }
+  }
+
   const filteredPrograms = programs.filter(p => 
     (p.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
     (p.programId?.toLowerCase() || '').includes(searchTerm.toLowerCase())
@@ -112,7 +155,7 @@ const ProgramDetails = () => {
     <div className="p-6 space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Program Details</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Programs</h1>
           <p className="text-muted-foreground">Manage and view all your active yoga programs.</p>
         </div>
         <div className="flex gap-2 w-full md:w-auto">
@@ -127,6 +170,10 @@ const ProgramDetails = () => {
           </div>
           <Button variant="outline" size="icon">
             <Filter className="h-4 w-4 text-muted-foreground" />
+          </Button>
+          <Button onClick={() => setIsAddOpen(true)} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Add Program
           </Button>
         </div>
       </div>
@@ -240,6 +287,75 @@ const ProgramDetails = () => {
               <Button type="button" variant="ghost" onClick={() => setEditingProgram(null)}>Cancel</Button>
               <Button type="submit" disabled={isUpdateLoading}>
                 {isUpdateLoading ? "Updating..." : "Save Changes"}
+              </Button>
+            </ShadcnFooter>
+          </form>
+        </ShadcnContent>
+      </ShadcnDialog>
+
+      {/* ADD MODAL */}
+      <ShadcnDialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+        <ShadcnContent className="sm:max-w-[500px]">
+          <ShadcnHeader>
+            <ShadcnTitle>Add New Program</ShadcnTitle>
+          </ShadcnHeader>
+          <form onSubmit={handleAddSubmit} className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="add-name">Program Name</Label>
+              <Input 
+                id="add-name"
+                required
+                placeholder="e.g. Morning Hatha Yoga" 
+                value={addForm.name}
+                onChange={(e) => setAddForm({...addForm, name: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="add-id">Program ID</Label>
+              <Input 
+                id="add-id"
+                required
+                placeholder="e.g. PROG-001" 
+                value={addForm.programId}
+                onChange={(e) => setAddForm({...addForm, programId: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="add-price">Booking Price (₹)</Label>
+              <Input 
+                id="add-price" 
+                type="number"
+                required
+                placeholder="0.00" 
+                value={addForm.bookingPrice}
+                onChange={(e) => setAddForm({...addForm, bookingPrice: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="add-desc">Description</Label>
+              <Textarea 
+                id="add-desc" 
+                required
+                placeholder="Describe the yoga program..." 
+                className="min-h-[100px]"
+                value={addForm.description}
+                onChange={(e) => setAddForm({...addForm, description: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="add-image">Program Image</Label>
+              <Input 
+                id="add-image" 
+                type="file" 
+                required
+                accept="image/*"
+                onChange={(e) => setAddFile(e.target.files?.[0] || null)}
+              />
+            </div>
+            <ShadcnFooter className="pt-4">
+              <Button type="button" variant="ghost" onClick={() => setIsAddOpen(false)}>Cancel</Button>
+              <Button type="submit" disabled={isAddLoading}>
+                {isAddLoading ? "Adding..." : "Add Program"}
               </Button>
             </ShadcnFooter>
           </form>

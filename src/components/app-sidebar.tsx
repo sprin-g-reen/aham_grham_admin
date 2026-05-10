@@ -63,22 +63,12 @@ const data = {
       icon: Gauge,
     },
     {
-      title: "Add Program",
-      url: "dashboard/programs",
-      icon: Library,
-    },
-    {
-      title: "Program Details",
+      title: "Programs",
       url: "dashboard/program-details",
       icon: Eye,
     },
     {
-      title: "Add Event",
-      url: "dashboard/events",
-      icon: Calendar,
-    },
-    {
-      title: "Event Details",
+      title: "Events",
       url: "dashboard/event-details",
       icon: Eye,
     },
@@ -86,11 +76,6 @@ const data = {
       title: "Add Testimonials",
       url: "dashboard/testimonials",
       icon: MessageSquareQuote,
-    },
-    {
-      title: "About Us",
-      url: "dashboard/about",
-      icon: BookOpen,
     },
     {
       title: "Page Content",
@@ -103,11 +88,6 @@ const data = {
       icon: Landmark,
     },
     {
-      title: "AI Tags",
-      url: "dashboard/aitags",
-      icon: Code,
-    },
-    {
       title: "Content Controller",
       url: "dashboard/content-controller",
       icon: Settings2,
@@ -118,18 +98,8 @@ const data = {
       icon: LayoutGrid,
     },
     {
-      title: "Product List",
+      title: "Products",
       url: "eCommerce/product-list",
-      icon: ShoppingCart,
-    },
-    {
-      title: "Product Grid",
-      url: "eCommerce/product-grid",
-      icon: ShoppingCart,
-    },
-    {
-      title: "Add Product",
-      url: "eCommerce/add-product",
       icon: ShoppingCart,
     },
     {
@@ -138,96 +108,14 @@ const data = {
       icon: ShoppingCart,
     },
     {
-      title: "Order List",
+      title: "Orders",
       url: "eCommerce/order-list",
       icon: ShoppingCart,
     },
     {
-      title: "Order Details",
-      url: "eCommerce/order-details",
-      icon: ShoppingCart,
-    },
-    {
-      title: "Customer List",
+      title: "Customers",
       url: "eCommerce/customer-list",
       icon: ShoppingCart,
-    },
-    {
-      title: "Customer Details",
-      url: "eCommerce/customer-details/1",
-      icon: ShoppingCart,
-    },
-    {
-      title: "Invoice",
-      url: "eCommerce/invoice",
-      icon: ShoppingCart,
-    },
-    {
-      title: "Authentication",
-      url: "#",
-      icon: LockKeyhole,
-      items: [
-        {
-          title: "Basic",
-          url: "#",
-          items: [
-            {
-              title: "Login",
-              url: "auth/basic/login",
-            },
-            {
-              title: "Register",
-              url: "auth/basic/register",
-            },
-            {
-              title: "Verify Email",
-              url: "auth/basic/verify-email",
-            },
-            {
-              title: "Forgot Password",
-              url: "auth/basic/forgot-password",
-            },
-            {
-              title: "New Password",
-              url: "auth/basic/reset-password",
-            },
-            {
-              title: "Reset Success",
-              url: "auth/basic/password-reset-success",
-            },
-          ],
-        },
-        {
-          title: "Cover",
-          url: "#",
-          items: [
-            {
-              title: "Login",
-              url: "auth/cover/login",
-            },
-            {
-              title: "Register",
-              url: "auth/cover/register",
-            },
-            {
-              title: "Verify Email",
-              url: "auth/cover/verify-email",
-            },
-            {
-              title: "Forgot Password",
-              url: "auth/cover/forgot-password",
-            },
-            {
-              title: "New Password",
-              url: "auth/cover/new-password",
-            },
-            {
-              title: "Reset Success",
-              url: "auth/cover/password-reset-success",
-            },
-          ],
-        },
-      ],
     },
     {
       title: "Accounts",

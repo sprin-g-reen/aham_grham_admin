@@ -77,15 +77,11 @@ import DatePickerPage from "@/pages/forms/datepicker/DatePickerPage"
 import SelectExamplesPage from "@/pages/forms/select/SelectExamplesPage"
 import FormRepeater from "@/pages/forms/FormRepeater"
 import LandingPage from "@/pages/dashboard/analytics/LandingPage"
-import ProgramsPage from "@/pages/programs/ProgramsPage"
-import EventsPage from "@/pages/events/EventsPage"
 import ProgramDetails from "@/pages/programs/ProgramDetails"
 import EventDetails from "@/pages/events/EventDetails"
 import TestimonialsPage from "@/pages/testimonials/TestimonialsPage"
-import AboutPage from "@/pages/about/AboutPage"
-import HeroPage from "@/pages/hero/HeroPage"
+import PageContentManagement from "@/pages/hero/PageContentPage"
 import CentersPage from "@/pages/centers/CentersPage"
-import AiTagsPage from "@/pages/aitags/AiTagsPage"
 import FooterPage from "@/pages/footer/FooterPage"
 import ContentController from "@/pages/dashboard/ContentController"
 
@@ -125,15 +121,13 @@ export const router = createBrowserRouter (
         {index: true, element: <EcommerceDashboard /> },
         {path: "dashboard/overview", element: <EcommerceDashboard /> },
         {path: "dashboard/landing-page", element: <LandingPage /> },
-        {path: "dashboard/programs", element: <ProgramsPage /> },
+        {path: "dashboard/programs", element: <ProgramDetails /> },
         {path: "dashboard/program-details", element: <ProgramDetails /> },
-        {path: "dashboard/events", element: <EventsPage /> },
+        {path: "dashboard/events", element: <EventDetails /> },
         {path: "dashboard/event-details", element: <EventDetails /> },
         {path: "dashboard/testimonials", element: <TestimonialsPage /> },
-        {path: "dashboard/about", element: <AboutPage /> },
-        {path: "dashboard/hero", element: <HeroPage /> },
+        {path: "dashboard/hero", element: <PageContentManagement /> },
         {path: "dashboard/centers", element: <CentersPage /> },
-        {path: "dashboard/aitags", element: <AiTagsPage /> },
         {path: "dashboard/footer", element: <FooterPage /> },
         {path: "dashboard/content-controller", element: <ContentController /> },
         
@@ -146,10 +140,10 @@ export const router = createBrowserRouter (
         {path: "eCommerce/add-product", element: <AddProduct /> },
         {path: "eCommerce/categories", element: <CategoryList /> },
         {path: "eCommerce/order-list", element: <OrderList /> },
-        {path: "eCommerce/order-details", element: <OrderDetails /> },
+        {path: "eCommerce/order-details/:id", element: <OrderDetails /> },
         {path: "eCommerce/customer-list", element: <CustomerList /> },
         {path: "eCommerce/customer-details/:id", element: <CustomerDetails /> },
-        {path: "eCommerce/invoice", element: <InvoicePage /> },
+        {path: "eCommerce/invoice/:id", element: <InvoicePage /> },
 
         // application routes
         {path: "app/chatbox", element: <ChatBox /> },

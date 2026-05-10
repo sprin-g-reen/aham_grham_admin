@@ -1,5 +1,5 @@
 import { useMemo, useState, ReactNode } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import {
   Eye,
   CheckCircle,
@@ -253,6 +253,7 @@ export default function OrderList() {
                 <TableHead>Total</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Invoice</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -268,7 +269,12 @@ export default function OrderList() {
                   </TableCell>
 
                   <TableCell className="font-medium">
-                    {order.orderNumber}
+                    <Link 
+                      to={`/eCommerce/order-details/${order.orderNumber}`}
+                      className="text-primary hover:underline"
+                    >
+                      {order.orderNumber}
+                    </Link>
                   </TableCell>
 
                   <TableCell>
@@ -293,6 +299,18 @@ export default function OrderList() {
                     </Badge>
                   </TableCell>
 
+                  <TableCell>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="gap-2 border-primary/20 hover:bg-primary/10 h-8 px-3"
+                      onClick={() => navigate(`/eCommerce/invoice/${order.orderNumber}`)}
+                    >
+                      <FileText size={14} className="text-primary" />
+                      <span className="text-xs font-medium">Invoice</span>
+                    </Button>
+                  </TableCell>
+
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -308,10 +326,10 @@ export default function OrderList() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
                           onClick={() => {
-                            console.log("View order", order.id)
+                            navigate(`/eCommerce/order-details/${order.orderNumber}`)
                           }}
                         >
-                          <UserIcon className="mr-2 h-4 w-4" />
+                          <Eye className="mr-2 h-4 w-4" />
                           View
                         </DropdownMenuItem>
 
@@ -322,15 +340,6 @@ export default function OrderList() {
                         >
                           <SettingsIcon className="mr-2 h-4 w-4" />
                           Edit
-                        </DropdownMenuItem>
-
-                        <DropdownMenuItem
-                          onClick={() => {
-                            navigate("/ecommerce/invoice")
-                          }}
-                        >
-                          <FileText className="mr-2 h-4 w-4" />
-                          Invoice
                         </DropdownMenuItem>
 
                         <DropdownMenuSeparator />
