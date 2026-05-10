@@ -146,7 +146,7 @@ const PageContentManagement = () => {
               <SelectItem value="services">Services Page</SelectItem>
               <SelectItem value="events">Events Page</SelectItem>
               <SelectItem value="centers">Centers Page</SelectItem>
-              <SelectItem value="sacred-moon-oil">Shop (Sacred Moon Oil)</SelectItem>
+              <SelectItem value="sacred-moon-oil">Shop</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -265,19 +265,19 @@ const PageContentManagement = () => {
                 <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><Heart className="w-5 h-5 text-primary" /><div><CardTitle>Experience of Yoga Section</CardTitle><CardDescription>The dual-column section explaining your core practices.</CardDescription></div></CardHeader>
                 <CardContent className="space-y-8 pt-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-b pb-6">
-                    <div className="space-y-2"><Label className="text-sm font-bold">Section Main Title</Label><Input value={heroData.sections?.experience?.title} onChange={(e) => updateSection('experience.title', e.target.value)} /></div>
-                    <div className="space-y-2"><Label className="text-sm font-bold">Section Sub-description</Label><Textarea value={heroData.sections?.experience?.description} onChange={(e) => updateSection('experience.description', e.target.value)} /></div>
+                    <div className="space-y-2"><Label className="text-sm font-bold">Section Main Title</Label><Input value={heroData.sections?.experience?.title || ''} onChange={(e) => updateSection('experience.title', e.target.value)} /></div>
+                    <div className="space-y-2"><Label className="text-sm font-bold">Section Sub-description</Label><Textarea value={heroData.sections?.experience?.description || ''} onChange={(e) => updateSection('experience.description', e.target.value)} /></div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-4 p-5 border rounded-2xl bg-muted/20">
                       <h3 className="font-bold text-primary flex items-center gap-2 tracking-widest uppercase text-xs">Left: Yoga Column</h3>
-                      <div className="space-y-2"><Label className="text-xs font-bold">Title</Label><Input value={heroData.sections?.experience?.yoga?.title} onChange={(e) => updateSection('experience.yoga.title', e.target.value)} /></div>
-                      <div className="space-y-2"><Label className="text-xs font-bold">Description</Label><Textarea value={heroData.sections?.experience?.yoga?.description} onChange={(e) => updateSection('experience.yoga.description', e.target.value)} /></div>
+                      <div className="space-y-2"><Label className="text-xs font-bold">Title</Label><Input value={heroData.sections?.experience?.yoga?.title || ''} onChange={(e) => updateSection('experience.yoga.title', e.target.value)} /></div>
+                      <div className="space-y-2"><Label className="text-xs font-bold">Description</Label><Textarea value={heroData.sections?.experience?.yoga?.description || ''} onChange={(e) => updateSection('experience.yoga.description', e.target.value)} /></div>
                     </div>
                     <div className="space-y-4 p-5 border rounded-2xl bg-muted/20">
                       <h3 className="font-bold text-primary flex items-center gap-2 tracking-widest uppercase text-xs">Right: Meditation Column</h3>
-                      <div className="space-y-2"><Label className="text-xs font-bold">Title</Label><Input value={heroData.sections?.experience?.meditation?.title} onChange={(e) => updateSection('experience.meditation.title', e.target.value)} /></div>
-                      <div className="space-y-2"><Label className="text-xs font-bold">Description</Label><Textarea value={heroData.sections?.experience?.meditation?.description} onChange={(e) => updateSection('experience.meditation.description', e.target.value)} /></div>
+                      <div className="space-y-2"><Label className="text-xs font-bold">Title</Label><Input value={heroData.sections?.experience?.meditation?.title || ''} onChange={(e) => updateSection('experience.meditation.title', e.target.value)} /></div>
+                      <div className="space-y-2"><Label className="text-xs font-bold">Description</Label><Textarea value={heroData.sections?.experience?.meditation?.description || ''} onChange={(e) => updateSection('experience.meditation.description', e.target.value)} /></div>
                     </div>
                   </div>
                 </CardContent>
@@ -286,21 +286,21 @@ const PageContentManagement = () => {
                 <Card className="border-primary/20 shadow-md">
                   <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><List className="w-5 h-5 text-primary" /><CardTitle>Programs Section Header</CardTitle></CardHeader>
                   <CardContent className="space-y-4 pt-6">
-                    <div className="space-y-2"><Label className="text-sm font-bold">Title</Label><Input value={heroData.sections?.programs?.title} onChange={(e) => updateSection('programs.title', e.target.value)} /></div>
-                    <div className="space-y-2"><Label className="text-sm font-bold">Subtitle</Label><Textarea value={heroData.sections?.programs?.description} onChange={(e) => updateSection('programs.description', e.target.value)} /></div>
+                    <div className="space-y-2"><Label className="text-sm font-bold">Title</Label><Input value={heroData.sections?.programs?.title || ''} onChange={(e) => updateSection('programs.title', e.target.value)} /></div>
+                    <div className="space-y-2"><Label className="text-sm font-bold">Subtitle</Label><Textarea value={heroData.sections?.programs?.description || ''} onChange={(e) => updateSection('programs.description', e.target.value)} /></div>
                   </CardContent>
                 </Card>
                 <Card className="border-primary/20 shadow-md">
                   <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><Zap className="w-5 h-5 text-primary" /><CardTitle>Blog Section Header</CardTitle></CardHeader>
                   <CardContent className="space-y-4 pt-6">
-                    <div className="space-y-2"><Label className="text-sm font-bold">Title</Label><Input value={heroData.sections?.blog?.title} onChange={(e) => updateSection('blog.title', e.target.value)} /></div>
-                    <div className="space-y-2"><Label className="text-sm font-bold">Subtitle</Label><Textarea value={heroData.sections?.blog?.description} onChange={(e) => updateSection('blog.description', e.target.value)} /></div>
+                    <div className="space-y-2"><Label className="text-sm font-bold">Title</Label><Input value={heroData.sections?.blog?.title || ''} onChange={(e) => updateSection('blog.title', e.target.value)} /></div>
+                    <div className="space-y-2"><Label className="text-sm font-bold">Subtitle</Label><Textarea value={heroData.sections?.blog?.description || ''} onChange={(e) => updateSection('blog.description', e.target.value)} /></div>
                   </CardContent>
                 </Card>
               </div>
               <Card className="border-primary/20 shadow-md">
                 <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><Zap className="w-5 h-5 text-primary" /><div><CardTitle>Home Bottom CTA (Healing Path)</CardTitle></div></CardHeader>
-                <CardContent className="space-y-4 pt-6"><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><div className="space-y-2"><Label className="text-sm font-bold">CTA Title</Label><Input value={heroData.sections?.cta?.title} onChange={(e) => updateSection('cta.title', e.target.value)} /></div><div className="space-y-2"><Label className="text-sm font-bold">CTA Description</Label><Textarea value={heroData.sections?.cta?.description} onChange={(e) => updateSection('cta.description', e.target.value)} className="min-h-[100px]" /></div></div></CardContent>
+                <CardContent className="space-y-4 pt-6"><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><div className="space-y-2"><Label className="text-sm font-bold">CTA Title</Label><Input value={heroData.sections?.cta?.title || ''} onChange={(e) => updateSection('cta.title', e.target.value)} /></div><div className="space-y-2"><Label className="text-sm font-bold">CTA Description</Label><Textarea value={heroData.sections?.cta?.description || ''} onChange={(e) => updateSection('cta.description', e.target.value)} className="min-h-[100px]" /></div></div></CardContent>
               </Card>
             </>
           )}
@@ -311,14 +311,14 @@ const PageContentManagement = () => {
               <Card className="border-primary/20 shadow-md">
                 <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><List className="w-5 h-5 text-primary" /><CardTitle>Programs Section Text</CardTitle></CardHeader>
                 <CardContent className="space-y-4 pt-6">
-                  <div className="space-y-2"><Label className="text-sm font-bold">Section Header</Label><Input value={heroData.sections?.programs?.title} onChange={(e) => updateSection('programs.title', e.target.value)} /></div>
-                  <div className="space-y-2"><Label className="text-sm font-bold">Section Subtitle</Label><Textarea value={heroData.sections?.programs?.description} onChange={(e) => updateSection('programs.description', e.target.value)} /></div>
+                  <div className="space-y-2"><Label className="text-sm font-bold">Section Header</Label><Input value={heroData.sections?.programs?.title || ''} onChange={(e) => updateSection('programs.title', e.target.value)} /></div>
+                  <div className="space-y-2"><Label className="text-sm font-bold">Section Subtitle</Label><Textarea value={heroData.sections?.programs?.description || ''} onChange={(e) => updateSection('programs.description', e.target.value)} /></div>
                 </CardContent>
               </Card>
               <Card className="border-primary/20 shadow-md">
                 <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><ShoppingBag className="w-5 h-5 text-primary" /><CardTitle>Products Section Text</CardTitle></CardHeader>
                 <CardContent className="space-y-4 pt-6">
-                  <div className="space-y-2"><Label className="text-sm font-bold">Section Header</Label><Input value={heroData.sections?.products?.title} onChange={(e) => updateSection('products.title', e.target.value)} /></div>
+                  <div className="space-y-2"><Label className="text-sm font-bold">Section Header</Label><Input value={heroData.sections?.products?.title || ''} onChange={(e) => updateSection('products.title', e.target.value)} /></div>
                 </CardContent>
               </Card>
             </div>
@@ -331,15 +331,15 @@ const PageContentManagement = () => {
                 <Card className="border-primary/20 shadow-md">
                   <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><Calendar className="w-5 h-5 text-primary" /><CardTitle>Main Events Section</CardTitle></CardHeader>
                   <CardContent className="space-y-4 pt-6">
-                    <div className="space-y-2"><Label className="text-sm font-bold">Header</Label><Input value={heroData.sections?.mainEvents?.title} onChange={(e) => updateSection('mainEvents.title', e.target.value)} /></div>
-                    <div className="space-y-2"><Label className="text-sm font-bold">Description</Label><Textarea value={heroData.sections?.mainEvents?.description} onChange={(e) => updateSection('mainEvents.description', e.target.value)} /></div>
+                    <div className="space-y-2"><Label className="text-sm font-bold">Header</Label><Input value={heroData.sections?.mainEvents?.title || ''} onChange={(e) => updateSection('mainEvents.title', e.target.value)} /></div>
+                    <div className="space-y-2"><Label className="text-sm font-bold">Description</Label><Textarea value={heroData.sections?.mainEvents?.description || ''} onChange={(e) => updateSection('mainEvents.description', e.target.value)} /></div>
                   </CardContent>
                 </Card>
                 <Card className="border-primary/20 shadow-md">
                   <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><Info className="w-5 h-5 text-primary" /><CardTitle>Highlights Section</CardTitle></CardHeader>
                   <CardContent className="space-y-4 pt-6">
-                    <div className="space-y-2"><Label className="text-sm font-bold">Header</Label><Input value={heroData.sections?.highlights?.title} onChange={(e) => updateSection('highlights.title', e.target.value)} /></div>
-                    <div className="space-y-2"><Label className="text-sm font-bold">Description</Label><Textarea value={heroData.sections?.highlights?.description} onChange={(e) => updateSection('highlights.description', e.target.value)} /></div>
+                    <div className="space-y-2"><Label className="text-sm font-bold">Header</Label><Input value={heroData.sections?.highlights?.title || ''} onChange={(e) => updateSection('highlights.title', e.target.value)} /></div>
+                    <div className="space-y-2"><Label className="text-sm font-bold">Description</Label><Textarea value={heroData.sections?.highlights?.description || ''} onChange={(e) => updateSection('highlights.description', e.target.value)} /></div>
                   </CardContent>
                 </Card>
               </div>
@@ -347,15 +347,15 @@ const PageContentManagement = () => {
                 <Card className="border-primary/20 shadow-md">
                   <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><Zap className="w-5 h-5 text-primary" /><CardTitle>Workshop Section</CardTitle></CardHeader>
                   <CardContent className="space-y-4 pt-6">
-                    <div className="space-y-2"><Label className="text-sm font-bold">Header</Label><Input value={heroData.sections?.workshop?.title} onChange={(e) => updateSection('workshop.title', e.target.value)} /></div>
-                    <div className="space-y-2"><Label className="text-sm font-bold">Description</Label><Textarea value={heroData.sections?.workshop?.description} onChange={(e) => updateSection('workshop.description', e.target.value)} /></div>
+                    <div className="space-y-2"><Label className="text-sm font-bold">Header</Label><Input value={heroData.sections?.workshop?.title || ''} onChange={(e) => updateSection('workshop.title', e.target.value)} /></div>
+                    <div className="space-y-2"><Label className="text-sm font-bold">Description</Label><Textarea value={heroData.sections?.workshop?.description || ''} onChange={(e) => updateSection('workshop.description', e.target.value)} /></div>
                   </CardContent>
                 </Card>
                 <Card className="border-primary/20 shadow-md">
                   <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><Zap className="w-5 h-5 text-primary" /><CardTitle>Upcoming Events Section</CardTitle></CardHeader>
                   <CardContent className="space-y-4 pt-6">
-                    <div className="space-y-2"><Label className="text-sm font-bold">Header</Label><Input value={heroData.sections?.upcoming?.title} onChange={(e) => updateSection('upcoming.title', e.target.value)} /></div>
-                    <div className="space-y-2"><Label className="text-sm font-bold">Description</Label><Textarea value={heroData.sections?.upcoming?.description} onChange={(e) => updateSection('upcoming.description', e.target.value)} /></div>
+                    <div className="space-y-2"><Label className="text-sm font-bold">Header</Label><Input value={heroData.sections?.upcoming?.title || ''} onChange={(e) => updateSection('upcoming.title', e.target.value)} /></div>
+                    <div className="space-y-2"><Label className="text-sm font-bold">Description</Label><Textarea value={heroData.sections?.upcoming?.description || ''} onChange={(e) => updateSection('upcoming.description', e.target.value)} /></div>
                   </CardContent>
                 </Card>
               </div>
@@ -369,21 +369,21 @@ const PageContentManagement = () => {
                 <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><MapPin className="w-5 h-5 text-primary" /><CardTitle>Centers List Content</CardTitle></CardHeader>
                 <CardContent className="space-y-6 pt-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2"><Label className="text-sm font-bold">Section Header</Label><Input value={heroData.sections?.mainCenters?.title} onChange={(e) => updateSection('mainCenters.title', e.target.value)} /></div>
-                    <div className="space-y-2"><Label className="text-sm font-bold">Section Description</Label><Textarea value={heroData.sections?.mainCenters?.description} onChange={(e) => updateSection('mainCenters.description', e.target.value)} /></div>
+                    <div className="space-y-2"><Label className="text-sm font-bold">Section Header</Label><Input value={heroData.sections?.mainCenters?.title || ''} onChange={(e) => updateSection('mainCenters.title', e.target.value)} /></div>
+                    <div className="space-y-2"><Label className="text-sm font-bold">Section Description</Label><Textarea value={heroData.sections?.mainCenters?.description || ''} onChange={(e) => updateSection('mainCenters.description', e.target.value)} /></div>
                   </div>
                 </CardContent>
               </Card>
               <Card className="border-primary/20 shadow-md">
                 <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><Activity className="w-5 h-5 text-primary" /><CardTitle>Live Stats (Numbers only)</CardTitle></CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6">
-                   <div className="space-y-2 p-4 border rounded-xl bg-muted/10 text-center"><Label className="text-xs font-bold uppercase text-primary">Active Portals</Label><Input className="text-center text-xl font-bold" value={heroData.sections?.stats?.active || '12'} onChange={(e) => updateSection('stats.active', e.target.value)} /></div>
-                   <div className="space-y-2 p-4 border rounded-xl bg-muted/10 text-center"><Label className="text-xs font-bold uppercase text-primary">Opening Soon</Label><Input className="text-center text-xl font-bold" value={heroData.sections?.stats?.soon || '4'} onChange={(e) => updateSection('stats.soon', e.target.value)} /></div>
+                   <div className="space-y-2 p-4 border rounded-xl bg-muted/10 text-center"><Label className="text-xs font-bold uppercase text-primary">Active Portals</Label><Input className="text-center text-xl font-bold" value={heroData.sections?.stats?.active || ''} onChange={(e) => updateSection('stats.active', e.target.value)} /></div>
+                   <div className="space-y-2 p-4 border rounded-xl bg-muted/10 text-center"><Label className="text-xs font-bold uppercase text-primary">Opening Soon</Label><Input className="text-center text-xl font-bold" value={heroData.sections?.stats?.soon || ''} onChange={(e) => updateSection('stats.soon', e.target.value)} /></div>
                 </CardContent>
               </Card>
               <Card className="border-primary/20 shadow-md">
                 <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><Zap className="w-5 h-5 text-primary" /><div><CardTitle>Centers Bottom CTA</CardTitle></div></CardHeader>
-                <CardContent className="space-y-4 pt-6"><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><div className="space-y-2"><Label className="text-sm font-bold">CTA Title</Label><Input value={heroData.sections?.cta?.title} onChange={(e) => updateSection('cta.title', e.target.value)} /></div><div className="space-y-2"><Label className="text-sm font-bold">CTA Subtitle</Label><Textarea value={heroData.sections?.cta?.description} onChange={(e) => updateSection('cta.description', e.target.value)} className="min-h-[80px]" /></div></div></CardContent>
+                <CardContent className="space-y-4 pt-6"><div className="grid grid-cols-1 md:grid-cols-2 gap-6"><div className="space-y-2"><Label className="text-sm font-bold">CTA Title</Label><Input value={heroData.sections?.cta?.title || ''} onChange={(e) => updateSection('cta.title', e.target.value)} /></div><div className="space-y-2"><Label className="text-sm font-bold">CTA Subtitle</Label><Textarea value={heroData.sections?.cta?.description || ''} onChange={(e) => updateSection('cta.description', e.target.value)} className="min-h-[80px]" /></div></div></CardContent>
               </Card>
             </div>
           )}
