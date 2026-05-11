@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 import axios from 'axios';
+import { API_URL } from '../config';
 
 interface User {
   _id: string;
@@ -40,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (user) {
         // We use a specific timeout or await to ensure the log is sent before the page reloads
-        await axios.post('https://aham-grham-website.vercel.app/api/admins/logout', { name: user.name });
+        await axios.post(`${API_URL}/admins/logout`, { name: user.name });
       }
     } catch (error) {
       console.error('Error logging out:', error);

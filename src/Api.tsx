@@ -1,12 +1,13 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import axios from "axios";
+import { API_URL } from "./config";
 
 function Api() {
 
   useEffect(() => {
-    axios.get("https://aham-grham-website.vercel.app/api/products")
-      .then(res => console.log(res.data))
-      .catch(err => console.log(err));
+    axios.get(`${API_URL}/products`)
+      .then((res: any) => console.log(res.data))
+      .catch((err: any) => console.log(err));
   }, []);
 
   return <h1>Check console</h1>;
