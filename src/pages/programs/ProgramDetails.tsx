@@ -3,6 +3,7 @@ import axios from 'axios'
 import { toast } from 'sonner'
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { compressImage, fileToBase64 } from "../../lib/image-utils"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -14,6 +15,7 @@ import {
   Plus
 } from 'lucide-react'
 import { ConfirmDialog } from "@/components/ConfirmDialog"
+import { API_URL, SITE_ORIGIN, UPLOADS_URL } from "@/config"
 
 import { 
   Dialog as ShadcnDialog, 
@@ -65,7 +67,7 @@ const ProgramDetails = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('https://aham-grham-website.vercel.app/api/programs')
+      const response = await axios.get(`${API_URL}/programs`)
       setPrograms(response.data)
     } catch (error) {
       toast.error("Failed to fetch programs")
@@ -81,7 +83,7 @@ const ProgramDetails = () => {
   const handleDelete = async () => {
     if (!deleteConfirmId) return
     try {
-      await axios.delete(`https://aham-grham-website.vercel.app/api/programs/${deleteConfirmId}`)
+      await axios.delete(`${API_URL}/programs/${deleteConfirmId}`)
       toast.success("Program deleted")
       setDeleteConfirmId(null)
       fetchData()
@@ -110,16 +112,19 @@ const ProgramDetails = () => {
 
     setIsUpdateLoading(true)
     try {
-      const formData = new FormData()
-      formData.append('name', editForm.name)
-      formData.append('programId', editForm.programId)
-      formData.append('bookingPrice', editForm.bookingPrice)
-      formData.append('description', editForm.description)
-      if (editFile) {
-        formData.append('image', editFile)
+      const payload: any = {
+        name: editForm.name,
+        programId: editForm.programId,
+        bookingPrice: editForm.bookingPrice,
+        description: editForm.description
       }
 
-      await axios.put(`https://aham-grham-website.vercel.app/api/programs/${editingProgram._id}`, formData)
+      if (editFile) {
+        const compressed = await compressImage(editFile);
+        payload.image = await fileToBase64(compressed);
+      }
+
+      await axios.put(`${API_URL}/programs/${editingProgram._id}`, payload)
       toast.success("Program updated successfully")
       setEditingProgram(null)
       fetchData()
@@ -139,16 +144,16 @@ const ProgramDetails = () => {
 
     setIsAddLoading(true)
     try {
-      const formData = new FormData()
-      formData.append('name', addForm.name)
-      formData.append('programId', addForm.programId)
-      formData.append('bookingPrice', addForm.bookingPrice)
-      formData.append('description', addForm.description)
-      if (addFile) {
-        formData.append('image', addFile)
+      const payload: any = {
+        ...addForm
       }
 
-      await axios.post('https://aham-grham-website.vercel.app/api/programs', formData)
+      if (addFile) {
+        const compressed = await compressImage(addFile);
+        payload.image = await fileToBase64(compressed);
+      }
+
+      await axios.post(`${API_URL}/programs`, payload)
       toast.success("Program added successfully")
       setAddForm({ name: '', programId: '', bookingPrice: '', description: '' })
       setAddFile(null)
@@ -206,7 +211,7 @@ const ProgramDetails = () => {
               <div className="flex items-center gap-6 p-6">
                 <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
                   <img 
-                    src={prog.image ? `https://aham-grham-website.vercel.app${prog.image}` : 'https://placehold.co/80x80/2c2c3a/white?text=No+Img'} 
+                    src={prog.image ? `${SITE_ORIGIN}${prog.image}` : 'https://placehold.co/80x80/2c2c3a/white?text=No+Img'} 
                     alt={prog.name} 
                     className="w-full h-full object-cover"
                   />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { Bell, History, PlusCircle, Edit, Trash2, FileUp, LogIn, LogOut } from "lucide-react"
 import axios from "axios"
+import { API_URL } from "@/config"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -30,7 +31,7 @@ export function NotificationDropdown() {
 
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get('https://aham-grham-website.vercel.app/api/activities')
+      const response = await axios.get(`${API_URL}/activities`)
       // Map and sort (assuming API already sorts by newest first)
       const data = response.data.map((n: any) => ({
         ...n,

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { API_URL } from "@/config";
 
 const ActivityPage = () => {
   const [activities, setActivities] = useState([]);
@@ -24,7 +25,7 @@ const ActivityPage = () => {
 
   const fetchActivities = async () => {
     try {
-      const response = await axios.get('https://aham-grham-website.vercel.app/api/activities');
+      const response = await axios.get(`${API_URL}/activities`);
       setActivities(response.data);
     } catch (error) {
       toast.error("Failed to fetch activity logs");
@@ -39,7 +40,7 @@ const ActivityPage = () => {
 
   const handleClearLogs = async () => {
     try {
-      await axios.delete('https://aham-grham-website.vercel.app/api/activities');
+      await axios.delete(`${API_URL}/activities`);
       toast.success("Activity logs cleared");
       setIsConfirmOpen(false);
       fetchActivities();

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import { API_URL, SITE_ORIGIN } from "@/config"
 import { toast } from 'sonner'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -52,7 +53,7 @@ const CentersPage = () => {
 
   const fetchCenters = async () => {
     try {
-      const { data } = await axios.get('https://aham-grham-website.vercel.app/api/centers')
+      const { data } = await axios.get(`${API_URL}/centers`)
       setCenters(data)
     } catch (error) {
       toast.error("Failed to fetch centers")
@@ -125,11 +126,11 @@ const CentersPage = () => {
       }
 
       if (isUpdateOpen && selectedId) {
-        await axios.put(`https://aham-grham-website.vercel.app/api/centers/${selectedId}`, payload)
+        await axios.put(`${API_URL}/centers/${selectedId}`, payload)
         toast.success("Center updated successfully")
         setIsUpdateOpen(false)
       } else {
-        await axios.post('https://aham-grham-website.vercel.app/api/centers', payload)
+        await axios.post(`${API_URL}/centers`, payload)
         toast.success("Center added successfully")
         setIsAddOpen(false)
       }
@@ -157,7 +158,7 @@ const CentersPage = () => {
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this center?")) return
     try {
-      await axios.delete(`https://aham-grham-website.vercel.app/api/centers/${id}`)
+      await axios.delete(`${API_URL}/centers/${id}`)
       toast.success("Center deleted")
       fetchCenters()
     } catch (error) {
@@ -207,7 +208,7 @@ const CentersPage = () => {
             <Card key={center._id} className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300">
               <div className="aspect-video relative overflow-hidden">
                 <img 
-                  src={center.image ? (center.image.startsWith('http') || center.image.startsWith('data:') ? center.image : `https://aham-grham-website.vercel.app${center.image}`) : '/placeholder-center.jpg'} 
+                  src={center.image ? (center.image.startsWith('http') || center.image.startsWith('data:') ? center.image : `${SITE_ORIGIN}${center.image}`) : '/placeholder-center.jpg'} 
                   alt={center.name}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1545208393-2160291ba86e?q=80&w=1000&auto=format&fit=crop' }}

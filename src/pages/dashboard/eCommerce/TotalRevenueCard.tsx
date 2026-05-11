@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Bar, BarChart, XAxis } from "recharts"
-import axios from "axios"
+import axios from 'axios'
+import { API_URL } from "@/config"
 import {
   ChartContainer,
   type ChartConfig,
@@ -23,7 +24,7 @@ export default function TotalRevenueCard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get('https://aham-grham-website.vercel.app/api/analytics/stats')
+        const response = await axios.get(`${API_URL}/analytics/stats`)
         setData({
           totalViews: response.data.totalViews,
           chartData: response.data.chartData || [] // We can use the same daily stats for simplicity

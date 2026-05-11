@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import axios from 'axios'
+import { API_URL } from "@/config"
 import { toast } from 'sonner'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -52,7 +53,7 @@ const EventsPage = () => {
         }
       }
 
-      await axios.post('https://aham-grham-website.vercel.app/api/events', formData)
+      await axios.post(`${API_URL}/events`, formData)
       toast.success("Event added successfully")
       setForm({ name: '', eventId: '', bookingPrice: '', description: '', about: '', category: '', isBlog: false })
       setSelectedFile(null)

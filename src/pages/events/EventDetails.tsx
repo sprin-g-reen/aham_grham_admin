@@ -15,6 +15,10 @@ import {
   Play
 } from 'lucide-react'
 import { ConfirmDialog } from "@/components/ConfirmDialog"
+import { API_URL, SITE_ORIGIN, UPLOADS_URL, BACKEND_URL } from "@/config"
+import { compressImage, fileToBase64 } from "../../lib/image-utils"
+// Note: I will check if image-utils exists, otherwise I'll add them inline.
+
 
 import { 
   Dialog as ShadcnDialog, 
@@ -24,48 +28,8 @@ import {
   DialogFooter as ShadcnFooter 
 } from "@/components/ui/dialog"
 
-const compressImage = (file: File, maxWidth = 1280, quality = 0.7): Promise<File> => {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target?.result as string;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
 
-        if (width > maxWidth) {
-          height = (maxWidth / width) * height;
-          width = maxWidth;
-        }
 
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx?.drawImage(img, 0, 0, width, height);
-
-        canvas.toBlob((blob) => {
-          if (blob) {
-            resolve(new File([blob], file.name, { type: 'image/jpeg' }));
-          } else {
-            resolve(file);
-          }
-        }, 'image/jpeg', quality);
-      };
-    };
-  });
-};
-
-const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = error => reject(error);
-  });
-};
 
 interface AhamEvent {
   _id: string;
@@ -118,7 +82,7 @@ const EventDetails = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('https://aham-grham-website.vercel.app/api/events')
+      const response = await axios.get(`${API_URL}/events`)
       setEvents(response.data)
     } catch (error) {
       toast.error("Failed to fetch events")
@@ -134,7 +98,7 @@ const EventDetails = () => {
   const handleDelete = async () => {
     if (!deleteConfirmId) return
     try {
-      await axios.delete(`https://aham-grham-website.vercel.app/api/events/${deleteConfirmId}`)
+      await axios.delete(`${API_URL}/events/${deleteConfirmId}`)
       toast.success("Event deleted")
       setDeleteConfirmId(null)
       fetchData()
@@ -166,24 +130,24 @@ const EventDetails = () => {
 
     setIsUpdateLoading(true)
     try {
-      let imageBase64 = '';
-      if (editFile) {
-        const compressed = await compressImage(editFile);
-        imageBase64 = await fileToBase64(compressed);
-      }
-
-      const payload = {
+      const payload: any = {
         name: editForm.name,
         eventId: editForm.eventId,
         bookingPrice: editForm.bookingPrice,
         description: editForm.description,
         about: editForm.about,
         category: editForm.category,
-        isBlog: editingEvent.isBlog,
-        image: imageBase64 || editingEvent.image
+        isBlog: editingEvent.isBlog
       };
 
-      await axios.put(`https://aham-grham-website.vercel.app/api/events/${editingEvent._id}`, payload)
+      if (editFile) {
+        const compressed = await compressImage(editFile);
+        payload.image = await fileToBase64(compressed);
+      } else {
+        payload.image = editingEvent.image;
+      }
+
+      await axios.put(`${API_URL}/events/${editingEvent._id}`, payload)
       toast.success("Event updated successfully")
       setEditingEvent(null)
       fetchData()
@@ -204,24 +168,16 @@ const EventDetails = () => {
 
     setIsAddLoading(true)
     try {
-      let imageBase64 = '';
-      if (addFile) {
-        const compressed = await compressImage(addFile);
-        imageBase64 = await fileToBase64(compressed);
-      }
-
-      const payload = {
-        name: addForm.name,
-        eventId: addForm.eventId,
-        bookingPrice: addForm.bookingPrice,
-        description: addForm.description,
-        about: addForm.about,
-        category: addForm.category,
-        isBlog: addForm.isBlog,
-        image: imageBase64
+      const payload: any = {
+        ...addForm
       };
 
-      await axios.post('https://aham-grham-website.vercel.app/api/events', payload)
+      if (addFile) {
+        const compressed = await compressImage(addFile);
+        payload.image = await fileToBase64(compressed);
+      }
+
+      await axios.post(`${API_URL}/events`, payload)
       toast.success("Event added successfully")
       setAddForm({ name: '', eventId: '', bookingPrice: '', description: '', about: '', category: '', isBlog: false })
       setAddFile(null)
@@ -279,7 +235,7 @@ const EventDetails = () => {
               <div className="flex items-center gap-6 p-6">
                 <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted relative group">
                     <img 
-                      src={ev.image ? (ev.image.startsWith('http') || ev.image.startsWith('data:') ? ev.image : `https://aham-grham-website.vercel.app${ev.image}`) : 'https://placehold.co/80x80/2c2c3a/white?text=No+Img'} 
+                      src={ev.image ? (ev.image.startsWith('http') || ev.image.startsWith('data:') ? ev.image : (ev.image.startsWith('/') ? `${BACKEND_URL}${ev.image}` : `${UPLOADS_URL}/${ev.image}`)) : 'https://placehold.co/80x80/2c2c3a/white?text=No+Img'} 
                       alt={ev.name} 
                       className="w-full h-full object-cover"
                     />
@@ -306,7 +262,7 @@ const EventDetails = () => {
                     className={`flex items-center gap-2 hover:bg-primary/5 hover:text-primary border-muted ${ev.isBlog ? 'bg-orange-50 text-orange-600 border-orange-200' : ''}`}
                     onClick={async () => {
                       try {
-                        await axios.patch(`https://aham-grham-website.vercel.app/api/events/${ev._id}/toggle-blog`)
+                        await axios.patch(`${API_URL}/events/${ev._id}/toggle-blog`)
                         toast.success(ev.isBlog ? "Removed from Blog" : "Added to Blog")
                         fetchData()
                       } catch (error) {

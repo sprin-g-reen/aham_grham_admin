@@ -3,6 +3,7 @@
 import * as React from "react"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 import axios from "axios"
+import { API_URL } from "@/config"
 
 import {
   Card,
@@ -54,7 +55,7 @@ export default function SalesAnalysisCard() {
   React.useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get('https://aham-grham-website.vercel.app/api/analytics/stats')
+        const response = await axios.get(`${API_URL}/analytics/stats`)
         const { chartData, totalVisitors, totalViews } = response.data
         
         // 1. Get all dates for the current month

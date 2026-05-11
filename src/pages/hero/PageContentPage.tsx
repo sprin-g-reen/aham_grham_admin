@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { toast } from 'sonner'
+import { API_URL, SITE_ORIGIN, UPLOADS_URL } from "@/config"
+import { compressImage, fileToBase64 } from "../../lib/image-utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -25,6 +27,46 @@ const PageContentManagement = () => {
   const [aboutData, setAboutData] = useState<any>(null)
   const [aboutCtaImage, setAboutCtaImage] = useState<File | null>(null)
 
+  const compressImage = (file: File, maxWidth = 1280, quality = 0.7): Promise<File> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          if (width > maxWidth) {
+            height = (maxWidth / width) * height;
+            width = maxWidth;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+            } else {
+              resolve(file);
+            }
+          }, 'image/jpeg', quality);
+        };
+      };
+    });
+  };
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
+
   useEffect(() => {
     if (selectedPage === 'about') {
       fetchAbout()
@@ -35,7 +77,7 @@ const PageContentManagement = () => {
 
   const fetchHero = async () => {
     try {
-      const response = await axios.get(`https://aham-grham-website.vercel.app/api/hero?page=${selectedPage}`)
+      const response = await axios.get(`${API_URL}/hero?page=${selectedPage}`)
       setHeroData(response.data)
     } catch (error) {
       toast.error(`Failed to fetch content for ${selectedPage}`)
@@ -45,7 +87,7 @@ const PageContentManagement = () => {
 
   const fetchAbout = async () => {
     try {
-      const response = await axios.get('https://aham-grham-website.vercel.app/api/about')
+      const response = await axios.get(`${API_URL}/about`)
       setAboutData(response.data)
     } catch (error) {
       toast.error("Failed to fetch About page content")
@@ -56,19 +98,21 @@ const PageContentManagement = () => {
     e.preventDefault()
     setLoading(true)
     try {
-      const formData = new FormData()
-      formData.append('page', selectedPage)
-      formData.append('kicker', heroData.kicker)
-      formData.append('title', heroData.title)
-      formData.append('subtitle', heroData.subtitle)
-      formData.append('buttonText', heroData.buttonText)
-      formData.append('sections', JSON.stringify(heroData.sections || {}))
+      const payload: any = {
+        page: selectedPage,
+        kicker: heroData.kicker,
+        title: heroData.title,
+        subtitle: heroData.subtitle,
+        buttonText: heroData.buttonText,
+        sections: heroData.sections || {}
+      }
       
       if (heroImage) {
-        formData.append('heroImage', heroImage)
+        const compressed = await compressImage(heroImage);
+        payload.heroImage = await fileToBase64(compressed);
       }
 
-      await axios.put('https://aham-grham-website.vercel.app/api/hero', formData)
+      await axios.put(`${API_URL}/hero`, payload)
       toast.success(`${selectedPage.toUpperCase()} content updated successfully`)
       fetchHero()
     } catch (error) {
@@ -82,23 +126,26 @@ const PageContentManagement = () => {
     e.preventDefault()
     setLoading(true)
     try {
-      const formData = new FormData()
-      formData.append('hero', JSON.stringify(aboutData.hero))
-      formData.append('halfSections', JSON.stringify(aboutData.halfSections))
-      formData.append('corePhilosophy', JSON.stringify(aboutData.corePhilosophy))
-      formData.append('lineageVoice', JSON.stringify(aboutData.lineageVoice))
-      formData.append('ancientLineage', JSON.stringify(aboutData.ancientLineage))
-      formData.append('faculties', JSON.stringify(aboutData.faculties))
-      formData.append('cta', JSON.stringify(aboutData.cta))
+      const payload: any = {
+        hero: aboutData.hero,
+        halfSections: aboutData.halfSections,
+        corePhilosophy: aboutData.corePhilosophy,
+        lineageVoice: aboutData.lineageVoice,
+        ancientLineage: aboutData.ancientLineage,
+        faculties: aboutData.faculties,
+        cta: aboutData.cta
+      }
       
       if (heroImage) {
-        formData.append('heroImage', heroImage)
+        const compressed = await compressImage(heroImage);
+        payload.heroImage = await fileToBase64(compressed);
       }
       if (aboutCtaImage) {
-        formData.append('ctaImage', aboutCtaImage)
+        const compressed = await compressImage(aboutCtaImage);
+        payload.ctaImage = await fileToBase64(compressed);
       }
 
-      await axios.put('https://aham-grham-website.vercel.app/api/about', formData)
+      await axios.put(`${API_URL}/about`, payload)
       toast.success("About page content updated successfully")
       fetchAbout()
     } catch (error) {

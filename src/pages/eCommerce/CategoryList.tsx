@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect } from "react"
 import axios from "axios"
+import { API_URL } from "@/config"
 import { toast } from "sonner"
 import {
   Card,
@@ -67,7 +68,7 @@ export default function CategoryList() {
 
   const fetchCategories = async () => {
     try {
-      const { data } = await axios.get('https://aham-grham-website.vercel.app/api/categories')
+      const { data } = await axios.get(`${API_URL}/categories`)
       setCategoryList(data)
     } catch (error) {
       toast.error("Failed to fetch categories")
@@ -113,7 +114,7 @@ export default function CategoryList() {
 
   const deleteCategory = async (id: string) => {
     try {
-      await axios.delete(`https://aham-grham-website.vercel.app/api/categories/${id}`)
+      await axios.delete(`${API_URL}/categories/${id}`)
       toast.success("Category deleted")
       fetchCategories()
     } catch (error) {
@@ -134,7 +135,7 @@ export default function CategoryList() {
   const handleDeleteSelected = async () => {
     try {
       for (const id of selected) {
-        await axios.delete(`https://aham-grham-website.vercel.app/api/categories/${id}`)
+        await axios.delete(`${API_URL}/categories/${id}`)
       }
       toast.success("Selected categories deleted")
       setSelected([])
@@ -167,10 +168,10 @@ export default function CategoryList() {
     setLoading(true)
     try {
       if (editId) {
-        await axios.put(`https://aham-grham-website.vercel.app/api/categories/${editId}`, form)
+        await axios.put(`${API_URL}/categories/${editId}`, form)
         toast.success("Category updated")
       } else {
-        await axios.post('https://aham-grham-website.vercel.app/api/categories', form)
+        await axios.post(`${API_URL}/categories`, form)
         toast.success("Category created")
       }
       setOpen(false)

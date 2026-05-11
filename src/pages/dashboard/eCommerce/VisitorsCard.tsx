@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Area, AreaChart, XAxis } from "recharts"
 import axios from "axios"
+import { API_URL } from "@/config"
 import {
   ChartContainer,
   type ChartConfig,
@@ -23,7 +24,7 @@ export default function VisitorsCard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get('https://aham-grham-website.vercel.app/api/analytics/stats')
+        const response = await axios.get(`${API_URL}/analytics/stats`)
         setData({
           totalVisitors: response.data.totalVisitors,
           chartData: response.data.chartData.length > 0 ? response.data.chartData : [

@@ -70,7 +70,7 @@ interface Product {
   stockStatus?: string
 }
 
-const UPLOADS_URL = 'https://aham-grham-website.vercel.app/uploads';
+// Use central UPLOADS_URL instead of local hardcoded one
 
 export default function ProductList() {
   const [search, setSearch] = useState("")
@@ -83,7 +83,7 @@ export default function ProductList() {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('https://aham-grham-website.vercel.app/api/products')
+      const response = await axios.get(`${API_URL}/products`)
       setOrdersData(response.data || [])
     } catch (error) {
       toast.error("Failed to fetch products")
@@ -99,7 +99,7 @@ export default function ProductList() {
 
   const deleteProduct = async (id: string) => {
     try {
-      await axios.delete(`https://aham-grham-website.vercel.app/api/products/${id}`)
+      await axios.delete(`${API_URL}/products/${id}`)
       toast.success("Product deleted")
       fetchProducts()
     } catch (error) {
@@ -109,7 +109,7 @@ export default function ProductList() {
 
   const toggleMostSelling = async (product: Product) => {
     try {
-      await axios.put(`https://aham-grham-website.vercel.app/api/products/${product._id}`, {
+      await axios.put(`${API_URL}/products/${product._id}`, {
         isMostSelling: !product.isMostSelling
       })
       toast.success(product.isMostSelling ? "Removed from Most Selling" : "Added to Most Selling")
@@ -121,7 +121,7 @@ export default function ProductList() {
 
   const toggleServicePage = async (product: Product) => {
     try {
-      await axios.put(`https://aham-grham-website.vercel.app/api/products/${product._id}`, {
+      await axios.put(`${API_URL}/products/${product._id}`, {
         isServicePage: !product.isServicePage
       })
       toast.success(product.isServicePage ? "Removed from Services" : "Added to Services")
