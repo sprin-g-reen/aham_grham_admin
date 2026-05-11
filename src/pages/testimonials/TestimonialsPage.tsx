@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
-import { Trash2, Plus, RefreshCw, UploadCloud, Search, Check, X, Edit, ExternalLink } from "lucide-react"
-import { API_URL } from "../../config"
+import { Trash2, Plus, RefreshCw, UploadCloud, Search, Check, X, Edit, ExternalLink, Download, FileUp, User } from "lucide-react"
+import { API_URL, SITE_ORIGIN } from "../../config"
 import {
   Dialog,
   DialogContent,
@@ -288,7 +288,7 @@ const TestimonialsPage = () => {
                   <div className="shrink-0">
                     {t.image ? (
                       <img
-                        src={t.image.startsWith('http') ? t.image : `https://aham-grham-website.vercel.app${t.image}`}
+                        src={t.image.startsWith('http') ? t.image : `${SITE_ORIGIN}${t.image}`}
                         alt={t.name}
                         className="w-16 h-16 rounded-full object-cover border-2 border-primary/10"
                       />
