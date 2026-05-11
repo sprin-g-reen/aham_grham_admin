@@ -1,8 +1,7 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { useState } from "react"
-
 import {
   Card,
   CardContent,
@@ -10,13 +9,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { useAuth } from "@/lib/AuthContext"
+import axios from "axios"
+import { toast } from "sonner"
+import { useNavigate, Link } from "react-router-dom"
 
 export function SignupForm({
   className,
@@ -24,48 +22,91 @@ export function SignupForm({
 }: React.ComponentProps<"div">) {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+
+  const { login } = useAuth()
+  const navigate = useNavigate()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match!")
+      return
+    }
+
+    setLoading(true)
+    try {
+      const { data } = await axios.post("http://localhost:5000/api/users", {
+        name,
+        email,
+        password,
+      })
+      
+      login(data)
+      toast.success("Account created successfully! Welcome to Aham Grham.")
+      navigate("/dashboard/overview")
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Registration failed. Please try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className={cn("flex flex-col gap-4", className)} {...props}>
-      <Card>
+      <Card className="border-border/50">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Create your account</CardTitle>
+          <CardTitle className="text-2xl font-bold tracking-tight">Create your account</CardTitle>
           <CardDescription>
-            Enter your email below to create your account
+            Join the Aham Grham administrative team
           </CardDescription>
         </CardHeader>
 
         <CardContent>
-          <form>
-            {/* ⬇ tighter spacing */}
-            <FieldGroup className="gap-4">
-              <Field>
-                <FieldLabel htmlFor="name">Full Name</FieldLabel>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Full Name</Label>
                 <Input
                   id="name"
                   type="text"
                   placeholder="John Doe"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   required
+                  disabled={loading}
                 />
-              </Field>
+              </div>
 
-              <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email Address</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="admin@ahamgrham.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={loading}
                 />
-              </Field>
+              </div>
 
-              <Field>
-                <FieldLabel htmlFor="password">Password</FieldLabel>
+              <div className="grid gap-2">
+                <Label htmlFor="password">Password</Label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
+                    disabled={loading}
                     className="pr-10"
                   />
                   <button
@@ -80,26 +121,23 @@ export function SignupForm({
                     )}
                   </button>
                 </div>
-              </Field>
+              </div>
 
-              <Field>
-                <FieldLabel htmlFor="confirm-password">
-                  Confirm Password
-                </FieldLabel>
+              <div className="grid gap-2">
+                <Label htmlFor="confirm-password">Confirm Password</Label>
                 <div className="relative">
                   <Input
                     id="confirm-password"
-                    type={
-                      showConfirmPassword ? "text" : "password"
-                    }
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     required
+                    disabled={loading}
                     className="pr-10"
                   />
                   <button
                     type="button"
-                    onClick={() =>
-                      setShowConfirmPassword(!showConfirmPassword)
-                    }
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
                     {showConfirmPassword ? (
@@ -109,36 +147,35 @@ export function SignupForm({
                     )}
                   </button>
                 </div>
+              </div>
 
-                <FieldDescription>
-                  Must be at least 8 characters long.
-                </FieldDescription>
-              </Field>
+              <Button type="submit" className="w-full mt-2" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating account...
+                  </>
+                ) : (
+                  "Create Account"
+                )}
+              </Button>
 
-              {/* ⬇ button like cover pages */}
-              <Field className="gap-2">
-                <Button type="submit" className="w-full">
-                  Create Account
-                </Button>
-
-                <FieldDescription className="text-center">
-                  Already have an account?{" "}
-                  <a href="#" className="underline underline-offset-4">
-                    Sign in
-                  </a>
-                </FieldDescription>
-              </Field>
-            </FieldGroup>
+              <div className="text-center text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <Link to="/login" className="font-semibold text-primary hover:underline underline-offset-4">
+                  Sign in
+                </Link>
+              </div>
+            </div>
           </form>
         </CardContent>
       </Card>
 
-      {/* ⬇ remove side padding */}
-      <FieldDescription className="text-center text-xs">
+      <div className="text-center text-xs text-muted-foreground">
         By clicking continue, you agree to our{" "}
-        <a href="#">Terms of Service</a> and{" "}
-        <a href="#">Privacy Policy</a>.
-      </FieldDescription>
+        <Link to="#" className="underline underline-offset-4">Terms of Service</Link> and{" "}
+        <Link to="#" className="underline underline-offset-4">Privacy Policy</Link>.
+      </div>
     </div>
   )
 }

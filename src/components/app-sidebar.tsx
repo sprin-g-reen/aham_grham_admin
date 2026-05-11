@@ -2,32 +2,25 @@
 
 import * as React from "react"
 import {
-  AudioWaveform,
-  BookOpen,
-  Tv,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Settings2,
-  Gauge,
-  ShoppingCart,
-  LayoutGrid,
-  File,
-  Grid2x2,
-  Landmark,
-  LockKeyhole,
-  CircleUserRound,
-  ChartNoAxesCombined,
-  TriangleAlert,
-  Code,
-  Droplet,
-  Library,
+  LayoutDashboard,
+  History,
+  GraduationCap,
   Calendar,
-  Eye,
-  MessageSquareQuote,
-  Sparkles
+  Quote,
+  FileText,
+  MapPin,
+  ShieldCheck,
+  Layout,
+  Package,
+  Tags,
+  ClipboardList,
+  Users,
+  UserCircle,
+  FileCode,
+  CreditCard,
+  GalleryVerticalEnd,
+  Settings2,
+  ShoppingBag
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -44,11 +37,6 @@ import {
 
 // This is sample data.
 const data = {
-  user: {
-    name: "Jhon Deo",
-    email: "m@example.com",
-    avatar: "https://github.com/evilrabbit.png",
-  },
   teams: [
     {
       name: "Aham Grham",
@@ -60,67 +48,75 @@ const data = {
     {
       title: "Overview",
       url: "dashboard/overview",
-      icon: Gauge,
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Activity",
+      url: "dashboard/activity",
+      icon: History,
     },
     {
       title: "Programs",
       url: "dashboard/program-details",
-      icon: Eye,
+      icon: GraduationCap,
     },
     {
       title: "Events",
       url: "dashboard/event-details",
-      icon: Eye,
+      icon: Calendar,
     },
     {
-      title: "Add Testimonials",
+      title: "Testimonials",
       url: "dashboard/testimonials",
-      icon: MessageSquareQuote,
+      icon: Quote,
     },
     {
       title: "Page Content",
       url: "dashboard/hero",
-      icon: Sparkles,
+      icon: FileText,
     },
     {
-      title: "Our Centers",
+      title: "Centers",
       url: "dashboard/centers",
-      icon: Landmark,
+      icon: MapPin,
     },
     {
       title: "Content Controller",
       url: "dashboard/content-controller",
-      icon: Settings2,
+      icon: ShieldCheck,
     },
     {
       title: "Footer Section",
       url: "dashboard/footer",
-      icon: LayoutGrid,
+      icon: Layout,
     },
     {
-      title: "Products",
-      url: "eCommerce/product-list",
-      icon: ShoppingCart,
-    },
-    {
-      title: "Categories",
-      url: "eCommerce/categories",
-      icon: ShoppingCart,
-    },
-    {
-      title: "Orders",
-      url: "eCommerce/order-list",
-      icon: ShoppingCart,
-    },
-    {
-      title: "Customers",
-      url: "eCommerce/customer-list",
-      icon: ShoppingCart,
+      title: "eCommerce",
+      url: "#",
+      icon: ShoppingBag,
+      items: [
+        {
+          title: "Products",
+          url: "eCommerce/product-list",
+        },
+        {
+          title: "Categories",
+          url: "eCommerce/categories",
+        },
+        {
+          title: "Orders",
+          url: "eCommerce/order-list",
+        },
+        {
+          title: "Customers",
+          url: "eCommerce/customer-list",
+        },
+      ],
     },
     {
       title: "Accounts",
       url: "#",
-      icon: CircleUserRound,
+      icon: UserCircle,
       items: [
         {
           title: "Profile",
@@ -143,7 +139,7 @@ const data = {
     {
       title: "Documentation",
       url: "#",
-      icon: Code,
+      icon: FileCode,
       items: [
         {
           title: "Docs",
@@ -158,7 +154,7 @@ const data = {
     {
       title: "Pricing",
       url: "pricing/pricing-tables",
-      icon: Landmark,
+      icon: CreditCard,
     },
   ],
 }
@@ -174,7 +170,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.overview} label="Dashboard" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

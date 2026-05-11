@@ -284,7 +284,12 @@ export default function OrderList() {
                         alt={order.customerName}
                         className="h-8 w-8 rounded-full border object-cover bg-muted/50"
                       />
-                      <span>{order.customerName}</span>
+                    <Link 
+                      to={`/eCommerce/customer-details/${order.id}`} // Using order.id as a fallback for customerId since it's mock data
+                      className="text-primary hover:underline"
+                    >
+                      {order.customerName}
+                    </Link>
                     </div>
                   </TableCell>
 

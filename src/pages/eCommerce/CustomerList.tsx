@@ -1,5 +1,5 @@
 import { useMemo, useState, ReactNode } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { useIsMobile } from "@/hooks/use-mobile"
 import {
   Users,
@@ -362,12 +362,12 @@ export default function CustomerList() {
                         className="h-10 w-10 rounded-full border object-cover bg-muted/50"
                       />
                       <div>
-                        <p 
-                          className="font-semibold cursor-pointer hover:text-primary transition-colors"
-                          onClick={() => navigate(`/ecommerce/customer-details/${customer.id}`)}
+                        <Link 
+                          to={`/ecommerce/customer-details/${customer.id}`}
+                          className="font-semibold cursor-pointer text-primary hover:underline transition-colors block"
                         >
                           {customer.name}
-                        </p>
+                        </Link>
                         <p className="text-xs text-muted-foreground">{customer.email}</p>
                       </div>
                     </div>
@@ -487,12 +487,12 @@ export default function CustomerList() {
                         alt={customer.name}
                         className="h-8 w-8 rounded-full border object-cover bg-muted/50"
                       />
-                      <span 
-                        className="font-medium cursor-pointer hover:text-primary transition-colors"
-                        onClick={() => navigate(`/ecommerce/customer-details/${customer.id}`)}
+                      <Link 
+                        to={`/ecommerce/customer-details/${customer.id}`}
+                        className="font-medium cursor-pointer text-primary hover:underline transition-colors"
                       >
                         {customer.name}
-                      </span>
+                      </Link>
                     </div>
                   </TableCell>
 

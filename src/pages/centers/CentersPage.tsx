@@ -4,11 +4,19 @@ import { toast } from 'sonner'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Pencil, Trash2, MapPin } from "lucide-react"
+import { Pencil, Trash2, MapPin, Search, Plus, Landmark } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 interface Center {
   _id: string;
@@ -22,7 +30,13 @@ interface Center {
 const CentersPage = () => {
   const [loading, setLoading] = useState(false)
   const [centers, setCenters] = useState<Center[]>([])
-  const [editingId, setEditingId] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  
+  // Dialog States
+  const [isAddOpen, setIsAddOpen] = useState(false)
+  const [isUpdateOpen, setIsUpdateOpen] = useState(false)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+
   const [form, setForm] = useState({
     name: '',
     location: '',
@@ -45,9 +59,16 @@ const CentersPage = () => {
     }
   }
 
+  const resetForm = () => {
+    setForm({ name: '', location: '', description: '', status: 'opened' })
+    setSelectedFile(null)
+    setFileInputKey(Date.now())
+    setSelectedId(null)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.name || !form.location || !form.description || !form.status) {
+    if (!form.name || !form.location || !form.description) {
       toast.error("Please fill in all required fields.")
       return
     }
@@ -63,18 +84,17 @@ const CentersPage = () => {
         formData.append('image', selectedFile)
       }
 
-      if (editingId) {
-        await axios.put(`http://localhost:5000/api/centers/${editingId}`, formData)
+      if (isUpdateOpen && selectedId) {
+        await axios.put(`http://localhost:5000/api/centers/${selectedId}`, formData)
         toast.success("Center updated successfully")
+        setIsUpdateOpen(false)
       } else {
         await axios.post('http://localhost:5000/api/centers', formData)
         toast.success("Center added successfully")
+        setIsAddOpen(false)
       }
 
-      setForm({ name: '', location: '', description: '', status: 'opened' })
-      setSelectedFile(null)
-      setEditingId(null)
-      setFileInputKey(Date.now()) // Clear the file input
+      resetForm()
       fetchCenters()
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to save center")
@@ -84,17 +104,18 @@ const CentersPage = () => {
   }
 
   const handleEdit = (center: Center) => {
-    setEditingId(center._id)
+    setSelectedId(center._id)
     setForm({
       name: center.name,
       location: center.location,
       description: center.description,
       status: center.status,
     })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setIsUpdateOpen(true)
   }
 
   const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this center?")) return
     try {
       await axios.delete(`http://localhost:5000/api/centers/${id}`)
       toast.success("Center deleted")
@@ -104,151 +125,174 @@ const CentersPage = () => {
     }
   }
 
+  const filteredCenters = centers.filter(c => 
+    c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.location.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   return (
-    <div className="p-6 space-y-8">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">{editingId ? "Update Center" : "Our Centers"}</h1>
-        <p className="text-muted-foreground">Manage your physical sanctuary locations and their status.</p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Form Section */}
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>{editingId ? "Edit Center" : "Add New Center"}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Center Name</Label>
-                  <Input 
-                    id="name" 
-                    required
-                    placeholder="e.g. The Midnight Grove" 
-                    value={form.name}
-                    onChange={(e) => setForm({...form, name: e.target.value})}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="location">Location / Address</Label>
-                  <Input 
-                    id="location" 
-                    required
-                    placeholder="e.g. Seattle, WA" 
-                    value={form.location}
-                    onChange={(e) => setForm({...form, location: e.target.value})}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="status">Operational Status</Label>
-                  <Select 
-                    value={form.status} 
-                    onValueChange={(val) => setForm({...form, status: val})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="opened">Opened</SelectItem>
-                      <SelectItem value="closed">Closed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea 
-                    id="description" 
-                    required
-                    placeholder="Describe the center..." 
-                    className="min-h-[100px]"
-                    value={form.description}
-                    onChange={(e) => setForm({...form, description: e.target.value})}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="image">Center Image {editingId && "(Optional if not changing)"}</Label>
-                  <Input 
-                    id="image" 
-                    key={fileInputKey}
-                    type="file" 
-                    accept="image/*"
-                    onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                  />
-                </div>
-
-                <div className="flex gap-4 pt-2">
-                  <Button type="submit" className="flex-1" disabled={loading}>
-                    {loading ? "Saving..." : editingId ? "Update Center" : "Add Center"}
-                  </Button>
-                  {editingId && (
-                    <Button type="button" variant="outline" onClick={() => {
-                      setEditingId(null)
-                      setForm({ name: '', location: '', description: '', status: 'opened' })
-                    }}>
-                      Cancel
-                    </Button>
-                  )}
-                </div>
-              </form>
-            </CardContent>
-          </Card>
+    <div className="p-6 space-y-8 max-w-7xl mx-auto">
+      {/* HEADER SECTION */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Centers</h1>
+          <p className="text-muted-foreground">Manage your physical sanctuary locations and their operational status.</p>
         </div>
-
-        {/* List Section */}
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold">Existing Centers</h2>
-          <div className="grid grid-cols-1 gap-4">
-            {centers.length === 0 ? (
-              <p className="text-muted-foreground italic">No centers added yet.</p>
-            ) : (
-              centers.map((center) => (
-                <Card key={center._id} className="overflow-hidden">
-                  <div className="flex h-full">
-                    {center.image && (
-                      <div className="w-32 h-full flex-shrink-0">
-                        <img 
-                          src={`http://localhost:5000${center.image}`} 
-                          alt={center.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
-                    <div className="p-4 flex-1">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="font-bold text-lg">{center.name}</h3>
-                          <p className="text-sm text-muted-foreground flex items-center gap-1">
-                            <MapPin className="w-3 h-3" /> {center.location}
-                          </p>
-                        </div>
-                        <Badge variant={center.status === 'opened' ? 'default' : 'destructive'}>
-                          {center.status}
-                        </Badge>
-                      </div>
-                      <p className="text-sm line-clamp-2 mb-4 text-muted-foreground">
-                        {center.description}
-                      </p>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={() => handleEdit(center)}>
-                          <Pencil className="w-3 h-3 mr-1" /> Edit
-                        </Button>
-                        <Button variant="destructive" size="sm" onClick={() => handleDelete(center._id)}>
-                          <Trash2 className="w-3 h-3 mr-1" /> Delete
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              ))
-            )}
+        <div className="flex gap-2 w-full md:w-auto">
+          <div className="relative flex-1 md:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input 
+              placeholder="Search centers..." 
+              className="pl-9"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
+          <Button onClick={() => setIsAddOpen(true)} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Add Center
+          </Button>
         </div>
       </div>
+
+      {/* CENTERS LIST */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredCenters.length === 0 ? (
+          <div className="col-span-full flex flex-col items-center justify-center py-20 border-2 border-dashed rounded-xl bg-muted/20">
+            <Landmark className="h-12 w-12 text-muted-foreground/50 mb-4" />
+            <p className="text-muted-foreground font-medium">No centers found.</p>
+          </div>
+        ) : (
+          filteredCenters.map((center) => (
+            <Card key={center._id} className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300">
+              <div className="aspect-video relative overflow-hidden">
+                <img 
+                  src={center.image ? `http://localhost:5000${center.image}` : '/placeholder-center.jpg'} 
+                  alt={center.name}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1545208393-2160291ba86e?q=80&w=1000&auto=format&fit=crop' }}
+                />
+                <div className="absolute top-3 right-3">
+                  <Badge variant={center.status === 'opened' ? 'default' : 'destructive'} className="shadow-lg">
+                    {center.status}
+                  </Badge>
+                </div>
+              </div>
+              <CardContent className="p-5">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="font-bold text-xl mb-1">{center.name}</h3>
+                    <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                      <MapPin className="w-4 h-4 text-primary" /> {center.location}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground line-clamp-3 mb-6 min-h-[60px]">
+                  {center.description}
+                </p>
+                <div className="flex gap-2">
+                  <Button variant="outline" className="flex-1" onClick={() => handleEdit(center)}>
+                    <Pencil className="w-4 h-4 mr-2" /> Edit
+                  </Button>
+                  <Button variant="destructive" size="icon" onClick={() => handleDelete(center._id)}>
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
+      </div>
+
+      {/* ADD/UPDATE DIALOG */}
+      <Dialog open={isAddOpen || isUpdateOpen} onOpenChange={(open) => {
+        if (!open) {
+          setIsAddOpen(false)
+          setIsUpdateOpen(false)
+          resetForm()
+        }
+      }}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>{isUpdateOpen ? "Update Center" : "Add New Center"}</DialogTitle>
+            <DialogDescription>
+              Fill in the details below to {isUpdateOpen ? "update" : "create"} a sanctuary location.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4 py-4">
+            <div className="grid gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Center Name</Label>
+                <Input 
+                  id="name" 
+                  placeholder="e.g. The Midnight Grove" 
+                  value={form.name}
+                  onChange={(e) => setForm({...form, name: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="location">Location / Address</Label>
+                <Input 
+                  id="location" 
+                  placeholder="e.g. Seattle, WA" 
+                  value={form.location}
+                  onChange={(e) => setForm({...form, location: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="status">Operational Status</Label>
+                <Select 
+                  value={form.status} 
+                  onValueChange={(val) => setForm({...form, status: val})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="opened">Opened</SelectItem>
+                    <SelectItem value="closed">Closed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea 
+                  id="description" 
+                  placeholder="Describe the sanctuary..." 
+                  className="min-h-[120px]"
+                  value={form.description}
+                  onChange={(e) => setForm({...form, description: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="image">Center Image {isUpdateOpen && "(Optional)"}</Label>
+                <Input 
+                  id="image" 
+                  key={fileInputKey}
+                  type="file" 
+                  accept="image/*"
+                  onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                />
+              </div>
+            </div>
+            <DialogFooter className="pt-4">
+              <Button type="button" variant="outline" onClick={() => {
+                setIsAddOpen(false)
+                setIsUpdateOpen(false)
+                resetForm()
+              }}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Saving..." : isUpdateOpen ? "Update Center" : "Create Center"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

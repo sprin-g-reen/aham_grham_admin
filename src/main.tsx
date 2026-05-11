@@ -7,16 +7,20 @@ import { Toaster } from "sonner"
 import { router } from "@/routes"
 import "@/index.css"
 
+import { AuthProvider } from "@/lib/AuthContext"
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
-      <RouterProvider router={router} />
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="dark"
+        enableSystem
+        disableTransitionOnChange
+      >
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </AuthProvider>
     <Toaster position="top-right" richColors closeButton />
   </React.StrictMode>
 )

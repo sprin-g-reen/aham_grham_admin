@@ -4,9 +4,9 @@ import { toast } from 'sonner'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
-import { Trash2, Star, Edit, X, Plus } from 'lucide-react'
+import { Trash2, Edit, Search, Plus, User, FileUp, Download } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -19,8 +19,11 @@ import {
 const TestimonialsPage = () => {
   const [loading, setLoading] = useState(false)
   const [testimonials, setTestimonials] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
   
   // States for Adding
+  const [isAddOpen, setIsAddOpen] = useState(false)
   const [addForm, setAddForm] = useState({
     name: '',
     testimonialId: '',
@@ -46,12 +49,101 @@ const TestimonialsPage = () => {
   }, [])
 
   const fetchTestimonials = async () => {
+    setLoading(true)
     try {
       const response = await axios.get('http://localhost:5000/api/testimonials')
       setTestimonials(response.data)
     } catch (error) {
       console.error("Failed to fetch testimonials", error)
+      toast.error("Failed to load testimonials")
+    } finally {
+      setLoading(false)
     }
+  }
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleCsvFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = async (event) => {
+      const text = event.target?.result as string
+      if (!text) return
+
+      // Robust CSV parsing (handles quotes and commas inside quotes)
+      const parseCSV = (data: string) => {
+        const rows = data.split(/\r?\n/).filter(row => row.trim())
+        if (rows.length < 2) return []
+
+        const headers = rows[0].split(',').map(h => h.trim().toLowerCase())
+        
+        return rows.slice(1).map(row => {
+          const values: string[] = []
+          let current = ''
+          let inQuotes = false
+          
+          for (let i = 0; i < row.length; i++) {
+            const char = row[i]
+            if (char === '"') {
+              inQuotes = !inQuotes
+            } else if (char === ',' && !inQuotes) {
+              values.push(current.trim())
+              current = ''
+            } else {
+              current += char
+            }
+          }
+          values.push(current.trim())
+          
+          const obj: any = {}
+          headers.forEach((header, index) => {
+            const val = values[index]?.replace(/^"|"$/g, '') // Remove wrapping quotes
+            if (header.includes('name')) obj.name = val
+            if (header.includes('id')) obj.testimonialId = val
+            if (header.includes('role')) obj.role = val
+            if (header.includes('content')) obj.content = val
+          })
+          return obj
+        })
+      }
+
+      try {
+        const testimonialsToImport = parseCSV(text)
+        if (testimonialsToImport.length === 0) {
+          toast.error("No valid data found in CSV")
+          return
+        }
+
+        setLoading(true)
+        const response = await axios.post('http://localhost:5000/api/testimonials/bulk', { 
+          testimonials: testimonialsToImport 
+        })
+        
+        toast.success(response.data.message)
+        fetchTestimonials()
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || "Failed to import CSV")
+      } finally {
+        setLoading(false)
+        if (fileInputRef.current) fileInputRef.current.value = ''
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  const downloadSampleCSV = () => {
+    const headers = "Name,TestimonialID,Role,Content\n"
+    const sample = "John Doe,TEST-999,Yoga Student,\"The experience was life changing.\"\n"
+    const blob = new Blob([headers + sample], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'testimonials_sample.csv'
+    a.click()
   }
 
   // Handle Add
@@ -77,6 +169,7 @@ const TestimonialsPage = () => {
       setAddForm({ name: '', testimonialId: '', role: '', content: '' })
       setAddFile(null)
       setAddFileInputKey(Date.now())
+      setIsAddOpen(false)
       fetchTestimonials()
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to add testimonial")
@@ -121,6 +214,7 @@ const TestimonialsPage = () => {
   }
 
   const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this testimonial?")) return
     try {
       await axios.delete(`http://localhost:5000/api/testimonials/${id}`)
       toast.success("Testimonial deleted")
@@ -130,150 +224,197 @@ const TestimonialsPage = () => {
     }
   }
 
+  const filteredTestimonials = testimonials.filter((t: any) => 
+    t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    t.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    t.testimonialId.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   return (
-    <div className="p-6 space-y-10">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">Testimonials Management</h1>
-        <p className="text-muted-foreground">Easily add new client feedback or update existing records.</p>
+    <div className="p-6 space-y-8">
+      {/* HEADER SECTION */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Testimonials</h1>
+          <p className="text-muted-foreground">Manage and view all your client feedback and testimonials.</p>
+        </div>
+        <div className="flex flex-wrap gap-2 w-full md:w-auto">
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            className="hidden" 
+            accept=".csv" 
+            onChange={handleCsvFileChange}
+          />
+          <Button variant="outline" onClick={downloadSampleCSV} className="flex items-center gap-2">
+            <Download className="h-4 w-4" />
+            Sample CSV
+          </Button>
+          <Button variant="outline" onClick={handleImportClick} className="flex items-center gap-2">
+            <FileUp className="h-4 w-4" />
+            Import CSV
+          </Button>
+          <div className="relative flex-1 md:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input 
+              placeholder="Search testimonials..." 
+              className="pl-9"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <Button onClick={() => setIsAddOpen(true)} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Add Testimonial
+          </Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* ADD CARD */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Plus className="w-5 h-5 text-primary" />
-              <CardTitle>Add New Testimonial</CardTitle>
+      {/* LIST SECTION */}
+      <div className="grid gap-4">
+        {loading && testimonials.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">Loading testimonials...</div>
+        ) : filteredTestimonials.length === 0 ? (
+          <p className="text-muted-foreground text-center py-12 border rounded-xl border-dashed">
+            {searchTerm ? "No testimonials match your search." : "No testimonials found."}
+          </p>
+        ) : (
+          filteredTestimonials.map((t: any) => (
+            <Card key={t._id} className="overflow-hidden hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                  {/* Photo Section */}
+                  <div className="shrink-0">
+                    {t.image ? (
+                      <img 
+                        src={`http://localhost:5000${t.image}`} 
+                        alt={t.name} 
+                        className="w-16 h-16 rounded-full object-cover border-2 border-primary/10"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20 text-primary">
+                        <User className="w-8 h-8" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content Section */}
+                  <div className="flex-grow min-w-0 text-center md:text-left">
+                    <div className="flex flex-col md:flex-row md:items-center gap-2 mb-2">
+                      <h3 className="font-bold text-xl truncate">{t.name}</h3>
+                      <span className="inline-flex w-fit mx-auto md:mx-0 text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">
+                        {t.testimonialId}
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-primary/80 mb-3">{t.role}</p>
+                    <p className="text-muted-foreground text-sm italic leading-relaxed line-clamp-3 md:line-clamp-none">
+                      "{t.content}"
+                    </p>
+                  </div>
+
+                  {/* Actions Section */}
+                  <div className="flex gap-2 shrink-0 self-center md:self-start">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex items-center gap-2 hover:bg-primary/5 hover:text-primary border-muted"
+                      onClick={() => handleUpdateClick(t)}
+                    >
+                      <Edit className="h-4 w-4" />
+                      Update
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="text-red-500 hover:text-red-600 hover:bg-red-50 border-muted"
+                      onClick={() => handleDelete(t._id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
+      </div>
+
+      {/* ADD DIALOG */}
+      <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Add New Testimonial</DialogTitle>
+            <DialogDescription>
+              Create a new client feedback record. All fields are required.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleAddSubmit} className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="add-name">Client Name</Label>
+                <Input 
+                  id="add-name" 
+                  required
+                  placeholder="e.g. Sarah Johnson" 
+                  value={addForm.name}
+                  onChange={(e) => setAddForm({...addForm, name: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="add-id">Testimonial ID</Label>
+                <Input 
+                  id="add-id" 
+                  required
+                  placeholder="e.g. TEST-001" 
+                  value={addForm.testimonialId}
+                  onChange={(e) => setAddForm({...addForm, testimonialId: e.target.value})}
+                />
+              </div>
             </div>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleAddSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="add-name">Client Name</Label>
-                  <Input 
-                    id="add-name" 
-                    required
-                    placeholder="e.g. Sarah Johnson" 
-                    value={addForm.name}
-                    onChange={(e) => setAddForm({...addForm, name: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="add-id">Testimonial ID</Label>
-                  <Input 
-                    id="add-id" 
-                    required
-                    placeholder="e.g. TEST-001" 
-                    value={addForm.testimonialId}
-                    onChange={(e) => setAddForm({...addForm, testimonialId: e.target.value})}
-                  />
-                </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="add-role">Role / Location</Label>
-                <Input 
-                  id="add-role" 
-                  required
-                  placeholder="e.g. Yoga Student, Switzerland" 
-                  value={addForm.role}
-                  onChange={(e) => setAddForm({...addForm, role: e.target.value})}
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="add-role">Role / Location</Label>
+              <Input 
+                id="add-role" 
+                required
+                placeholder="e.g. Yoga Student, Switzerland" 
+                value={addForm.role}
+                onChange={(e) => setAddForm({...addForm, role: e.target.value})}
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="add-content">Testimonial Content</Label>
-                <Textarea 
-                  id="add-content" 
-                  required
-                  placeholder="What did the client say?" 
-                  className="min-h-[100px]"
-                  value={addForm.content}
-                  onChange={(e) => setAddForm({...addForm, content: e.target.value})}
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="add-content">Testimonial Content</Label>
+              <Textarea 
+                id="add-content" 
+                required
+                placeholder="What did the client say?" 
+                className="min-h-[100px]"
+                value={addForm.content}
+                onChange={(e) => setAddForm({...addForm, content: e.target.value})}
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="add-image">Client Photo (Optional)</Label>
-                <Input 
-                  id="add-image" 
-                  key={addFileInputKey}
-                  type="file" 
-                  accept="image/*"
-                  onChange={(e) => setAddFile(e.target.files?.[0] || null)}
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="add-image">Client Photo (Optional)</Label>
+              <Input 
+                id="add-image" 
+                key={addFileInputKey}
+                type="file" 
+                accept="image/*"
+                onChange={(e) => setAddFile(e.target.files?.[0] || null)}
+              />
+            </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
+            <DialogFooter className="pt-4">
+              <Button type="button" variant="ghost" onClick={() => setIsAddOpen(false)}>Cancel</Button>
+              <Button type="submit" disabled={loading}>
                 {loading ? "Adding..." : "Add Testimonial"}
               </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* LIST CARD */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Existing Testimonials</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
-              {testimonials.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">No testimonials found.</p>
-              ) : (
-                testimonials.map((t: any) => (
-                  <div key={t._id} className="p-4 border rounded-xl relative group bg-muted/30 hover:bg-muted/50 transition-all">
-                    <div className="flex items-start gap-4">
-                      {t.image ? (
-                        <img 
-                          src={`http://localhost:5000${t.image}`} 
-                          alt={t.name} 
-                          className="w-12 h-12 rounded-full object-cover border"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary border">
-                          {t.name.charAt(0)}
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="font-bold text-sm">{t.name}</h4>
-                            <div className="flex items-center gap-2">
-                              <p className="text-[10px] text-muted-foreground uppercase tracking-widest">{t.role}</p>
-                              <span className="text-[10px] bg-primary/10 px-1.5 py-0.5 rounded text-primary font-mono">{t.testimonialId}</span>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10"
-                              onClick={() => handleUpdateClick(t)}
-                            >
-                              <Edit size={14} />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                              onClick={() => handleDelete(t._id)}
-                            >
-                              <Trash2 size={14} />
-                            </Button>
-                          </div>
-                        </div>
-                        <p className="mt-2 text-xs italic text-muted-foreground line-clamp-3">"{t.content}"</p>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* UPDATE DIALOG */}
       <Dialog open={isUpdateOpen} onOpenChange={setIsUpdateOpen}>
@@ -284,57 +425,57 @@ const TestimonialsPage = () => {
               Make changes to the testimonial below. Click save when you're done.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleUpdateSubmit}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="up-name" className="text-right">Name</Label>
+          <form onSubmit={handleUpdateSubmit} className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="up-name">Client Name</Label>
                 <Input
                   id="up-name"
                   value={updateForm.name}
                   onChange={(e) => setUpdateForm({...updateForm, name: e.target.value})}
-                  className="col-span-3"
                 />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="up-id" className="text-right">ID</Label>
+              <div className="space-y-2">
+                <Label htmlFor="up-id">Testimonial ID</Label>
                 <Input
                   id="up-id"
                   value={updateForm.testimonialId}
                   onChange={(e) => setUpdateForm({...updateForm, testimonialId: e.target.value})}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="up-role" className="text-right">Role</Label>
-                <Input
-                  id="up-role"
-                  value={updateForm.role}
-                  onChange={(e) => setUpdateForm({...updateForm, role: e.target.value})}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="up-content" className="text-right">Content</Label>
-                <Textarea
-                  id="up-content"
-                  value={updateForm.content}
-                  onChange={(e) => setUpdateForm({...updateForm, content: e.target.value})}
-                  className="col-span-3 min-h-[100px]"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="up-image" className="text-right">Photo</Label>
-                <Input
-                  id="up-image"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setUpdateFile(e.target.files?.[0] || null)}
-                  className="col-span-3"
                 />
               </div>
             </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsUpdateOpen(false)}>Cancel</Button>
+            
+            <div className="space-y-2">
+              <Label htmlFor="up-role">Role / Location</Label>
+              <Input
+                id="up-role"
+                value={updateForm.role}
+                onChange={(e) => setUpdateForm({...updateForm, role: e.target.value})}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="up-content">Testimonial Content</Label>
+              <Textarea
+                id="up-content"
+                value={updateForm.content}
+                onChange={(e) => setUpdateForm({...updateForm, content: e.target.value})}
+                className="min-h-[100px]"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="up-image">Update Photo (Optional)</Label>
+              <Input
+                id="up-image"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setUpdateFile(e.target.files?.[0] || null)}
+              />
+            </div>
+
+            <DialogFooter className="pt-4">
+              <Button type="button" variant="ghost" onClick={() => setIsUpdateOpen(false)}>Cancel</Button>
               <Button type="submit" disabled={loading}>
                 {loading ? "Updating..." : "Save Changes"}
               </Button>
@@ -347,3 +488,4 @@ const TestimonialsPage = () => {
 }
 
 export default TestimonialsPage
+

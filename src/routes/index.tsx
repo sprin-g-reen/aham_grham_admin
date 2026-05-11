@@ -84,10 +84,25 @@ import PageContentManagement from "@/pages/hero/PageContentPage"
 import CentersPage from "@/pages/centers/CentersPage"
 import FooterPage from "@/pages/footer/FooterPage"
 import ContentController from "@/pages/dashboard/ContentController"
+import ActivityPage from "@/pages/dashboard/ActivityPage"
+
+import ProtectedRoute from "@/components/ProtectedRoute"
+import { Navigate } from "react-router-dom"
 
 export const router = createBrowserRouter (
   [
-    // 🔐 AUTH ROUTES
+    // 🚪 DEFAULT REDIRECT
+    {
+      path: "/",
+      element: <Navigate to="/login" replace />,
+    },
+
+    // 🔐 AUTH ROUTES (SHORTCUTS)
+    { path: "/login", element: <LoginPage /> },
+    { path: "/register", element: <RegisterPage /> },
+    { path: "/forgot-password", element: <ForgotPasswordPage /> },
+
+    // 🔐 AUTH ROUTES (FULL PATHS)
     {
       element: <AuthLayout />,
       errorElement: <ErrorPage />,
@@ -113,13 +128,18 @@ export const router = createBrowserRouter (
       ],
     },
 
-    // 📊 APP ROUTES
+    // 📊 APP ROUTES (PROTECTED)
     {
-      element: <AppLayout />,
+      element: (
+        <ProtectedRoute>
+          <AppLayout />
+        </ProtectedRoute>
+      ),
       errorElement: <ErrorPage />,
       children: [
         {index: true, element: <EcommerceDashboard /> },
         {path: "dashboard/overview", element: <EcommerceDashboard /> },
+        {path: "dashboard/activity", element: <ActivityPage /> },
         {path: "dashboard/landing-page", element: <LandingPage /> },
         {path: "dashboard/programs", element: <ProgramDetails /> },
         {path: "dashboard/program-details", element: <ProgramDetails /> },

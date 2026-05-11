@@ -44,14 +44,7 @@ const ContentController = () => {
       bg: "bg-purple-500/10",
       path: "/dashboard/footer"
     },
-    {
-      title: "AI & Meta Tags",
-      description: "Manage dynamic marquee tags and SEO meta information.",
-      icon: Code,
-      color: "text-cyan-500",
-      bg: "bg-cyan-500/10",
-      path: "/dashboard/aitags"
-    },
+
     {
       title: "Programs & Courses",
       description: "Add or edit yoga programs, descriptions, and scheduling.",
