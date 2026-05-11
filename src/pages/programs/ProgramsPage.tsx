@@ -18,6 +18,46 @@ const ProgramsPage = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [fileInputKey, setFileInputKey] = useState(Date.now())
 
+  const compressImage = (file: File, maxWidth = 1280, quality = 0.7): Promise<File> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          if (width > maxWidth) {
+            height = (maxWidth / width) * height;
+            width = maxWidth;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+            } else {
+              resolve(file);
+            }
+          }, 'image/jpeg', quality);
+        };
+      };
+    });
+  };
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.name || !form.programId || !form.bookingPrice || !form.description || !selectedFile) {
@@ -27,16 +67,15 @@ const ProgramsPage = () => {
 
     setLoading(true)
     try {
-      const formData = new FormData()
-      formData.append('name', form.name)
-      formData.append('programId', form.programId)
-      formData.append('bookingPrice', form.bookingPrice)
-      formData.append('description', form.description)
-      if (selectedFile) {
-        formData.append('image', selectedFile)
+      const compressed = await compressImage(selectedFile);
+      const imageBase64 = await fileToBase64(compressed);
+
+      const payload = {
+        ...form,
+        image: imageBase64
       }
 
-      await axios.post('http://localhost:5000/api/programs', formData)
+      await axios.post('http://localhost:5000/api/programs', payload)
       toast.success("Program added successfully")
       setForm({ name: '', programId: '', bookingPrice: '', description: '' })
       setSelectedFile(null)
