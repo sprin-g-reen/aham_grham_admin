@@ -15,6 +15,7 @@ import { useAuth } from "@/lib/AuthContext"
 import axios from "axios"
 import { toast } from "sonner"
 import { useNavigate, Link } from "react-router-dom"
+import { API_URL } from "@/config"
 
 export function SignupForm({
   className,
@@ -42,7 +43,7 @@ export function SignupForm({
 
     setLoading(true)
     try {
-      const { data } = await axios.post("https://aham-grham-website.vercel.app/api/admins", {
+      const { data } = await axios.post(`${API_URL}/admins`, {
         name,
         email,
         password,
