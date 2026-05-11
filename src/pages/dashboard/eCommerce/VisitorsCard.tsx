@@ -1,19 +1,11 @@
+import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Area, AreaChart, XAxis } from "recharts"
+import axios from "axios"
 import {
   ChartContainer,
   type ChartConfig,
 } from "@/components/ui/chart"
-
-const chartData = [
-  { month: "January", visitors: 145 },
-  { month: "February", visitors: 278 },
-  { month: "March", visitors: 192 },
-  { month: "April", visitors: 356 },
-  { month: "May", visitors: 221 },
-  { month: "June", visitors: 174 },
-  { month: "July", visitors: 680 },
-]
 
 const chartConfig = {
   visitors: {
@@ -23,23 +15,48 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export default function VisitorsCard() {
+  const [data, setData] = useState<{ totalVisitors: number; chartData: any[] }>({
+    totalVisitors: 0,
+    chartData: []
+  })
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/analytics/stats')
+        setData({
+          totalVisitors: response.data.totalVisitors,
+          chartData: response.data.chartData.length > 0 ? response.data.chartData : [
+            { date: "N/A", visitors: 0 }
+          ]
+        })
+      } catch (error) {
+        console.error("Failed to fetch analytics stats", error)
+      }
+    }
+    fetchStats()
+    // Poll every 30 seconds for real-time feel
+    const interval = setInterval(fetchStats, 10000)
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <Card className="overflow-hidden">
       <CardContent className="p-6">
         <div className="mb-3">
           <p className="text-md text-muted-foreground">Visitors</p>
-          <h2 className="text-3xl font-semibold">18,432</h2>
+          <h2 className="text-3xl font-semibold">{data.totalVisitors.toLocaleString()}</h2>
         </div>
 
         <p className="text-sm flex gap-2 mb-5">
-          <span className="text-green-600 font-semibold">+9.6%</span>
-          from last month
+          <span className="text-green-600 font-semibold">+ Real-time</span>
+          tracking active
         </p>
 
         <ChartContainer config={chartConfig} className="h-14 w-full">
           <AreaChart
             accessibilityLayer
-            data={chartData}
+            data={data.chartData}
             margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
           >
             <defs>
@@ -57,7 +74,7 @@ export default function VisitorsCard() {
               </linearGradient>
             </defs>
 
-            <XAxis hide dataKey="month" />
+            <XAxis hide dataKey="date" />
 
             <Area
               type="monotone"

@@ -109,6 +109,7 @@ const EventDetails = () => {
       formData.append('description', editForm.description)
       formData.append('about', editForm.about)
       formData.append('category', editForm.category)
+      formData.append('isBlog', String(editingEvent.isBlog))
       if (editFile) {
         if (isHighlight) {
           if (editFile.type.startsWith('video/')) {
@@ -218,6 +219,13 @@ const EventDetails = () => {
           filteredEvents.map((ev) => (
             <Card key={ev._id} className="overflow-hidden hover:shadow-md transition-shadow">
               <div className="flex items-center gap-6 p-6">
+                <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
+                  <img 
+                    src={ev.image ? `http://localhost:5000${ev.image}` : 'https://placehold.co/80x80/2c2c3a/white?text=No+Img'} 
+                    alt={ev.name} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
                 <div className="flex-grow min-w-0">
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="font-bold text-xl truncate">{ev.name}</h3>
