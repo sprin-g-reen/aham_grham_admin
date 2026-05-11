@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import { API_URL, SITE_ORIGIN } from "@/config"
+import { API_URL, SITE_ORIGIN, BACKEND_URL, UPLOADS_URL } from "@/config"
 import { toast } from 'sonner'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -208,7 +208,7 @@ const CentersPage = () => {
             <Card key={center._id} className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300">
               <div className="aspect-video relative overflow-hidden">
                 <img 
-                  src={center.image ? (center.image.startsWith('http') || center.image.startsWith('data:') ? center.image : `${SITE_ORIGIN}${center.image}`) : '/placeholder-center.jpg'} 
+                  src={center.image ? (center.image.startsWith('http') || center.image.startsWith('data:') ? center.image : (center.image.startsWith('/') ? `${BACKEND_URL}${center.image}` : `${UPLOADS_URL}/${center.image}`)) : '/placeholder-center.jpg'} 
                   alt={center.name}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1545208393-2160291ba86e?q=80&w=1000&auto=format&fit=crop' }}

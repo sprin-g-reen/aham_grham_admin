@@ -3,6 +3,7 @@
 import { useMemo, useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import axios from "axios"
+import { API_URL, UPLOADS_URL } from "@/config"
 import { toast } from "sonner"
 import {
   Card,
@@ -326,9 +327,9 @@ export default function ProductList() {
                       <div className="flex items-center gap-3">
                         <img
                           src={
-                            product.image 
-                              ? (product.image.startsWith('http') || product.image.startsWith('data:') 
-                                ? product.image 
+                            product.image
+                              ? (product.image.startsWith('http') || product.image.startsWith('data:')
+                                ? product.image
                                 : `${UPLOADS_URL}/${product.image}`)
                               : 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80'
                           }
