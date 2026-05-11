@@ -11,7 +11,8 @@ import {
   Edit, 
   Filter, 
   Search,
-  Plus
+  Plus,
+  Play
 } from 'lucide-react'
 import { ConfirmDialog } from "@/components/ConfirmDialog"
 
@@ -22,6 +23,15 @@ import {
   DialogTitle as ShadcnTitle,
   DialogFooter as ShadcnFooter 
 } from "@/components/ui/dialog"
+
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
+  });
+};
 
 const EventDetails = () => {
   const [events, setEvents] = useState<any[]>([])
@@ -101,34 +111,30 @@ const EventDetails = () => {
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
     const isHighlight = editForm.category === 'Highlight'
-    if (!editForm.name || !editForm.eventId || !editForm.category || (!isHighlight && (!editForm.bookingPrice || !editForm.about)) || !editForm.description) {
+    if (!editForm.name || !editForm.eventId || !editForm.category || !editForm.about || !editForm.description) {
       toast.error("Please fill all required fields, including 'What it is all about'.")
       return
     }
 
     setIsUpdateLoading(true)
     try {
-      const formData = new FormData()
-      formData.append('name', editForm.name)
-      formData.append('eventId', editForm.eventId)
-      formData.append('bookingPrice', editForm.bookingPrice)
-      formData.append('description', editForm.description)
-      formData.append('about', editForm.about)
-      formData.append('category', editForm.category)
-      formData.append('isBlog', String(editingEvent.isBlog))
+      let imageBase64 = '';
       if (editFile) {
-        if (isHighlight) {
-          if (editFile.type.startsWith('video/')) {
-            formData.append('video', editFile)
-          } else {
-            formData.append('image', editFile)
-          }
-        } else {
-          formData.append('image', editFile)
-        }
+        imageBase64 = await fileToBase64(editFile);
       }
 
-      await axios.put(`http://localhost:5000/api/events/${editingEvent._id}`, formData)
+      const payload = {
+        name: editForm.name,
+        eventId: editForm.eventId,
+        bookingPrice: editForm.bookingPrice,
+        description: editForm.description,
+        about: editForm.about,
+        category: editForm.category,
+        isBlog: editingEvent.isBlog,
+        image: imageBase64 || editingEvent.image
+      };
+
+      await axios.put(`http://localhost:5000/api/events/${editingEvent._id}`, payload)
       toast.success("Event updated successfully")
       setEditingEvent(null)
       fetchData()
@@ -142,34 +148,30 @@ const EventDetails = () => {
   const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const isHighlight = addForm.category === 'Highlight'
-    if (!addForm.name || !addForm.eventId || !addForm.category || (!isHighlight && (!addForm.bookingPrice || !addForm.about)) || !addForm.description || !addFile) {
-      toast.error(`All fields are required, including Category and ${isHighlight ? 'Highlight Media' : 'Event Image'}.`)
+    if (!addForm.name || !addForm.eventId || !addForm.category || !addForm.about || !addForm.description || !addFile) {
+      toast.error(`All fields are required, including Category and ${isHighlight ? 'Highlight Image' : 'Event Image'}.`)
       return
     }
 
     setIsAddLoading(true)
     try {
-      const formData = new FormData()
-      formData.append('name', addForm.name)
-      formData.append('eventId', addForm.eventId)
-      formData.append('bookingPrice', addForm.bookingPrice)
-      formData.append('description', addForm.description)
-      formData.append('about', addForm.about)
-      formData.append('category', addForm.category)
-      formData.append('isBlog', String(addForm.isBlog))
+      let imageBase64 = '';
       if (addFile) {
-        if (isHighlight) {
-          if (addFile.type.startsWith('video/')) {
-            formData.append('video', addFile)
-          } else {
-            formData.append('image', addFile)
-          }
-        } else {
-          formData.append('image', addFile)
-        }
+        imageBase64 = await fileToBase64(addFile);
       }
 
-      await axios.post('http://localhost:5000/api/events', formData)
+      const payload = {
+        name: addForm.name,
+        eventId: addForm.eventId,
+        bookingPrice: addForm.bookingPrice,
+        description: addForm.description,
+        about: addForm.about,
+        category: addForm.category,
+        isBlog: addForm.isBlog,
+        image: imageBase64
+      };
+
+      await axios.post('http://localhost:5000/api/events', payload)
       toast.success("Event added successfully")
       setAddForm({ name: '', eventId: '', bookingPrice: '', description: '', about: '', category: '', isBlog: false })
       setAddFile(null)
@@ -225,12 +227,12 @@ const EventDetails = () => {
           filteredEvents.map((ev) => (
             <Card key={ev._id} className="overflow-hidden hover:shadow-md transition-shadow">
               <div className="flex items-center gap-6 p-6">
-                <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
-                  <img 
-                    src={ev.image ? `http://localhost:5000${ev.image}` : 'https://placehold.co/80x80/2c2c3a/white?text=No+Img'} 
-                    alt={ev.name} 
-                    className="w-full h-full object-cover"
-                  />
+                <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted relative group">
+                    <img 
+                      src={ev.image ? `http://localhost:5000${ev.image}` : 'https://placehold.co/80x80/2c2c3a/white?text=No+Img'} 
+                      alt={ev.name} 
+                      className="w-full h-full object-cover"
+                    />
                 </div>
                 <div className="flex-grow min-w-0">
                   <div className="flex items-center gap-3 mb-2">
@@ -301,7 +303,7 @@ const EventDetails = () => {
 
       {/* UPDATE MODAL */}
       <ShadcnDialog open={!!editingEvent} onOpenChange={() => setEditingEvent(null)}>
-        <ShadcnContent className="sm:max-w-[500px]">
+        <ShadcnContent className="sm:max-w-[500px]" aria-describedby={undefined}>
           <ShadcnHeader>
             <ShadcnTitle>Update Event</ShadcnTitle>
           </ShadcnHeader>
@@ -369,28 +371,26 @@ const EventDetails = () => {
                 onChange={(e) => setEditForm({...editForm, description: e.target.value})}
               />
             </div>
-            {editForm.category !== 'Highlight' && (
-              <div className="space-y-1">
-                <Label htmlFor="edit-about" className="text-xs">What it is all about</Label>
-                <Textarea 
-                  id="edit-about" 
-                  required
-                  placeholder="Detailed info..." 
-                  className="min-h-[80px] text-sm"
-                  value={editForm.about}
-                  onChange={(e) => setEditForm({...editForm, about: e.target.value})}
-                />
-              </div>
-            )}
+            <div className="space-y-1">
+              <Label htmlFor="edit-about" className="text-xs">What it is all about</Label>
+              <Textarea 
+                id="edit-about" 
+                required
+                placeholder="Detailed info..." 
+                className="min-h-[80px] text-sm"
+                value={editForm.about}
+                onChange={(e) => setEditForm({...editForm, about: e.target.value})}
+              />
+            </div>
             <div className="space-y-1">
               <Label htmlFor="edit-media" className="text-xs">
-                {editForm.category === 'Highlight' ? 'Highlight Media' : 'Update Image'}
+                {editForm.category === 'Highlight' ? 'Highlight Image' : 'Update Image'}
               </Label>
               <Input 
                 id="edit-media" 
                 type="file" 
                 className="h-9 text-xs"
-                accept={editForm.category === 'Highlight' ? 'image/*,video/*' : 'image/*'}
+                accept="image/*"
                 onChange={(e) => setEditFile(e.target.files?.[0] || null)}
               />
             </div>
@@ -406,7 +406,7 @@ const EventDetails = () => {
 
       {/* ADD MODAL */}
       <ShadcnDialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <ShadcnContent className="sm:max-w-[500px]">
+        <ShadcnContent className="sm:max-w-[500px]" aria-describedby={undefined}>
           <ShadcnHeader>
             <ShadcnTitle>Add New Event</ShadcnTitle>
           </ShadcnHeader>
@@ -481,30 +481,28 @@ const EventDetails = () => {
               />
             </div>
 
-            {addForm.category !== 'Highlight' && (
-              <div className="space-y-1">
-                <Label htmlFor="add-about" className="text-xs">What it is all about</Label>
-                <Textarea 
-                  id="add-about" 
-                  required
-                  placeholder="Detailed info..." 
-                  className="min-h-[80px] text-sm"
-                  value={addForm.about}
-                  onChange={(e) => setAddForm({...addForm, about: e.target.value})}
-                />
-              </div>
-            )}
+            <div className="space-y-1">
+              <Label htmlFor="add-about" className="text-xs">What it is all about</Label>
+              <Textarea 
+                id="add-about" 
+                required
+                placeholder="Detailed info..." 
+                className="min-h-[80px] text-sm"
+                value={addForm.about}
+                onChange={(e) => setAddForm({...addForm, about: e.target.value})}
+              />
+            </div>
 
             <div className="space-y-1">
               <Label htmlFor="add-media" className="text-xs">
-                {addForm.category === 'Highlight' ? 'Highlight Media' : 'Event Image'}
+                {addForm.category === 'Highlight' ? 'Highlight Image' : 'Event Image'}
               </Label>
               <Input 
                 id="add-media" 
                 type="file" 
                 required
                 className="h-9 text-xs"
-                accept={addForm.category === 'Highlight' ? 'image/*,video/*' : 'image/*'}
+                accept="image/*"
                 onChange={(e) => setAddFile(e.target.files?.[0] || null)}
               />
             </div>

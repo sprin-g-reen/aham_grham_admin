@@ -255,7 +255,7 @@ const ProgramDetails = () => {
 
       {/* UPDATE MODAL */}
       <ShadcnDialog open={!!editingProgram} onOpenChange={() => setEditingProgram(null)}>
-        <ShadcnContent className="sm:max-w-[500px]">
+        <ShadcnContent className="sm:max-w-[500px]" aria-describedby={undefined}>
           <ShadcnHeader>
             <ShadcnTitle>Update Program</ShadcnTitle>
           </ShadcnHeader>
@@ -319,7 +319,7 @@ const ProgramDetails = () => {
 
       {/* ADD MODAL */}
       <ShadcnDialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <ShadcnContent className="sm:max-w-[500px]">
+        <ShadcnContent className="sm:max-w-[500px]" aria-describedby={undefined}>
           <ShadcnHeader>
             <ShadcnTitle>Add New Program</ShadcnTitle>
           </ShadcnHeader>
