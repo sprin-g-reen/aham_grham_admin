@@ -66,6 +66,46 @@ const CentersPage = () => {
     setSelectedId(null)
   }
 
+  const compressImage = (file: File, maxWidth = 1280, quality = 0.7): Promise<File> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          if (width > maxWidth) {
+            height = (maxWidth / width) * height;
+            width = maxWidth;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+            } else {
+              resolve(file);
+            }
+          }, 'image/jpeg', quality);
+        };
+      };
+    });
+  };
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.name || !form.location || !form.description) {
@@ -75,21 +115,21 @@ const CentersPage = () => {
 
     setLoading(true)
     try {
-      const formData = new FormData()
-      formData.append('name', form.name)
-      formData.append('location', form.location)
-      formData.append('description', form.description)
-      formData.append('status', form.status)
+      const payload: any = {
+        ...form
+      }
+      
       if (selectedFile) {
-        formData.append('image', selectedFile)
+        const compressed = await compressImage(selectedFile);
+        payload.image = await fileToBase64(compressed);
       }
 
       if (isUpdateOpen && selectedId) {
-        await axios.put(`http://localhost:5000/api/centers/${selectedId}`, formData)
+        await axios.put(`http://localhost:5000/api/centers/${selectedId}`, payload)
         toast.success("Center updated successfully")
         setIsUpdateOpen(false)
       } else {
-        await axios.post('http://localhost:5000/api/centers', formData)
+        await axios.post('http://localhost:5000/api/centers', payload)
         toast.success("Center added successfully")
         setIsAddOpen(false)
       }
@@ -166,8 +206,8 @@ const CentersPage = () => {
           filteredCenters.map((center) => (
             <Card key={center._id} className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300">
               <div className="aspect-video relative overflow-hidden">
-                <img
-                  src={center.image ? `http://localhost:5000${center.image}` : '/placeholder-center.jpg'}
+                <img 
+                  src={center.image ? (center.image.startsWith('http') || center.image.startsWith('data:') ? center.image : `http://localhost:5000${center.image}`) : '/placeholder-center.jpg'} 
                   alt={center.name}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1545208393-2160291ba86e?q=80&w=1000&auto=format&fit=crop' }}
