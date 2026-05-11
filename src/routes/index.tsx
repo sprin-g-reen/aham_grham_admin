@@ -130,7 +130,9 @@ export const router = createBrowserRouter (
 
     {
       element: (
+        <ProtectedRoute>
           <AppLayout />
+        </ProtectedRoute>
       ),
       errorElement: <ErrorPage />,
       children: [
