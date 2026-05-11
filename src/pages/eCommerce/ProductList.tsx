@@ -147,7 +147,7 @@ export default function ProductList() {
   const currentPage = Math.min(pageState, totalPages)
 
   const paginatedProducts = filteredOrders.slice(
-    (currentPage - 1) * PAGE_SIZE, 
+    (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   )
 
@@ -155,7 +155,7 @@ export default function ProductList() {
   const toggleAll = (checked: boolean) => {
     setSelected(checked ? paginatedProducts.map(p => p._id) : [])
   }
-  
+
   const toggleOne = (id: string) => {
     setSelected(prev =>
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
@@ -190,7 +190,7 @@ export default function ProductList() {
     URL.revokeObjectURL(url)
   }
 
-    
+
   return (
     <div className="space-y-6">
 
@@ -229,10 +229,10 @@ export default function ProductList() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between border-b py-4 flex-wrap gap-3">
           <div>
-          <CardTitle className="text-lg mb-0">Products Management</CardTitle>
-          <CardDescription>
-            View, manage and organize your digital apothecary.
-          </CardDescription>
+            <CardTitle className="text-lg mb-0">Products Management</CardTitle>
+            <CardDescription>
+              View, manage and organize your digital apothecary.
+            </CardDescription>
           </div>
           <div className="flex items-center gap-3">
             {/* Search */}
@@ -244,7 +244,7 @@ export default function ProductList() {
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value)
-                  setPageState(1) 
+                  setPageState(1)
                 }}
               />
             </div>
@@ -273,14 +273,14 @@ export default function ProductList() {
 
               <div className="flex gap-2">
                 <Button
-                   size="sm"
-                   variant="destructive"
-                   onClick={async () => {
-                     for (const id of selected) {
-                        await deleteProduct(id)
-                     }
-                     setSelected([])
-                   }}
+                  size="sm"
+                  variant="destructive"
+                  onClick={async () => {
+                    for (const id of selected) {
+                      await deleteProduct(id)
+                    }
+                    setSelected([])
+                  }}
                 >
                   Delete Selected
                 </Button>
@@ -295,12 +295,12 @@ export default function ProductList() {
                 <TableRow>
                   <TableHead className="w-10">
                     <Checkbox
-                    checked={
-                      paginatedProducts.length > 0 &&
-                      selected.length === paginatedProducts.length
-                    }
-                    onCheckedChange={(val) => toggleAll(!!val)}
-                  />
+                      checked={
+                        paginatedProducts.length > 0 &&
+                        selected.length === paginatedProducts.length
+                      }
+                      onCheckedChange={(val) => toggleAll(!!val)}
+                    />
                   </TableHead>
                   <TableHead>Product</TableHead>
                   <TableHead>Product ID</TableHead>
@@ -317,9 +317,9 @@ export default function ProductList() {
                   <TableRow key={product._id}>
                     <TableCell>
                       <Checkbox
-                      checked={selected.includes(product._id)}
-                      onCheckedChange={() => toggleOne(product._id)}
-                    />
+                        checked={selected.includes(product._id)}
+                        onCheckedChange={() => toggleOne(product._id)}
+                      />
                     </TableCell>
 
                     <TableCell>
@@ -351,38 +351,38 @@ export default function ProductList() {
                     </TableCell>
 
                     <TableCell className="text-right">
-                       <div className="flex justify-end gap-2">
-                           <Button 
-                             variant={product.isMostSelling ? "default" : "outline"}
-                             size="sm"
-                             onClick={() => toggleMostSelling(product)}
-                             className={product.isMostSelling ? "bg-orange-500 hover:bg-orange-600 text-white" : ""}
-                           >
-                              {product.isMostSelling ? "Featured" : "Feature"}
-                           </Button>
-                           <Button 
-                             variant={product.isServicePage ? "default" : "outline"}
-                             size="sm"
-                             onClick={() => toggleServicePage(product)}
-                             className={product.isServicePage ? "bg-purple-500 hover:bg-purple-600 text-white" : ""}
-                           >
-                              {product.isServicePage ? "On Services" : "To Service"}
-                           </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => toast.info("Full update feature coming soon!")}
-                          >
-                             Update
-                          </Button>
-                          <Button 
-                            variant="destructive" 
-                            size="sm"
-                            onClick={() => deleteProduct(product._id)}
-                          >
-                             Remove
-                          </Button>
-                       </div>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant={product.isMostSelling ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => toggleMostSelling(product)}
+                          className={product.isMostSelling ? "bg-orange-500 hover:bg-orange-600 text-white" : ""}
+                        >
+                          {product.isMostSelling ? "Featured" : "Feature"}
+                        </Button>
+                        <Button
+                          variant={product.isServicePage ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => toggleServicePage(product)}
+                          className={product.isServicePage ? "bg-purple-500 hover:bg-purple-600 text-white" : ""}
+                        >
+                          {product.isServicePage ? "On Services" : "To Service"}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => toast.info("Full update feature coming soon!")}
+                        >
+                          Update
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => deleteProduct(product._id)}
+                        >
+                          Remove
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -394,7 +394,7 @@ export default function ProductList() {
             <div className="text-sm text-muted-foreground">
               {filteredOrders.length === 0
                 ? "Showing 0 of 0"
-                : `Showing ${ (currentPage - 1) * PAGE_SIZE + 1 } - ${ Math.min(currentPage * PAGE_SIZE, filteredOrders.length) } of ${ filteredOrders.length }`}
+                : `Showing ${(currentPage - 1) * PAGE_SIZE + 1} - ${Math.min(currentPage * PAGE_SIZE, filteredOrders.length)} of ${filteredOrders.length}`}
             </div>
 
             <div className="flex items-center gap-2">
