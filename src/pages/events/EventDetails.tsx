@@ -67,8 +67,22 @@ const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
+interface AhamEvent {
+  _id: string;
+  name: string;
+  eventId: string;
+  bookingPrice: number;
+  description: string;
+  about: string;
+  category: string;
+  image: string;
+  video?: string;
+  isBlog: boolean;
+  createdAt: string;
+}
+
 const EventDetails = () => {
-  const [events, setEvents] = useState<any[]>([])
+  const [events, setEvents] = useState<AhamEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   
@@ -129,7 +143,7 @@ const EventDetails = () => {
     }
   }
 
-  const handleEditClick = (event: any) => {
+  const handleEditClick = (event: AhamEvent) => {
     setEditingEvent(event)
     setEditForm({
       name: event.name,
@@ -260,7 +274,7 @@ const EventDetails = () => {
             {searchTerm ? "No events match your search." : "No events found."}
           </p>
         ) : (
-          filteredEvents.map((ev) => (
+          filteredEvents.map((ev: AhamEvent) => (
             <Card key={ev._id} className="overflow-hidden hover:shadow-md transition-shadow">
               <div className="flex items-center gap-6 p-6">
                 <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted relative group">

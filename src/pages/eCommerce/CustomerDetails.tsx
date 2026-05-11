@@ -46,6 +46,19 @@ const countryData: { [key: string]: { name: string; code: string } } = {
   jp: { name: "Japan", code: "jp" },
 }
 
+interface Order {
+  id: string;
+  date: string;
+  status: string;
+  items: number;
+  total: string;
+}
+
+interface ActivityItem {
+  date: string;
+  action: string;
+}
+
 // Mock data list (usually this would come from an API or shared state)
 const customerList = [
   {
@@ -284,7 +297,7 @@ export default function CustomerDetails() {
                 </TableHeader>
 
                 <TableBody>
-                  {customerDetails.recentOrders.map((order) => (
+                  {customerDetails.recentOrders.map((order: Order) => (
                     <TableRow key={order.id}>
                       <TableCell className="font-medium">{order.id}</TableCell>
                       <TableCell>{order.date}</TableCell>
@@ -308,7 +321,7 @@ export default function CustomerDetails() {
               <CardTitle>Activity Timeline</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {customerDetails.activity.map((item, idx) => (
+              {customerDetails.activity.map((item: ActivityItem, idx: number) => (
                 <div key={idx} className="flex gap-4 pb-4 last:pb-0">
                   <div className="relative">
                     <div className="h-3 w-3 rounded-full bg-green-600 mt-1.5" />

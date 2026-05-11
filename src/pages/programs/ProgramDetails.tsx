@@ -23,8 +23,18 @@ import {
   DialogFooter as ShadcnFooter 
 } from "@/components/ui/dialog"
 
+interface Program {
+  _id: string;
+  name: string;
+  programId: string;
+  bookingPrice: number;
+  description: string;
+  image: string;
+  createdAt: string;
+}
+
 const ProgramDetails = () => {
-  const [programs, setPrograms] = useState<any[]>([])
+  const [programs, setPrograms] = useState<Program[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   
@@ -80,7 +90,7 @@ const ProgramDetails = () => {
     }
   }
 
-  const handleEditClick = (program: any) => {
+  const handleEditClick = (program: Program) => {
     setEditingProgram(program)
     setEditForm({
       name: program.name,
@@ -191,7 +201,7 @@ const ProgramDetails = () => {
             {searchTerm ? "No programs match your search." : "No programs found."}
           </p>
         ) : (
-          filteredPrograms.map((prog) => (
+          filteredPrograms.map((prog: Program) => (
             <Card key={prog._id} className="overflow-hidden hover:shadow-md transition-shadow">
               <div className="flex items-center gap-6 p-6">
                 <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
