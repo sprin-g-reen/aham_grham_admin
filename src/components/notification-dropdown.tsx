@@ -111,11 +111,8 @@ export function NotificationDropdown() {
           </Button>
 
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 h-4 min-w-4 rounded-full
-              bg-destructive px-1 text-[10px] font-medium
-              text-destructive-foreground flex items-center justify-center animate-pulse">
-              {unreadCount}
-            </span>
+            <span className="absolute top-1.5 right-2 h-2.5 w-2.5 rounded-full
+              bg-destructive border-2 border-background animate-pulse" />
           )}
         </div>
       </DropdownMenuTrigger>
@@ -124,13 +121,8 @@ export function NotificationDropdown() {
         align="end"
         className="w-80 p-0 rounded-xl border shadow-xl"
       >
-        <DropdownMenuLabel className="flex items-center justify-between px-4 py-3">
+        <DropdownMenuLabel className="px-4 py-3">
           <span>Notifications</span>
-          {unreadCount > 0 && (
-            <span className="text-xs text-primary font-medium">
-              {unreadCount} new
-            </span>
-          )}
         </DropdownMenuLabel>
 
         <DropdownMenuSeparator />
