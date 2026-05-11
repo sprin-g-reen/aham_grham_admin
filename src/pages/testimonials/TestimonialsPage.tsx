@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
-import { Trash2, Edit, Search, Plus, User, FileUp, Download } from 'lucide-react'
+import { Trash2, Plus, RefreshCw, UploadCloud, Search, Check, X, Edit, ExternalLink } from "lucide-react"
+import { API_URL } from "../../config"
 import {
   Dialog,
   DialogContent,
@@ -51,7 +52,7 @@ const TestimonialsPage = () => {
   const fetchTestimonials = async () => {
     setLoading(true)
     try {
-      const response = await axios.get('https://aham-grham-website.vercel.app/api/testimonials')
+      const response = await axios.get(`${API_URL}/testimonials`)
       setTestimonials(response.data)
     } catch (error) {
       console.error("Failed to fetch testimonials", error)
@@ -119,7 +120,7 @@ const TestimonialsPage = () => {
         }
 
         setLoading(true)
-        const response = await axios.post('https://aham-grham-website.vercel.app/api/testimonials/bulk', {
+        const response = await axios.post(`${API_URL}/testimonials/bulk`, {
           testimonials: testimonialsToImport
         })
 
@@ -164,7 +165,7 @@ const TestimonialsPage = () => {
       formData.append('rating', '5')
       if (addFile) formData.append('image', addFile)
 
-      await axios.post('https://aham-grham-website.vercel.app/api/testimonials', formData)
+      await axios.post(`${API_URL}/testimonials`, formData)
       toast.success("Testimonial added successfully")
       setAddForm({ name: '', testimonialId: '', role: '', content: '' })
       setAddFile(null)
@@ -202,7 +203,7 @@ const TestimonialsPage = () => {
       formData.append('rating', '5')
       if (updateFile) formData.append('image', updateFile)
 
-      await axios.put(`https://aham-grham-website.vercel.app/api/testimonials/${updateId}`, formData)
+      await axios.put(`${API_URL}/testimonials/${updateId}`, formData)
       toast.success("Testimonial updated successfully")
       setIsUpdateOpen(false)
       fetchTestimonials()
@@ -216,7 +217,7 @@ const TestimonialsPage = () => {
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this testimonial?")) return
     try {
-      await axios.delete(`https://aham-grham-website.vercel.app/api/testimonials/${id}`)
+      await axios.delete(`${API_URL}/testimonials/${id}`)
       toast.success("Testimonial deleted")
       fetchTestimonials()
     } catch (error) {
@@ -287,7 +288,7 @@ const TestimonialsPage = () => {
                   <div className="shrink-0">
                     {t.image ? (
                       <img
-                        src={`https://aham-grham-website.vercel.app${t.image}`}
+                        src={t.image.startsWith('http') ? t.image : `https://aham-grham-website.vercel.app${t.image}`}
                         alt={t.name}
                         className="w-16 h-16 rounded-full object-cover border-2 border-primary/10"
                       />
