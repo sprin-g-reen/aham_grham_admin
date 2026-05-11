@@ -13,8 +13,8 @@ import {
   Search,
   Plus
 } from 'lucide-react'
+import { ConfirmDialog } from "@/components/ConfirmDialog"
 
-// Note: Assuming Dialog components are available from your UI library
 import { 
   Dialog as ShadcnDialog, 
   DialogContent as ShadcnContent, 
@@ -27,6 +27,9 @@ const ProgramDetails = () => {
   const [programs, setPrograms] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  
+  // Confirmation state
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
   
   // Edit State
   const [editingProgram, setEditingProgram] = useState<any>(null)
@@ -65,10 +68,12 @@ const ProgramDetails = () => {
     fetchData()
   }, [])
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
+    if (!deleteConfirmId) return
     try {
-      await axios.delete(`http://localhost:5000/api/programs/${id}`)
+      await axios.delete(`http://localhost:5000/api/programs/${deleteConfirmId}`)
       toast.success("Program deleted")
+      setDeleteConfirmId(null)
       fetchData()
     } catch (error) {
       toast.error("Failed to delete program")
@@ -189,6 +194,13 @@ const ProgramDetails = () => {
           filteredPrograms.map((prog) => (
             <Card key={prog._id} className="overflow-hidden hover:shadow-md transition-shadow">
               <div className="flex items-center gap-6 p-6">
+                <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
+                  <img 
+                    src={prog.image ? `http://localhost:5000${prog.image}` : 'https://placehold.co/80x80/2c2c3a/white?text=No+Img'} 
+                    alt={prog.name} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
                 <div className="flex-grow min-w-0">
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="font-bold text-xl truncate">{prog.name}</h3>
@@ -196,6 +208,7 @@ const ProgramDetails = () => {
                       {prog.programId}
                     </span>
                   </div>
+                  <p className="text-sm text-muted-foreground truncate max-w-md">{prog.description}</p>
                   <div className="flex gap-4 text-xs mt-2">
                     <div className="flex items-center gap-1.5 text-primary font-bold">
                       <span>₹{prog.bookingPrice}</span>
@@ -218,7 +231,7 @@ const ProgramDetails = () => {
                     variant="outline" 
                     size="icon" 
                     className="text-red-500 hover:text-red-600 hover:bg-red-50 border-muted"
-                    onClick={() => handleDelete(prog._id)}
+                    onClick={() => setDeleteConfirmId(prog._id)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -228,6 +241,17 @@ const ProgramDetails = () => {
           ))
         )}
       </div>
+
+      {/* DELETE CONFIRMATION */}
+      <ConfirmDialog 
+        isOpen={!!deleteConfirmId}
+        onClose={() => setDeleteConfirmId(null)}
+        onConfirm={handleDelete}
+        title="Delete Program"
+        description="Are you sure you want to delete this program? This action cannot be undone."
+        confirmText="Delete"
+        variant="destructive"
+      />
 
       {/* UPDATE MODAL */}
       <ShadcnDialog open={!!editingProgram} onOpenChange={() => setEditingProgram(null)}>

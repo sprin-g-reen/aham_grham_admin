@@ -13,6 +13,7 @@ import {
   Search,
   Plus
 } from 'lucide-react'
+import { ConfirmDialog } from "@/components/ConfirmDialog"
 
 import { 
   Dialog as ShadcnDialog, 
@@ -26,6 +27,9 @@ const EventDetails = () => {
   const [events, setEvents] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  
+  // Confirmation state
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
   
   // Edit State
   const [editingEvent, setEditingEvent] = useState<any>(null)
@@ -69,10 +73,12 @@ const EventDetails = () => {
     fetchData()
   }, [])
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
+    if (!deleteConfirmId) return
     try {
-      await axios.delete(`http://localhost:5000/api/events/${id}`)
+      await axios.delete(`http://localhost:5000/api/events/${deleteConfirmId}`)
       toast.success("Event deleted")
+      setDeleteConfirmId(null)
       fetchData()
     } catch (error) {
       toast.error("Failed to delete event")
@@ -271,7 +277,7 @@ const EventDetails = () => {
                     variant="outline" 
                     size="icon" 
                     className="text-red-500 hover:text-red-600 hover:bg-red-50 border-muted"
-                    onClick={() => handleDelete(ev._id)}
+                    onClick={() => setDeleteConfirmId(ev._id)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -281,6 +287,17 @@ const EventDetails = () => {
           ))
         )}
       </div>
+
+      {/* DELETE CONFIRMATION */}
+      <ConfirmDialog 
+        isOpen={!!deleteConfirmId}
+        onClose={() => setDeleteConfirmId(null)}
+        onConfirm={handleDelete}
+        title="Delete Event"
+        description="Are you sure you want to delete this event? This action cannot be undone."
+        confirmText="Delete"
+        variant="destructive"
+      />
 
       {/* UPDATE MODAL */}
       <ShadcnDialog open={!!editingEvent} onOpenChange={() => setEditingEvent(null)}>

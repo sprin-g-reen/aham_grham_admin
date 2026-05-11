@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
   History, 
@@ -11,15 +11,16 @@ import {
   FileUp, 
   LogIn, 
   LogOut,
-  Search,
-  Filter
+  Search
 } from 'lucide-react';
 import { Input } from "@/components/ui/input";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 const ActivityPage = () => {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const fetchActivities = async () => {
     try {
@@ -37,10 +38,10 @@ const ActivityPage = () => {
   }, []);
 
   const handleClearLogs = async () => {
-    if (!window.confirm("Are you sure you want to clear all activity logs?")) return;
     try {
       await axios.delete('http://localhost:5000/api/activities');
       toast.success("Activity logs cleared");
+      setIsConfirmOpen(false);
       fetchActivities();
     } catch (error) {
       toast.error("Failed to clear logs");
@@ -100,7 +101,11 @@ const ActivityPage = () => {
           <Button variant="outline" onClick={fetchActivities} disabled={loading}>
             Refresh
           </Button>
-          <Button variant="destructive" onClick={handleClearLogs} className="flex items-center gap-2">
+          <Button 
+            variant="destructive" 
+            onClick={() => setIsConfirmOpen(true)} 
+            className="flex items-center gap-2"
+          >
             <Trash2 className="w-4 h-4" />
             Clear Logs
           </Button>
@@ -159,6 +164,16 @@ const ActivityPage = () => {
           </div>
         </CardContent>
       </Card>
+
+      <ConfirmDialog 
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={handleClearLogs}
+        title="Clear Activity Logs"
+        description="Are you sure you want to permanently clear all activity logs? This action cannot be undone."
+        confirmText="Clear All"
+        variant="destructive"
+      />
     </div>
   );
 };
