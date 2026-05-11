@@ -64,56 +64,56 @@ const ProgramsPage = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Program Name</Label>
-                <Input 
-                  id="name" 
+                <Input
+                  id="name"
                   required
-                  placeholder="e.g. Morning Hatha Yoga" 
+                  placeholder="e.g. Morning Hatha Yoga"
                   value={form.name}
-                  onChange={(e) => setForm({...form, name: e.target.value})}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="programId">Program ID</Label>
-                <Input 
-                  id="programId" 
+                <Input
+                  id="programId"
                   required
-                  placeholder="e.g. PROG-001" 
+                  placeholder="e.g. PROG-001"
                   value={form.programId}
-                  onChange={(e) => setForm({...form, programId: e.target.value})}
+                  onChange={(e) => setForm({ ...form, programId: e.target.value })}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="price">Booking Price (₹)</Label>
-                <Input 
-                  id="price" 
-                  type="number" 
+                <Input
+                  id="price"
+                  type="number"
                   required
-                  placeholder="0.00" 
+                  placeholder="0.00"
                   value={form.bookingPrice}
-                  onChange={(e) => setForm({...form, bookingPrice: e.target.value})}
+                  onChange={(e) => setForm({ ...form, bookingPrice: e.target.value })}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
-                <Textarea 
-                  id="description" 
+                <Textarea
+                  id="description"
                   required
-                  placeholder="Describe the yoga program..." 
+                  placeholder="Describe the yoga program..."
                   className="min-h-[100px]"
                   value={form.description}
-                  onChange={(e) => setForm({...form, description: e.target.value})}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="image">Program Image</Label>
-                <Input 
-                  id="image" 
+                <Input
+                  id="image"
                   key={fileInputKey}
-                  type="file" 
+                  type="file"
                   required
                   accept="image/*"
                   onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}

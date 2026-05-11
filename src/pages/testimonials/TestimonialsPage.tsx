@@ -21,7 +21,7 @@ const TestimonialsPage = () => {
   const [testimonials, setTestimonials] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const fileInputRef = React.useRef<HTMLInputElement>(null)
-  
+
   // States for Adding
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [addForm, setAddForm] = useState({
@@ -80,12 +80,12 @@ const TestimonialsPage = () => {
         if (rows.length < 2) return []
 
         const headers = rows[0].split(',').map(h => h.trim().toLowerCase())
-        
+
         return rows.slice(1).map(row => {
           const values: string[] = []
           let current = ''
           let inQuotes = false
-          
+
           for (let i = 0; i < row.length; i++) {
             const char = row[i]
             if (char === '"') {
@@ -98,7 +98,7 @@ const TestimonialsPage = () => {
             }
           }
           values.push(current.trim())
-          
+
           const obj: any = {}
           headers.forEach((header, index) => {
             const val = values[index]?.replace(/^"|"$/g, '') // Remove wrapping quotes
@@ -119,10 +119,10 @@ const TestimonialsPage = () => {
         }
 
         setLoading(true)
-        const response = await axios.post('http://localhost:5000/api/testimonials/bulk', { 
-          testimonials: testimonialsToImport 
+        const response = await axios.post('http://localhost:5000/api/testimonials/bulk', {
+          testimonials: testimonialsToImport
         })
-        
+
         toast.success(response.data.message)
         fetchTestimonials()
       } catch (error: any) {
@@ -224,7 +224,7 @@ const TestimonialsPage = () => {
     }
   }
 
-  const filteredTestimonials = testimonials.filter((t: any) => 
+  const filteredTestimonials = testimonials.filter((t: any) =>
     t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     t.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
     t.testimonialId.toLowerCase().includes(searchTerm.toLowerCase())
@@ -239,11 +239,11 @@ const TestimonialsPage = () => {
           <p className="text-muted-foreground">Manage and view all your client feedback and testimonials.</p>
         </div>
         <div className="flex flex-wrap gap-2 w-full md:w-auto">
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            className="hidden" 
-            accept=".csv" 
+          <input
+            type="file"
+            ref={fileInputRef}
+            className="hidden"
+            accept=".csv"
             onChange={handleCsvFileChange}
           />
           <Button variant="outline" onClick={downloadSampleCSV} className="flex items-center gap-2">
@@ -256,8 +256,8 @@ const TestimonialsPage = () => {
           </Button>
           <div className="relative flex-1 md:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search testimonials..." 
+            <Input
+              placeholder="Search testimonials..."
               className="pl-9"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -286,9 +286,9 @@ const TestimonialsPage = () => {
                   {/* Photo Section */}
                   <div className="shrink-0">
                     {t.image ? (
-                      <img 
-                        src={`http://localhost:5000${t.image}`} 
-                        alt={t.name} 
+                      <img
+                        src={`http://localhost:5000${t.image}`}
+                        alt={t.name}
                         className="w-16 h-16 rounded-full object-cover border-2 border-primary/10"
                       />
                     ) : (
@@ -314,18 +314,18 @@ const TestimonialsPage = () => {
 
                   {/* Actions Section */}
                   <div className="flex gap-2 shrink-0 self-center md:self-start">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       className="flex items-center gap-2 hover:bg-primary/5 hover:text-primary border-muted"
                       onClick={() => handleUpdateClick(t)}
                     >
                       <Edit className="h-4 w-4" />
                       Update
                     </Button>
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
+                    <Button
+                      variant="outline"
+                      size="icon"
                       className="text-red-500 hover:text-red-600 hover:bg-red-50 border-muted"
                       onClick={() => handleDelete(t._id)}
                     >
@@ -352,55 +352,55 @@ const TestimonialsPage = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="add-name">Client Name</Label>
-                <Input 
-                  id="add-name" 
+                <Input
+                  id="add-name"
                   required
-                  placeholder="e.g. Sarah Johnson" 
+                  placeholder="e.g. Sarah Johnson"
                   value={addForm.name}
-                  onChange={(e) => setAddForm({...addForm, name: e.target.value})}
+                  onChange={(e) => setAddForm({ ...addForm, name: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="add-id">Testimonial ID</Label>
-                <Input 
-                  id="add-id" 
+                <Input
+                  id="add-id"
                   required
-                  placeholder="e.g. TEST-001" 
+                  placeholder="e.g. TEST-001"
                   value={addForm.testimonialId}
-                  onChange={(e) => setAddForm({...addForm, testimonialId: e.target.value})}
+                  onChange={(e) => setAddForm({ ...addForm, testimonialId: e.target.value })}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="add-role">Role / Location</Label>
-              <Input 
-                id="add-role" 
+              <Input
+                id="add-role"
                 required
-                placeholder="e.g. Yoga Student, Switzerland" 
+                placeholder="e.g. Yoga Student, Switzerland"
                 value={addForm.role}
-                onChange={(e) => setAddForm({...addForm, role: e.target.value})}
+                onChange={(e) => setAddForm({ ...addForm, role: e.target.value })}
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="add-content">Testimonial Content</Label>
-              <Textarea 
-                id="add-content" 
+              <Textarea
+                id="add-content"
                 required
-                placeholder="What did the client say?" 
+                placeholder="What did the client say?"
                 className="min-h-[100px]"
                 value={addForm.content}
-                onChange={(e) => setAddForm({...addForm, content: e.target.value})}
+                onChange={(e) => setAddForm({ ...addForm, content: e.target.value })}
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="add-image">Client Photo (Optional)</Label>
-              <Input 
-                id="add-image" 
+              <Input
+                id="add-image"
                 key={addFileInputKey}
-                type="file" 
+                type="file"
                 accept="image/*"
                 onChange={(e) => setAddFile(e.target.files?.[0] || null)}
               />
@@ -432,7 +432,7 @@ const TestimonialsPage = () => {
                 <Input
                   id="up-name"
                   value={updateForm.name}
-                  onChange={(e) => setUpdateForm({...updateForm, name: e.target.value})}
+                  onChange={(e) => setUpdateForm({ ...updateForm, name: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
@@ -440,17 +440,17 @@ const TestimonialsPage = () => {
                 <Input
                   id="up-id"
                   value={updateForm.testimonialId}
-                  onChange={(e) => setUpdateForm({...updateForm, testimonialId: e.target.value})}
+                  onChange={(e) => setUpdateForm({ ...updateForm, testimonialId: e.target.value })}
                 />
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="up-role">Role / Location</Label>
               <Input
                 id="up-role"
                 value={updateForm.role}
-                onChange={(e) => setUpdateForm({...updateForm, role: e.target.value})}
+                onChange={(e) => setUpdateForm({ ...updateForm, role: e.target.value })}
               />
             </div>
 
@@ -459,7 +459,7 @@ const TestimonialsPage = () => {
               <Textarea
                 id="up-content"
                 value={updateForm.content}
-                onChange={(e) => setUpdateForm({...updateForm, content: e.target.value})}
+                onChange={(e) => setUpdateForm({ ...updateForm, content: e.target.value })}
                 className="min-h-[100px]"
               />
             </div>

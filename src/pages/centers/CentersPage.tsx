@@ -31,7 +31,7 @@ const CentersPage = () => {
   const [loading, setLoading] = useState(false)
   const [centers, setCenters] = useState<Center[]>([])
   const [searchTerm, setSearchTerm] = useState('')
-  
+
   // Dialog States
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [isUpdateOpen, setIsUpdateOpen] = useState(false)
@@ -125,7 +125,7 @@ const CentersPage = () => {
     }
   }
 
-  const filteredCenters = centers.filter(c => 
+  const filteredCenters = centers.filter(c =>
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.location.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -141,8 +141,8 @@ const CentersPage = () => {
         <div className="flex gap-2 w-full md:w-auto">
           <div className="relative flex-1 md:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search centers..." 
+            <Input
+              placeholder="Search centers..."
               className="pl-9"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -166,8 +166,8 @@ const CentersPage = () => {
           filteredCenters.map((center) => (
             <Card key={center._id} className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300">
               <div className="aspect-video relative overflow-hidden">
-                <img 
-                  src={center.image ? `http://localhost:5000${center.image}` : '/placeholder-center.jpg'} 
+                <img
+                  src={center.image ? `http://localhost:5000${center.image}` : '/placeholder-center.jpg'}
                   alt={center.name}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1545208393-2160291ba86e?q=80&w=1000&auto=format&fit=crop' }}
@@ -223,29 +223,29 @@ const CentersPage = () => {
             <div className="grid gap-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Center Name</Label>
-                <Input 
-                  id="name" 
-                  placeholder="e.g. The Midnight Grove" 
+                <Input
+                  id="name"
+                  placeholder="e.g. The Midnight Grove"
                   value={form.name}
-                  onChange={(e) => setForm({...form, name: e.target.value})}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
                   required
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="location">Location / Address</Label>
-                <Input 
-                  id="location" 
-                  placeholder="e.g. Seattle, WA" 
+                <Input
+                  id="location"
+                  placeholder="e.g. Seattle, WA"
                   value={form.location}
-                  onChange={(e) => setForm({...form, location: e.target.value})}
+                  onChange={(e) => setForm({ ...form, location: e.target.value })}
                   required
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="status">Operational Status</Label>
-                <Select 
-                  value={form.status} 
-                  onValueChange={(val) => setForm({...form, status: val})}
+                <Select
+                  value={form.status}
+                  onValueChange={(val) => setForm({ ...form, status: val })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
@@ -258,21 +258,21 @@ const CentersPage = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
-                <Textarea 
-                  id="description" 
-                  placeholder="Describe the sanctuary..." 
+                <Textarea
+                  id="description"
+                  placeholder="Describe the sanctuary..."
                   className="min-h-[120px]"
                   value={form.description}
-                  onChange={(e) => setForm({...form, description: e.target.value})}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
                   required
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="image">Center Image {isUpdateOpen && "(Optional)"}</Label>
-                <Input 
-                  id="image" 
+                <Input
+                  id="image"
                   key={fileInputKey}
-                  type="file" 
+                  type="file"
                   accept="image/*"
                   onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
                 />
