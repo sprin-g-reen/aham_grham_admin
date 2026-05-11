@@ -325,7 +325,13 @@ export default function ProductList() {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <img
-                          src={product.image && product.image !== 'no-photo.jpg' ? `${UPLOADS_URL}/${product.image}` : 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80'}
+                          src={
+                            product.image 
+                              ? (product.image.startsWith('http') || product.image.startsWith('data:') 
+                                ? product.image 
+                                : `${UPLOADS_URL}/${product.image}`)
+                              : 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80'
+                          }
                           alt={product.name}
                           className="h-10 w-10 rounded-full border object-cover p-1 bg-muted/50"
                         />

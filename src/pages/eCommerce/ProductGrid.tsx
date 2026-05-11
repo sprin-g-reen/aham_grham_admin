@@ -399,7 +399,13 @@ function ProductGridCard({
         {/* Image */}
         <div className="aspect-square rounded-xl bg-muted overflow-hidden">
           <img
-            src={product.image && product.image !== 'no-photo.jpg' ? `${UPLOADS_URL}/${product.image}` : 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80'}
+            src={
+              product.image 
+                ? (product.image.startsWith('http') || product.image.startsWith('data:') 
+                    ? product.image 
+                    : `${UPLOADS_URL}/${product.image}`)
+                : 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80'
+            }
             alt={product.name}
             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300 p-2"
           />

@@ -252,6 +252,7 @@ function GeneralInfoCard({ form, setForm, errors, setErrors, categories }: any) 
         <div className="space-y-2 md:col-span-2">
           <Label>Category</Label>
           <Select
+            value={form.category}
             onValueChange={(value) => {
               setForm({ ...form, category: value })
               setErrors({ ...errors, category: "" })
@@ -329,6 +330,7 @@ function PricingCard({ form, setForm, errors, setErrors }: any) {
         <div className="space-y-2">
           <Label>GST</Label>
           <Select
+            value={form.tax}
             onValueChange={(value) => {
               setForm({ ...form, tax: value })
               setErrors({ ...errors, tax: "" })
@@ -373,6 +375,7 @@ function InventoryCard({ form, setForm, errors, setErrors }: any) {
         <div className="space-y-2">
           <Label>Stock Status</Label>
           <Select
+            value={form.stockStatus}
             onValueChange={(value) => {
               setForm({ ...form, stockStatus: value })
               setErrors({ ...errors, stockStatus: "" })
