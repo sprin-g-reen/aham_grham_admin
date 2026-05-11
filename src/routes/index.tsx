@@ -94,7 +94,7 @@ export const router = createBrowserRouter (
     // 🚪 DEFAULT REDIRECT
     {
       path: "/",
-      element: <Navigate to="/login" replace />,
+      element: <Navigate to="/dashboard/overview" replace />,
     },
 
     // 🔐 AUTH ROUTES (SHORTCUTS)
@@ -128,12 +128,9 @@ export const router = createBrowserRouter (
       ],
     },
 
-    // 📊 APP ROUTES (PROTECTED)
     {
       element: (
-        <ProtectedRoute>
           <AppLayout />
-        </ProtectedRoute>
       ),
       errorElement: <ErrorPage />,
       children: [
