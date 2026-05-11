@@ -42,7 +42,7 @@ export function SignupForm({
 
     setLoading(true)
     try {
-      const { data } = await axios.post("http://localhost:5000/api/users", {
+      const { data } = await axios.post("http://localhost:5000/api/admins", {
         name,
         email,
         password,

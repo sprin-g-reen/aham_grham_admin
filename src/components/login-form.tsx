@@ -32,7 +32,7 @@ export function LoginForm({
     e.preventDefault()
     setLoading(true)
     try {
-      const { data } = await axios.post("http://localhost:5000/api/users/login", {
+      const { data } = await axios.post("http://localhost:5000/api/admins/login", {
         email,
         password,
       })
