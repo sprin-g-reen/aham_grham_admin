@@ -229,7 +229,7 @@ const EventDetails = () => {
               <div className="flex items-center gap-6 p-6">
                 <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted relative group">
                     <img 
-                      src={ev.image ? `http://localhost:5000${ev.image}` : 'https://placehold.co/80x80/2c2c3a/white?text=No+Img'} 
+                      src={ev.image ? (ev.image.startsWith('http') || ev.image.startsWith('data:') ? ev.image : `http://localhost:5000${ev.image}`) : 'https://placehold.co/80x80/2c2c3a/white?text=No+Img'} 
                       alt={ev.name} 
                       className="w-full h-full object-cover"
                     />
