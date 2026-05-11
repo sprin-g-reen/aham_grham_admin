@@ -118,7 +118,7 @@ const EventDetails = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/events')
+      const response = await axios.get('https://aham-grham-website.vercel.app/api/events')
       setEvents(response.data)
     } catch (error) {
       toast.error("Failed to fetch events")
@@ -134,7 +134,7 @@ const EventDetails = () => {
   const handleDelete = async () => {
     if (!deleteConfirmId) return
     try {
-      await axios.delete(`http://localhost:5000/api/events/${deleteConfirmId}`)
+      await axios.delete(`https://aham-grham-website.vercel.app/api/events/${deleteConfirmId}`)
       toast.success("Event deleted")
       setDeleteConfirmId(null)
       fetchData()
@@ -183,7 +183,7 @@ const EventDetails = () => {
         image: imageBase64 || editingEvent.image
       };
 
-      await axios.put(`http://localhost:5000/api/events/${editingEvent._id}`, payload)
+      await axios.put(`https://aham-grham-website.vercel.app/api/events/${editingEvent._id}`, payload)
       toast.success("Event updated successfully")
       setEditingEvent(null)
       fetchData()
@@ -221,7 +221,7 @@ const EventDetails = () => {
         image: imageBase64
       };
 
-      await axios.post('http://localhost:5000/api/events', payload)
+      await axios.post('https://aham-grham-website.vercel.app/api/events', payload)
       toast.success("Event added successfully")
       setAddForm({ name: '', eventId: '', bookingPrice: '', description: '', about: '', category: '', isBlog: false })
       setAddFile(null)
@@ -279,7 +279,7 @@ const EventDetails = () => {
               <div className="flex items-center gap-6 p-6">
                 <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted relative group">
                     <img 
-                      src={ev.image ? (ev.image.startsWith('http') || ev.image.startsWith('data:') ? ev.image : `http://localhost:5000${ev.image}`) : 'https://placehold.co/80x80/2c2c3a/white?text=No+Img'} 
+                      src={ev.image ? (ev.image.startsWith('http') || ev.image.startsWith('data:') ? ev.image : `https://aham-grham-website.vercel.app${ev.image}`) : 'https://placehold.co/80x80/2c2c3a/white?text=No+Img'} 
                       alt={ev.name} 
                       className="w-full h-full object-cover"
                     />
@@ -306,7 +306,7 @@ const EventDetails = () => {
                     className={`flex items-center gap-2 hover:bg-primary/5 hover:text-primary border-muted ${ev.isBlog ? 'bg-orange-50 text-orange-600 border-orange-200' : ''}`}
                     onClick={async () => {
                       try {
-                        await axios.patch(`http://localhost:5000/api/events/${ev._id}/toggle-blog`)
+                        await axios.patch(`https://aham-grham-website.vercel.app/api/events/${ev._id}/toggle-blog`)
                         toast.success(ev.isBlog ? "Removed from Blog" : "Added to Blog")
                         fetchData()
                       } catch (error) {

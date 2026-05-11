@@ -40,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (user) {
         // We use a specific timeout or await to ensure the log is sent before the page reloads
-        await axios.post('http://localhost:5000/api/admins/logout', { name: user.name });
+        await axios.post('https://aham-grham-website.vercel.app/api/admins/logout', { name: user.name });
       }
     } catch (error) {
       console.error('Error logging out:', error);
@@ -48,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(null);
       localStorage.removeItem('user');
       // Use replace to prevent back-navigation issues
-      window.location.replace('/pulse-ui/login');
+      window.location.replace('/login');
     }
   };
 

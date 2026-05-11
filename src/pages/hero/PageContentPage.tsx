@@ -35,7 +35,7 @@ const PageContentManagement = () => {
 
   const fetchHero = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/hero?page=${selectedPage}`)
+      const response = await axios.get(`https://aham-grham-website.vercel.app/api/hero?page=${selectedPage}`)
       setHeroData(response.data)
     } catch (error) {
       toast.error(`Failed to fetch content for ${selectedPage}`)
@@ -45,7 +45,7 @@ const PageContentManagement = () => {
 
   const fetchAbout = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/about')
+      const response = await axios.get('https://aham-grham-website.vercel.app/api/about')
       setAboutData(response.data)
     } catch (error) {
       toast.error("Failed to fetch About page content")
@@ -68,7 +68,7 @@ const PageContentManagement = () => {
         formData.append('heroImage', heroImage)
       }
 
-      await axios.put('http://localhost:5000/api/hero', formData)
+      await axios.put('https://aham-grham-website.vercel.app/api/hero', formData)
       toast.success(`${selectedPage.toUpperCase()} content updated successfully`)
       fetchHero()
     } catch (error) {
@@ -98,7 +98,7 @@ const PageContentManagement = () => {
         formData.append('ctaImage', aboutCtaImage)
       }
 
-      await axios.put('http://localhost:5000/api/about', formData)
+      await axios.put('https://aham-grham-website.vercel.app/api/about', formData)
       toast.success("About page content updated successfully")
       fetchAbout()
     } catch (error) {

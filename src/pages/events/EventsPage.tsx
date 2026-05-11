@@ -52,7 +52,7 @@ const EventsPage = () => {
         }
       }
 
-      await axios.post('http://localhost:5000/api/events', formData)
+      await axios.post('https://aham-grham-website.vercel.app/api/events', formData)
       toast.success("Event added successfully")
       setForm({ name: '', eventId: '', bookingPrice: '', description: '', about: '', category: '', isBlog: false })
       setSelectedFile(null)

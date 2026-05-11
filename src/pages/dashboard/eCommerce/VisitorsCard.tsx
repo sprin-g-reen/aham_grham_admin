@@ -23,7 +23,7 @@ export default function VisitorsCard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/analytics/stats')
+        const response = await axios.get('https://aham-grham-website.vercel.app/api/analytics/stats')
         setData({
           totalVisitors: response.data.totalVisitors,
           chartData: response.data.chartData.length > 0 ? response.data.chartData : [

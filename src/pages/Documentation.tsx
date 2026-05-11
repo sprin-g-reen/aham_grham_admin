@@ -27,7 +27,7 @@ export default function Documentation() {
 
           <Button asChild>
             <a
-              href="https://codervent.com/pulse-ui/documentation.pdf"
+              href="https://codervent.com/documentation.pdf"
               target="_blank"
               rel="noopener noreferrer"
             >

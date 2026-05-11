@@ -57,7 +57,7 @@ export function LanguageDropdown() {
                 )}
             >
                 <img
-                    src={`/pulse-ui/images/countries/${lang.code}.png`}
+                    src={`/images/countries/${lang.code}.png`}
                     alt={lang.name}
                     className="h-5 w-5 rounded-full object-cover"
                 />

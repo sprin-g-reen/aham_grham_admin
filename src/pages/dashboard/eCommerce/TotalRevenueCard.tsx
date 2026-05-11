@@ -23,7 +23,7 @@ export default function TotalRevenueCard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/analytics/stats')
+        const response = await axios.get('https://aham-grham-website.vercel.app/api/analytics/stats')
         setData({
           totalViews: response.data.totalViews,
           chartData: response.data.chartData || [] // We can use the same daily stats for simplicity

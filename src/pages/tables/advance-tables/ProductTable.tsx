@@ -47,7 +47,7 @@ const products = [
     stock: "In Stock",
     price: "$120",
     status: "Published",
-    image: "/pulse-ui/products/01.png",
+    image: "/products/01.png",
   },
   {
     id: 2,
@@ -56,7 +56,7 @@ const products = [
     stock: "In Stock",
     price: "$45",
     status: "Published",
-    image: "/pulse-ui/products/02.png",
+    image: "/products/02.png",
   },
   {
     id: 3,
@@ -65,7 +65,7 @@ const products = [
     stock: "Low Stock",
     price: "$899",
     status: "Draft",
-    image: "/pulse-ui/products/03.png",
+    image: "/products/03.png",
   },
   {
     id: 4,
@@ -74,7 +74,7 @@ const products = [
     stock: "In Stock",
     price: "$199",
     status: "Published",
-    image: "/pulse-ui/products/04.png",
+    image: "/products/04.png",
   },
   {
     id: 5,
@@ -83,7 +83,7 @@ const products = [
     stock: "Out of Stock",
     price: "$75",
     status: "Published",
-    image: "/pulse-ui/products/05.png",
+    image: "/products/05.png",
   },
   {
     id: 6,
@@ -92,7 +92,7 @@ const products = [
     stock: "In Stock",
     price: "$149",
     status: "Draft",
-    image: "/pulse-ui/products/06.png",
+    image: "/products/06.png",
   },
 ]
 

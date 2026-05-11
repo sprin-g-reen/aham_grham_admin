@@ -30,7 +30,7 @@ export function NavMain({ items, label = "Platform" }: { items: MenuItem[], labe
   const location = useLocation()
 
   const isActiveRoute = (url: string) => {
-    const currentPath = location.pathname.replace(/^\/pulse-ui/, "").replace(/^\//, "")
+    const currentPath = location.pathname.replace(/^\/, "").replace(/^\//, "")
     const targetUrl = url.replace(/^\//, "")
     return currentPath === targetUrl || currentPath.startsWith(targetUrl)
   }

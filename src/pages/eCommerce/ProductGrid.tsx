@@ -45,7 +45,7 @@ interface Product {
   stockStatus?: string
 }
 
-const UPLOADS_URL = 'http://localhost:5000/uploads';
+const UPLOADS_URL = 'https://aham-grham-website.vercel.app/uploads';
 const PAGE_SIZE = 8;
 
 export default function ProductGrid() {
@@ -57,7 +57,7 @@ export default function ProductGrid() {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/products')
+      const response = await axios.get('https://aham-grham-website.vercel.app/api/products')
       setData(response.data || [])
     } catch (error) {
       toast.error("Failed to fetch products")
@@ -73,7 +73,7 @@ export default function ProductGrid() {
 
   const deleteProduct = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:5000/api/products/${id}`)
+      await axios.delete(`https://aham-grham-website.vercel.app/api/products/${id}`)
       toast.success("Product deleted")
       fetchProducts()
     } catch (error) {
@@ -83,7 +83,7 @@ export default function ProductGrid() {
 
   const toggleMostSelling = async (product: Product) => {
     try {
-      await axios.put(`http://localhost:5000/api/products/${product._id}`, {
+      await axios.put(`https://aham-grham-website.vercel.app/api/products/${product._id}`, {
         isMostSelling: !product.isMostSelling
       })
       toast.success(product.isMostSelling ? "Removed from Most Selling" : "Added to Most Selling")

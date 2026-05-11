@@ -13,11 +13,11 @@ export function FullCarousel() {
       <Carousel className="w-full mx-auto">
         <CarouselContent>
           {[
-            "/pulse-ui/images/carousels/01.png",
-            "/pulse-ui/images/carousels/02.png",
-            "/pulse-ui/images/carousels/03.png",
-            "/pulse-ui/images/carousels/04.png",
-            "/pulse-ui/images/carousels/06.png",
+            "/images/carousels/01.png",
+            "/images/carousels/02.png",
+            "/images/carousels/03.png",
+            "/images/carousels/04.png",
+            "/images/carousels/06.png",
           ].map((src, index) => (
             <CarouselItem key={index}>
               <div className="p-1">

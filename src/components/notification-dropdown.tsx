@@ -30,7 +30,7 @@ export function NotificationDropdown() {
 
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/activities')
+      const response = await axios.get('https://aham-grham-website.vercel.app/api/activities')
       // Map and sort (assuming API already sorts by newest first)
       const data = response.data.map((n: any) => ({
         ...n,

@@ -52,7 +52,7 @@ const CentersPage = () => {
 
   const fetchCenters = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5000/api/centers')
+      const { data } = await axios.get('https://aham-grham-website.vercel.app/api/centers')
       setCenters(data)
     } catch (error) {
       toast.error("Failed to fetch centers")
@@ -125,11 +125,11 @@ const CentersPage = () => {
       }
 
       if (isUpdateOpen && selectedId) {
-        await axios.put(`http://localhost:5000/api/centers/${selectedId}`, payload)
+        await axios.put(`https://aham-grham-website.vercel.app/api/centers/${selectedId}`, payload)
         toast.success("Center updated successfully")
         setIsUpdateOpen(false)
       } else {
-        await axios.post('http://localhost:5000/api/centers', payload)
+        await axios.post('https://aham-grham-website.vercel.app/api/centers', payload)
         toast.success("Center added successfully")
         setIsAddOpen(false)
       }
@@ -157,7 +157,7 @@ const CentersPage = () => {
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this center?")) return
     try {
-      await axios.delete(`http://localhost:5000/api/centers/${id}`)
+      await axios.delete(`https://aham-grham-website.vercel.app/api/centers/${id}`)
       toast.success("Center deleted")
       fetchCenters()
     } catch (error) {
@@ -207,7 +207,7 @@ const CentersPage = () => {
             <Card key={center._id} className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300">
               <div className="aspect-video relative overflow-hidden">
                 <img 
-                  src={center.image ? (center.image.startsWith('http') || center.image.startsWith('data:') ? center.image : `http://localhost:5000${center.image}`) : '/placeholder-center.jpg'} 
+                  src={center.image ? (center.image.startsWith('http') || center.image.startsWith('data:') ? center.image : `https://aham-grham-website.vercel.app${center.image}`) : '/placeholder-center.jpg'} 
                   alt={center.name}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1545208393-2160291ba86e?q=80&w=1000&auto=format&fit=crop' }}

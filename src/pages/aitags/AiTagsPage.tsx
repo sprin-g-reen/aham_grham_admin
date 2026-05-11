@@ -19,7 +19,7 @@ const AiTagsPage = () => {
 
   const fetchTags = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/aitags')
+      const response = await axios.get('https://aham-grham-website.vercel.app/api/aitags')
       setTags(response.data)
     } catch (error) {
       console.error("Failed to fetch tags", error)
@@ -39,7 +39,7 @@ const AiTagsPage = () => {
 
     setLoading(true)
     try {
-      await axios.post('http://localhost:5000/api/aitags', form)
+      await axios.post('https://aham-grham-website.vercel.app/api/aitags', form)
       toast.success("AI Tag added successfully")
       setForm({ name: '', description: '' })
       fetchTags()
@@ -52,7 +52,7 @@ const AiTagsPage = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:5000/api/aitags/${id}`)
+      await axios.delete(`https://aham-grham-website.vercel.app/api/aitags/${id}`)
       toast.success("AI Tag deleted successfully")
       fetchTags()
     } catch (error: any) {

@@ -15,7 +15,7 @@ export function TravelCards() {
 
           <div className="relative">
             <img
-              src="/pulse-ui/images/cards/travel/01.jpeg"
+              src="/images/cards/travel/01.jpeg"
               alt="San Francisco"
               className="w-full h-80 object-cover"
             />
@@ -71,7 +71,7 @@ export function TravelCards() {
         <div className="rounded-3xl overflow-hidden bg-card border shadow hover:-translate-y-2 hover:shadow-2xl transition-all duration-500">
 
           <img
-            src="/pulse-ui/images/cards/travel/02.jpeg"
+            src="/images/cards/travel/02.jpeg"
             alt="Paris"
             className="w-full h-80 object-cover"
           />
@@ -126,7 +126,7 @@ export function TravelCards() {
         <div className="rounded-3xl overflow-hidden bg-card border shadow hover:-translate-y-2 hover:shadow-2xl transition-all duration-500">
 
           <img
-            src="/pulse-ui/images/cards/travel/03.jpeg"
+            src="/images/cards/travel/03.jpeg"
             alt="Tokyo"
             className="w-full h-80 object-cover"
           />

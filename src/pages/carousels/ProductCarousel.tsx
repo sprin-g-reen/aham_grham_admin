@@ -11,12 +11,12 @@ import { ShoppingCart } from "lucide-react"
 
 export function ProductCarousel() {
   const products = [
-    { title: "Wireless Headphones", price: 89, img: "/pulse-ui/products/01.png" },
-    { title: "Smart Watch", price: 120, img: "/pulse-ui/products/02.png" },
-    { title: "Running Shoes", price: 150, img: "/pulse-ui/products/03.png" },
-    { title: "Leather Bag", price: 65, img: "/pulse-ui/products/04.png" },
-    { title: "Gaming Mouse", price: 45, img: "/pulse-ui/products/05.png" },
-    { title: "Bluetooth Speaker", price: 75, img: "/pulse-ui/products/06.png" },
+    { title: "Wireless Headphones", price: 89, img: "/products/01.png" },
+    { title: "Smart Watch", price: 120, img: "/products/02.png" },
+    { title: "Running Shoes", price: 150, img: "/products/03.png" },
+    { title: "Leather Bag", price: 65, img: "/products/04.png" },
+    { title: "Gaming Mouse", price: 45, img: "/products/05.png" },
+    { title: "Bluetooth Speaker", price: 75, img: "/products/06.png" },
   ]
 
   return (

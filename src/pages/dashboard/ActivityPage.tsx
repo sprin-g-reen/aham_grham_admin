@@ -24,7 +24,7 @@ const ActivityPage = () => {
 
   const fetchActivities = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/activities');
+      const response = await axios.get('https://aham-grham-website.vercel.app/api/activities');
       setActivities(response.data);
     } catch (error) {
       toast.error("Failed to fetch activity logs");
@@ -39,7 +39,7 @@ const ActivityPage = () => {
 
   const handleClearLogs = async () => {
     try {
-      await axios.delete('http://localhost:5000/api/activities');
+      await axios.delete('https://aham-grham-website.vercel.app/api/activities');
       toast.success("Activity logs cleared");
       setIsConfirmOpen(false);
       fetchActivities();

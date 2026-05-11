@@ -75,7 +75,7 @@ const ProgramsPage = () => {
         image: imageBase64
       }
 
-      await axios.post('http://localhost:5000/api/programs', payload)
+      await axios.post('https://aham-grham-website.vercel.app/api/programs', payload)
       toast.success("Program added successfully")
       setForm({ name: '', programId: '', bookingPrice: '', description: '' })
       setSelectedFile(null)

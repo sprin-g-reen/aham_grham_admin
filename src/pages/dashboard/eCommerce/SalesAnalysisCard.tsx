@@ -54,7 +54,7 @@ export default function SalesAnalysisCard() {
   React.useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/analytics/stats')
+        const response = await axios.get('https://aham-grham-website.vercel.app/api/analytics/stats')
         const { chartData, totalVisitors, totalViews } = response.data
         
         // 1. Get all dates for the current month

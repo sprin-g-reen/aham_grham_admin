@@ -51,7 +51,7 @@ const FooterPage = () => {
 
   const fetchFooterData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/footer');
+      const response = await axios.get('https://aham-grham-website.vercel.app/api/footer');
       setData(response.data);
     } catch (error) {
       toast.error("Failed to load footer data");
@@ -62,7 +62,7 @@ const FooterPage = () => {
 
   const fetchTags = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/aitags');
+      const response = await axios.get('https://aham-grham-website.vercel.app/api/aitags');
       setTags(response.data);
     } catch (error) {
       console.error("Failed to fetch tags", error);
@@ -71,7 +71,7 @@ const FooterPage = () => {
 
   const handleSaveFooter = async () => {
     try {
-      await axios.put('http://localhost:5000/api/footer', data);
+      await axios.put('https://aham-grham-website.vercel.app/api/footer', data);
       toast.success("Footer updated successfully");
     } catch (error) {
       toast.error("Failed to update footer");
@@ -86,7 +86,7 @@ const FooterPage = () => {
     }
     setTagLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/aitags', tagForm);
+      await axios.post('https://aham-grham-website.vercel.app/api/aitags', tagForm);
       toast.success("AI Tag added successfully");
       setTagForm({ name: '', description: '' });
       fetchTags();
@@ -99,7 +99,7 @@ const FooterPage = () => {
 
   const handleDeleteTag = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:5000/api/aitags/${id}`);
+      await axios.delete(`https://aham-grham-website.vercel.app/api/aitags/${id}`);
       toast.success("AI Tag deleted successfully");
       fetchTags();
     } catch (error: any) {

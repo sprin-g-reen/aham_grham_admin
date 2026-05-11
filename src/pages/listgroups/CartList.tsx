@@ -19,7 +19,7 @@ export function CartList() {
   const [items, setItems] = useState([
     {
       title: "Project Manager Tee",
-      img: "/pulse-ui/products/01.png",
+      img: "/products/01.png",
       color: "Silver",
       size: "Large",
       pricePerItem: 23,
@@ -27,7 +27,7 @@ export function CartList() {
     },
     {
       title: "Cozy Pink Zip-Up Hoodie",
-      img: "/pulse-ui/products/02.png",
+      img: "/products/02.png",
       color: "Silver",
       size: "Large",
       pricePerItem: 23,
@@ -35,7 +35,7 @@ export function CartList() {
     },
     {
       title: "Adidas Running Shoes",
-      img: "/pulse-ui/products/03.png",
+      img: "/products/03.png",
       color: "Black",
       size: "Medium",
       pricePerItem: 35,
@@ -43,7 +43,7 @@ export function CartList() {
     },
     {
       title: "Elegant White Leather Handbag",
-      img: "/pulse-ui/products/04.png",
+      img: "/products/04.png",
       color: "Gold",
       size: "Small",
       pricePerItem: 15,
@@ -51,7 +51,7 @@ export function CartList() {
     },
     {
       title: "Classic Green Formal Shirt",
-      img: "/pulse-ui/products/05.png",
+      img: "/products/05.png",
       color: "Blue",
       size: "Extra Large",
       pricePerItem: 14,

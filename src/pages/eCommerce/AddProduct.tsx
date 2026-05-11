@@ -31,7 +31,7 @@ export default function AddProduct() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data } = await axios.get('http://localhost:5000/api/categories')
+        const { data } = await axios.get('https://aham-grham-website.vercel.app/api/categories')
         setCategoriesData(data)
       } catch (error) {
         console.error("Failed to fetch categories")
@@ -134,7 +134,7 @@ export default function AddProduct() {
         payload.image = await fileToBase64(compressed);
       }
 
-      await axios.post('http://localhost:5000/api/products', payload);
+      await axios.post('https://aham-grham-website.vercel.app/api/products', payload);
 
       toast.success("Product created successfully!")
 

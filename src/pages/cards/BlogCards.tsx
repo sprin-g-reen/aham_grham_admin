@@ -15,7 +15,7 @@ export function BlogCards() {
 
           <div className="relative">
             <img
-              src="/pulse-ui/images/cards/blog/01.jpeg"
+              src="/images/cards/blog/01.jpeg"
               alt="AI in SaaS"
               className="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
             />
@@ -59,7 +59,7 @@ export function BlogCards() {
 
           <div className="relative">
             <img
-              src="/pulse-ui/images/cards/blog/02.jpeg"
+              src="/images/cards/blog/02.jpeg"
               alt="Web3 Growth"
               className="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
             />
@@ -103,7 +103,7 @@ export function BlogCards() {
 
           <div className="relative">
             <img
-              src="/pulse-ui/images/cards/blog/03.jpeg"
+              src="/images/cards/blog/03.jpeg"
               alt="UI Trends"
               className="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
             />
@@ -147,7 +147,7 @@ export function BlogCards() {
 
           <div className="relative">
             <img
-              src="/pulse-ui/images/cards/blog/05.jpeg"
+              src="/images/cards/blog/05.jpeg"
               alt="Startup Growth"
               className="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
             />

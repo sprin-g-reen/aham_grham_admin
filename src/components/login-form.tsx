@@ -32,7 +32,7 @@ export function LoginForm({
     e.preventDefault()
     setLoading(true)
     try {
-      const { data } = await axios.post("http://localhost:5000/api/admins/login", {
+      const { data } = await axios.post("https://aham-grham-website.vercel.app/api/admins/login", {
         email,
         password,
       })

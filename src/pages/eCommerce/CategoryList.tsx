@@ -67,7 +67,7 @@ export default function CategoryList() {
 
   const fetchCategories = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5000/api/categories')
+      const { data } = await axios.get('https://aham-grham-website.vercel.app/api/categories')
       setCategoryList(data)
     } catch (error) {
       toast.error("Failed to fetch categories")
@@ -113,7 +113,7 @@ export default function CategoryList() {
 
   const deleteCategory = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:5000/api/categories/${id}`)
+      await axios.delete(`https://aham-grham-website.vercel.app/api/categories/${id}`)
       toast.success("Category deleted")
       fetchCategories()
     } catch (error) {
@@ -134,7 +134,7 @@ export default function CategoryList() {
   const handleDeleteSelected = async () => {
     try {
       for (const id of selected) {
-        await axios.delete(`http://localhost:5000/api/categories/${id}`)
+        await axios.delete(`https://aham-grham-website.vercel.app/api/categories/${id}`)
       }
       toast.success("Selected categories deleted")
       setSelected([])
@@ -167,10 +167,10 @@ export default function CategoryList() {
     setLoading(true)
     try {
       if (editId) {
-        await axios.put(`http://localhost:5000/api/categories/${editId}`, form)
+        await axios.put(`https://aham-grham-website.vercel.app/api/categories/${editId}`, form)
         toast.success("Category updated")
       } else {
-        await axios.post('http://localhost:5000/api/categories', form)
+        await axios.post('https://aham-grham-website.vercel.app/api/categories', form)
         toast.success("Category created")
       }
       setOpen(false)

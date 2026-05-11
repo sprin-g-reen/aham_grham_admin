@@ -65,7 +65,7 @@ const ProgramDetails = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/programs')
+      const response = await axios.get('https://aham-grham-website.vercel.app/api/programs')
       setPrograms(response.data)
     } catch (error) {
       toast.error("Failed to fetch programs")
@@ -81,7 +81,7 @@ const ProgramDetails = () => {
   const handleDelete = async () => {
     if (!deleteConfirmId) return
     try {
-      await axios.delete(`http://localhost:5000/api/programs/${deleteConfirmId}`)
+      await axios.delete(`https://aham-grham-website.vercel.app/api/programs/${deleteConfirmId}`)
       toast.success("Program deleted")
       setDeleteConfirmId(null)
       fetchData()
@@ -119,7 +119,7 @@ const ProgramDetails = () => {
         formData.append('image', editFile)
       }
 
-      await axios.put(`http://localhost:5000/api/programs/${editingProgram._id}`, formData)
+      await axios.put(`https://aham-grham-website.vercel.app/api/programs/${editingProgram._id}`, formData)
       toast.success("Program updated successfully")
       setEditingProgram(null)
       fetchData()
@@ -148,7 +148,7 @@ const ProgramDetails = () => {
         formData.append('image', addFile)
       }
 
-      await axios.post('http://localhost:5000/api/programs', formData)
+      await axios.post('https://aham-grham-website.vercel.app/api/programs', formData)
       toast.success("Program added successfully")
       setAddForm({ name: '', programId: '', bookingPrice: '', description: '' })
       setAddFile(null)
@@ -206,7 +206,7 @@ const ProgramDetails = () => {
               <div className="flex items-center gap-6 p-6">
                 <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
                   <img 
-                    src={prog.image ? `http://localhost:5000${prog.image}` : 'https://placehold.co/80x80/2c2c3a/white?text=No+Img'} 
+                    src={prog.image ? `https://aham-grham-website.vercel.app${prog.image}` : 'https://placehold.co/80x80/2c2c3a/white?text=No+Img'} 
                     alt={prog.name} 
                     className="w-full h-full object-cover"
                   />
