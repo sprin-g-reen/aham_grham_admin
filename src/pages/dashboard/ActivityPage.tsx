@@ -122,6 +122,7 @@ const ActivityPage = () => {
                   <th className="px-6 py-4 font-semibold text-muted-foreground">Action</th>
                   <th className="px-6 py-4 font-semibold text-muted-foreground">Module</th>
                   <th className="px-6 py-4 font-semibold text-muted-foreground">Description</th>
+                  <th className="px-6 py-4 font-semibold text-muted-foreground text-center">Location (IP)</th>
                   <th className="px-6 py-4 font-semibold text-muted-foreground">User</th>
                   <th className="px-6 py-4 font-semibold text-muted-foreground">Time</th>
                 </tr>
@@ -129,11 +130,11 @@ const ActivityPage = () => {
               <tbody className="divide-y">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-10 text-center text-muted-foreground">Loading activities...</td>
+                    <td colSpan={6} className="px-6 py-10 text-center text-muted-foreground">Loading activities...</td>
                   </tr>
                 ) : filteredActivities.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-10 text-center text-muted-foreground">No activities found.</td>
+                    <td colSpan={6} className="px-6 py-10 text-center text-muted-foreground">No activities found.</td>
                   </tr>
                 ) : (
                   filteredActivities.map((a: any) => (
@@ -146,6 +147,11 @@ const ActivityPage = () => {
                       </td>
                       <td className="px-6 py-4 font-medium">{a.module}</td>
                       <td className="px-6 py-4 text-muted-foreground">{a.description}</td>
+                      <td className="px-6 py-4 text-center">
+                        <code className="text-[10px] bg-muted px-2 py-1 rounded border text-muted-foreground">
+                          {a.ip || 'Unknown'}
+                        </code>
+                      </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
