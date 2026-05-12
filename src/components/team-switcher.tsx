@@ -3,7 +3,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar"
 
 export function TeamSwitcher({
@@ -11,12 +10,11 @@ export function TeamSwitcher({
 }: {
   teams: {
     name: string
-    logo: React.ElementType
+    logo: React.ElementType | string
     plan: string
   }[]
 }) {
-  const { isMobile } = useSidebar()
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
+  const [activeTeam] = React.useState(teams[0])
 
   if (!activeTeam) {
     return null
@@ -27,16 +25,22 @@ export function TeamSwitcher({
       <SidebarMenuItem>
         <SidebarMenuButton
           size="lg"
-          className="cursor-default hover:bg-transparent"
+          className="cursor-default hover:bg-transparent h-14"
         >
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-            <activeTeam.logo className="size-4" />
+          <div className="flex aspect-square size-12 items-center justify-center rounded-lg overflow-hidden">
+            {typeof activeTeam.logo === "string" ? (
+              <img src={activeTeam.logo} alt={activeTeam.name} className="size-full object-contain" />
+            ) : (
+              <div className="bg-sidebar-primary text-sidebar-primary-foreground size-full flex items-center justify-center">
+                <activeTeam.logo className="size-4" />
+              </div>
+            )}
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">
+            <span className="truncate font-bold tracking-tight">
               {activeTeam.name}
             </span>
-            <span className="truncate text-xs">{activeTeam.plan}</span>
+            <span className="truncate text-[10px] text-muted-foreground">{activeTeam.plan}</span>
           </div>
         </SidebarMenuButton>
       </SidebarMenuItem>

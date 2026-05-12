@@ -6,12 +6,23 @@ export default function CoverLoginPage() {
     <div className="min-h-svh grid lg:grid-cols-2">
       {/* LEFT – LOGIN */}
       <div className="flex items-center justify-center bg-muted p-6 md:p-10">
-        <div className="w-full max-w-sm">
-          <div className="mb-6 flex items-center justify-center gap-2 font-medium">
-            <div className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-md">
-              <GalleryVerticalEnd className="size-5" />
+        <div className="w-full max-w-sm flex flex-col gap-1">
+          <div className="flex flex-col items-center justify-center select-none group">
+            <div className="relative flex items-center justify-center transition-all duration-500 group-hover:scale-[1.02]">
+              <div className="absolute -inset-4 bg-primary/5 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              
+              <div className="flex items-center translate-x-[1.3rem]">
+                <img 
+                  src="/logo.png" 
+                  alt="Aham Grham Logo" 
+                  className="h-20 w-auto object-contain drop-shadow-sm transition-transform duration-500 group-hover:rotate-[-2deg]" 
+                />
+                <span className="text-4xl font-extrabold tracking-tighter text-foreground ml-[-2.6rem] transition-colors duration-500 group-hover:text-primary">
+                  ahamgrham
+                </span>
+              </div>
             </div>
-            <span className="text-lg">Acme Inc.</span>
+            <div className="mt-1 w-16 h-[1px] bg-gradient-to-r from-transparent via-border to-transparent" />
           </div>
           <LoginForm />
         </div>
@@ -38,7 +49,7 @@ export default function CoverLoginPage() {
         </div>
 
         <div className="relative z-10 text-sm text-primary-foreground/80">
-          © {new Date().getFullYear()} Acme Inc. All rights reserved.
+          © {new Date().getFullYear()} Aham Grham. All rights reserved.
         </div>
       </div>
     </div>

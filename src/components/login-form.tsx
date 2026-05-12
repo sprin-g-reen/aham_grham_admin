@@ -130,7 +130,7 @@ export function LoginForm({
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
-        Aham Grham Administrative Control Panel v1.0
+        @copyright ahamgrham
       </div>
     </div>
   )

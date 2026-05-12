@@ -39,8 +39,8 @@ import {
 const data = {
   teams: [
     {
-      name: "Aham Grham",
-      logo: GalleryVerticalEnd,
+      name: "ahamgrham",
+      logo: "/logo.png",
       plan: "Admin Dashboard",
     },
   ],
@@ -154,7 +154,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon"
-     {...props}>
+      {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
