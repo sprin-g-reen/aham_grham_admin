@@ -125,7 +125,7 @@ export function LoginForm({
         </CardContent>
       </Card>
       <div className="text-balance text-center text-sm text-muted-foreground/60 transition-opacity hover:opacity-100">
-        © copyright ahamgrham
+        © Copyright Springreen
       </div>
     </div>
   )
