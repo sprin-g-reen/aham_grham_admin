@@ -40,7 +40,7 @@ const data = {
   teams: [
     {
       name: "ahamgrham",
-      logo: "/logo.png",
+      logo: "/logo_new.png",
       plan: "Admin Dashboard",
     },
   ],
