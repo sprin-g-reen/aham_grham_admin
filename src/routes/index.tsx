@@ -99,7 +99,7 @@ export const router = createBrowserRouter (
 
     // 🔐 AUTH ROUTES (SHORTCUTS)
     { path: "/login", element: <LoginPage /> },
-    { path: "/register", element: <RegisterPage /> },
+
     { path: "/forgot-password", element: <ForgotPasswordPage /> },
 
     // 🔐 AUTH ROUTES (FULL PATHS)
@@ -108,14 +108,14 @@ export const router = createBrowserRouter (
       errorElement: <ErrorPage />,
       children: [
         {path: "auth/basic/login", element: <LoginPage /> },
-        {path: "auth/basic/register", element: <RegisterPage /> },
+
         {path: "auth/basic/forgot-password", element: <ForgotPasswordPage /> },
         {path: "auth/basic/reset-password", element: <ResetPasswordForm /> },
         {path: "auth/basic/verify-email", element: <VerifyEmailForm /> },
         {path: "auth/basic/password-reset-success", element: <PasswordResetSuccess /> },
 
         {path: "auth/cover/login", element: <CoverLoginPage /> },
-        {path: "auth/cover/register", element: <CoverRegisterPage /> },
+
         {path: "auth/cover/forgot-password", element: <CoverForgotPasswordPage /> },
         {path: "auth/cover/new-password", element: <CoverResetPasswordPage /> },
         {path: "auth/cover/password-reset-success", element: <CoverPasswordResetSuccessPage /> },

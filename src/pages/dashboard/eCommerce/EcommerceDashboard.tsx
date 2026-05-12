@@ -9,9 +9,9 @@ const VisitorsCard = lazy(() => import("./VisitorsCard"))
 const ConversionRateCard = lazy(() => import("./ConversionRateCard"))
 const SalesAnalysisCard = lazy(() => import("./SalesAnalysisCard"))
 const RecentOrdersCard = lazy(() => import("./RecentOrdersCard"))
-const SalesByCountriesCard = lazy(() => import("./SalesByCountriesCard"))
+
 const OrderStatus = lazy(() => import("./OrderStatus"))
-const RecentOrdersTable = lazy(() => import("./RecentOrdersTable"))
+
 const PopularProductsCard = lazy(() => import("./PopularProductsCard"))
 
 // Reusable Skeleton
@@ -58,31 +58,23 @@ export default function EcommerceDashboard() {
           </Suspense>
         </div>
 
-        <div className="col-span-12 lg:col-span-6 xl:col-span-4">
+        <div className="col-span-12 lg:col-span-6 xl:col-span-6">
           <Suspense fallback={<CardSkeleton height={260} />}>
             <RecentOrdersCard />
           </Suspense>
         </div>
 
-        <div className="col-span-12 lg:col-span-6 xl:col-span-4">
+        <div className="col-span-12 lg:col-span-6 xl:col-span-6">
           <Suspense fallback={<CardSkeleton height={260} />}>
             <OrderStatus />
           </Suspense>
         </div>
 
-        <div className="col-span-12 xl:col-span-4">
-          <Suspense fallback={<CardSkeleton height={260} />}>
-            <SalesByCountriesCard />
-          </Suspense>
-        </div>
 
-        <div className="col-span-12 xl:col-span-8">
-          <Suspense fallback={<CardSkeleton height={400} />}>
-            <RecentOrdersTable />
-          </Suspense>
-        </div>
 
-        <div className="col-span-12 xl:col-span-4">
+
+
+        <div className="col-span-12 xl:col-span-12">
           <Suspense fallback={<CardSkeleton height={300} />}>
             <PopularProductsCard />
           </Suspense>
