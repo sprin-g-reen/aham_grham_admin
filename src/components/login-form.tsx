@@ -76,7 +76,7 @@ export function LoginForm({
                 </div>
                 <div className="grid gap-2">
                   <div className="flex items-center">
-                    <Label htmlFor="password" name="Password" className="text-sm font-semibold">Password</Label>
+                    <Label htmlFor="password" className="text-sm font-semibold">Password</Label>
                     <Link
                       to="/forgot-password"
                       className="ml-auto text-sm font-medium text-primary hover:underline underline-offset-4"
