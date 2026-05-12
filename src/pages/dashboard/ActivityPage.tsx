@@ -4,6 +4,13 @@ import { toast } from 'sonner';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
   History, 
   Trash2, 
   PlusCircle, 
@@ -11,7 +18,8 @@ import {
   FileUp, 
   LogIn, 
   LogOut,
-  Search
+  Search,
+  Filter
 } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
@@ -21,12 +29,20 @@ const ActivityPage = () => {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState('ALL');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [visibleLimit, setVisibleLimit] = useState(15);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
+  const ITEMS_PER_PAGE = 5;
+
   const fetchActivities = async () => {
+    setLoading(true);
     try {
       const response = await axios.get(`${API_URL}/activities`);
       setActivities(response.data);
+      setCurrentPage(1);
+      setVisibleLimit(15);
     } catch (error) {
       toast.error("Failed to fetch activity logs");
     } finally {
@@ -37,6 +53,10 @@ const ActivityPage = () => {
   useEffect(() => {
     fetchActivities();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterType]);
 
   const handleClearLogs = async () => {
     try {
@@ -73,11 +93,39 @@ const ActivityPage = () => {
     }
   };
 
-  const filteredActivities = activities.filter((a: any) => 
-    a.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    a.module.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    a.action.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const allFiltered = activities.filter((a: any) => {
+    const matchesSearch = a.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.module.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.action.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesFilter = filterType === 'ALL' || a.action === filterType;
+    
+    return matchesSearch && matchesFilter;
+  });
+
+  const isSearching = searchTerm !== '' || filterType !== 'ALL';
+
+  let displayedActivities = [];
+  let totalVisiblePages = 1;
+
+  if (isSearching) {
+    displayedActivities = allFiltered;
+    totalVisiblePages = 1;
+  } else {
+    // Paginate based on visibleLimit (starts at 15)
+    const paginatedBase = activities.slice(0, visibleLimit);
+    totalVisiblePages = Math.ceil(paginatedBase.length / ITEMS_PER_PAGE);
+    displayedActivities = paginatedBase.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  }
+
+  const handleFetchMore = () => {
+    const nextLimit = visibleLimit + 15;
+    setVisibleLimit(nextLimit);
+    // Automatically jump to the first page of the new batch
+    setCurrentPage(visibleLimit / ITEMS_PER_PAGE + 1);
+  };
+
+  const hasMoreToFetch = !isSearching && visibleLimit < activities.length;
 
   return (
     <div className="p-6 space-y-8 max-w-7xl mx-auto">
@@ -89,8 +137,8 @@ const ActivityPage = () => {
           </h1>
           <p className="text-muted-foreground">Monitor all administrative actions and system changes.</p>
         </div>
-        <div className="flex gap-2 w-full md:w-auto">
-           <div className="relative flex-1 md:w-64">
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+           <div className="relative flex-1 md:w-64 min-w-[200px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input 
               placeholder="Search logs..." 
@@ -99,17 +147,35 @@ const ActivityPage = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button variant="outline" onClick={fetchActivities} disabled={loading}>
-            Refresh
-          </Button>
-          <Button 
-            variant="destructive" 
-            onClick={() => setIsConfirmOpen(true)} 
-            className="flex items-center gap-2"
-          >
-            <Trash2 className="w-4 h-4" />
-            Clear Logs
-          </Button>
+
+          <Select value={filterType} onValueChange={setFilterType}>
+            <SelectTrigger className="w-[140px] gap-2">
+              <Filter className="w-4 h-4 text-muted-foreground" />
+              <SelectValue placeholder="All Actions" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Actions</SelectItem>
+              <SelectItem value="LOGIN">Login</SelectItem>
+              <SelectItem value="LOGOUT">Logout</SelectItem>
+              <SelectItem value="CREATE">Create</SelectItem>
+              <SelectItem value="UPDATE">Update</SelectItem>
+              <SelectItem value="DELETE">Delete</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={fetchActivities} disabled={loading} size="icon" title="Refresh">
+              <History className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={() => setIsConfirmOpen(true)} 
+              className="flex items-center gap-2"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Clear Logs</span>
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -132,12 +198,12 @@ const ActivityPage = () => {
                   <tr>
                     <td colSpan={6} className="px-6 py-10 text-center text-muted-foreground">Loading activities...</td>
                   </tr>
-                ) : filteredActivities.length === 0 ? (
+                ) : displayedActivities.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-10 text-center text-muted-foreground">No activities found.</td>
                   </tr>
                 ) : (
-                  filteredActivities.map((a: any) => (
+                  displayedActivities.map((a: any) => (
                     <tr key={a._id} className="hover:bg-muted/30 transition-colors">
                       <td className="px-6 py-4">
                         <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-bold uppercase tracking-wider ${getActionColor(a.action)}`}>
@@ -169,6 +235,54 @@ const ActivityPage = () => {
               </tbody>
             </table>
           </div>
+
+          {!isSearching && !loading && activities.length > 0 && (
+            <div className="flex items-center justify-between px-6 py-4 border-t bg-muted/20">
+              <p className="text-xs text-muted-foreground font-medium">
+                Viewing {Math.min(visibleLimit, activities.length)} of {activities.length} logs
+              </p>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-4"
+                >
+                  Previous
+                </Button>
+                
+                <div className="flex items-center gap-1">
+                  {[...Array(totalVisiblePages)].map((_, i) => (
+                    <Button
+                      key={i + 1}
+                      variant={currentPage === i + 1 ? "default" : "ghost"}
+                      size="sm"
+                      className={`w-9 h-9 p-0 font-bold ${currentPage === i + 1 ? 'shadow-md shadow-primary/20' : ''}`}
+                      onClick={() => setCurrentPage(i + 1)}
+                    >
+                      {i + 1}
+                    </Button>
+                  ))}
+                </div>
+
+                {hasMoreToFetch ? (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleFetchMore}
+                    className="ml-2 border-primary/20 text-primary hover:bg-primary/5 px-6 font-semibold"
+                  >
+                    Fetch More
+                  </Button>
+                ) : (
+                  <span className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-widest ml-4">
+                    No other activity logs
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
