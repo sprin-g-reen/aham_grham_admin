@@ -27,7 +27,6 @@ const TestimonialsPage = () => {
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [addForm, setAddForm] = useState({
     name: '',
-    testimonialId: '',
     role: '',
     content: '',
   })
@@ -150,7 +149,7 @@ const TestimonialsPage = () => {
   // Handle Add
   const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!addForm.name || !addForm.testimonialId || !addForm.role || !addForm.content) {
+    if (!addForm.name || !addForm.role || !addForm.content) {
       toast.error("Please fill in all required fields.")
       return
     }
@@ -159,7 +158,6 @@ const TestimonialsPage = () => {
     try {
       const formData = new FormData()
       formData.append('name', addForm.name)
-      formData.append('testimonialId', addForm.testimonialId)
       formData.append('role', addForm.role)
       formData.append('content', addForm.content)
       formData.append('rating', '5')
@@ -167,7 +165,7 @@ const TestimonialsPage = () => {
 
       await axios.post(`${API_URL}/testimonials`, formData)
       toast.success("Testimonial added successfully")
-      setAddForm({ name: '', testimonialId: '', role: '', content: '' })
+      setAddForm({ name: '', role: '', content: '' })
       setAddFile(null)
       setAddFileInputKey(Date.now())
       setIsAddOpen(false)
@@ -351,7 +349,7 @@ const TestimonialsPage = () => {
           </DialogHeader>
           <form onSubmit={handleAddSubmit} className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
+              <div className="space-y-2 col-span-2">
                 <Label htmlFor="add-name">Client Name</Label>
                 <Input
                   id="add-name"
@@ -359,16 +357,6 @@ const TestimonialsPage = () => {
                   placeholder="e.g. Sarah Johnson"
                   value={addForm.name}
                   onChange={(e) => setAddForm({ ...addForm, name: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="add-id">Testimonial ID</Label>
-                <Input
-                  id="add-id"
-                  required
-                  placeholder="e.g. TEST-001"
-                  value={addForm.testimonialId}
-                  onChange={(e) => setAddForm({ ...addForm, testimonialId: e.target.value })}
                 />
               </div>
             </div>
@@ -428,20 +416,12 @@ const TestimonialsPage = () => {
           </DialogHeader>
           <form onSubmit={handleUpdateSubmit} className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
+              <div className="space-y-2 col-span-2">
                 <Label htmlFor="up-name">Client Name</Label>
                 <Input
                   id="up-name"
                   value={updateForm.name}
                   onChange={(e) => setUpdateForm({ ...updateForm, name: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="up-id">Testimonial ID</Label>
-                <Input
-                  id="up-id"
-                  value={updateForm.testimonialId}
-                  onChange={(e) => setUpdateForm({ ...updateForm, testimonialId: e.target.value })}
                 />
               </div>
             </div>

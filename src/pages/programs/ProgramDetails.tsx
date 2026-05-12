@@ -58,7 +58,6 @@ const ProgramDetails = () => {
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [addForm, setAddForm] = useState({
     name: '',
-    programId: '',
     bookingPrice: '',
     description: ''
   })
@@ -137,7 +136,7 @@ const ProgramDetails = () => {
 
   const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!addForm.name || !addForm.programId || !addForm.bookingPrice || !addForm.description || !addFile) {
+    if (!addForm.name || !addForm.bookingPrice || !addForm.description || !addFile) {
       toast.error("All fields are required, including the program image.")
       return
     }
@@ -155,7 +154,7 @@ const ProgramDetails = () => {
 
       await axios.post(`${API_URL}/programs`, payload)
       toast.success("Program added successfully")
-      setAddForm({ name: '', programId: '', bookingPrice: '', description: '' })
+      setAddForm({ name: '', bookingPrice: '', description: '' })
       setAddFile(null)
       setIsAddOpen(false)
       fetchData()
@@ -166,7 +165,7 @@ const ProgramDetails = () => {
     }
   }
 
-  const filteredPrograms = programs.filter(p => 
+  const filteredPrograms = programs.filter((p: Program) => 
     (p.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
     (p.programId?.toLowerCase() || '').includes(searchTerm.toLowerCase())
   )
@@ -285,15 +284,7 @@ const ProgramDetails = () => {
                 onChange={(e) => setEditForm({...editForm, name: e.target.value})}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-id">Program ID</Label>
-              <Input 
-                id="edit-id"
-                required
-                value={editForm.programId}
-                onChange={(e) => setEditForm({...editForm, programId: e.target.value})}
-              />
-            </div>
+
             <div className="space-y-2">
               <Label htmlFor="edit-price">Booking Price (₹)</Label>
               <Input 
@@ -350,16 +341,7 @@ const ProgramDetails = () => {
                 onChange={(e) => setAddForm({...addForm, name: e.target.value})}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="add-id">Program ID</Label>
-              <Input 
-                id="add-id"
-                required
-                placeholder="e.g. PROG-001" 
-                value={addForm.programId}
-                onChange={(e) => setAddForm({...addForm, programId: e.target.value})}
-              />
-            </div>
+
             <div className="space-y-2">
               <Label htmlFor="add-price">Booking Price (₹)</Label>
               <Input 

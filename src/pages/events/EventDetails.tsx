@@ -70,7 +70,6 @@ const EventDetails = () => {
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [addForm, setAddForm] = useState({
     name: '',
-    eventId: '',
     bookingPrice: '',
     description: '',
     about: '',
@@ -161,7 +160,7 @@ const EventDetails = () => {
   const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const isHighlight = addForm.category === 'Highlight'
-    if (!addForm.name || !addForm.eventId || !addForm.category || !addForm.about || !addForm.description || !addFile) {
+    if (!addForm.name || !addForm.category || !addForm.about || !addForm.description || !addFile) {
       toast.error(`All fields are required, including Category and ${isHighlight ? 'Highlight Image' : 'Event Image'}.`)
       return
     }
@@ -179,7 +178,7 @@ const EventDetails = () => {
 
       await axios.post(`${API_URL}/events`, payload)
       toast.success("Event added successfully")
-      setAddForm({ name: '', eventId: '', bookingPrice: '', description: '', about: '', category: '', isBlog: false })
+      setAddForm({ name: '', bookingPrice: '', description: '', about: '', category: '', isBlog: false })
       setAddFile(null)
       setIsAddOpen(false)
       fetchData()
@@ -190,7 +189,7 @@ const EventDetails = () => {
     }
   }
 
-  const filteredEvents = events.filter(e => 
+  const filteredEvents = events.filter((e: any) => 
     (e.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
     (e.eventId?.toLowerCase() || '').includes(searchTerm.toLowerCase())
   )
@@ -315,7 +314,7 @@ const EventDetails = () => {
           </ShadcnHeader>
           <form onSubmit={handleUpdate} className="space-y-3 py-2">
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
+              <div className="space-y-1 col-span-2">
                 <Label htmlFor="edit-name" className="text-xs">Event Name</Label>
                 <Input 
                   id="edit-name" 
@@ -323,16 +322,6 @@ const EventDetails = () => {
                   className="h-9"
                   value={editForm.name}
                   onChange={(e) => setEditForm({...editForm, name: e.target.value})}
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="edit-id" className="text-xs">Event ID</Label>
-                <Input 
-                  id="edit-id" 
-                  required
-                  className="h-9"
-                  value={editForm.eventId}
-                  onChange={(e) => setEditForm({...editForm, eventId: e.target.value})}
                 />
               </div>
             </div>
@@ -418,7 +407,7 @@ const EventDetails = () => {
           </ShadcnHeader>
           <form onSubmit={handleAddSubmit} className="space-y-3 py-2">
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
+              <div className="space-y-1 col-span-2">
                 <Label htmlFor="add-name" className="text-xs">Event Name</Label>
                 <Input 
                   id="add-name" 
@@ -427,17 +416,6 @@ const EventDetails = () => {
                   placeholder="e.g. Retreat" 
                   value={addForm.name}
                   onChange={(e) => setAddForm({...addForm, name: e.target.value})}
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="add-id" className="text-xs">Event ID</Label>
-                <Input 
-                  id="add-id" 
-                  required
-                  className="h-9"
-                  placeholder="e.g. EVNT-001" 
-                  value={addForm.eventId}
-                  onChange={(e) => setAddForm({...addForm, eventId: e.target.value})}
                 />
               </div>
             </div>
