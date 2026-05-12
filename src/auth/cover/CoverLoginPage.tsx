@@ -11,13 +11,13 @@ export default function CoverLoginPage() {
             <div className="relative flex items-center justify-center transition-all duration-500 group-hover:scale-[1.02]">
               <div className="absolute -inset-4 bg-primary/5 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-              <div className="flex items-center translate-x-[1.3rem]">
+              <div className="flex items-center">
                 <img
                   src="/logo.png"
                   alt="Aham Grham Logo"
-                  className="h-20 w-auto object-contain drop-shadow-sm transition-transform duration-500 group-hover:rotate-[-2deg]"
+                  className="h-16 w-auto object-contain drop-shadow-[0_0_15px_rgba(168,85,247,0.2)] transition-transform duration-500 group-hover:scale-110"
                 />
-                <span className="text-4xl font-extrabold tracking-tighter text-foreground ml-[-2.6rem] transition-colors duration-500 group-hover:text-primary">
+                <span className="text-4xl font-bold tracking-tight text-foreground ml-[-2.4rem] transition-colors duration-500 group-hover:text-primary">
                   ahamgrham
                 </span>
               </div>

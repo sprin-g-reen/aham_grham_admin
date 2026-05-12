@@ -50,23 +50,24 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="border-border/50">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold tracking-tight">Admin Login</CardTitle>
-          <CardDescription>
+      <Card className="border-border/50 shadow-xl shadow-primary/5">
+        <CardHeader className="text-center pt-10 pb-6">
+          <CardTitle className="text-3xl font-extrabold tracking-tight">Admin Login</CardTitle>
+          <CardDescription className="text-base">
             Enter your credentials to access the Aham Grham dashboard
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-10 pb-10">
           <form onSubmit={handleSubmit}>
-            <div className="grid gap-6">
+            <div className="grid gap-8">
               <div className="grid gap-6">
                 <div className="grid gap-2">
-                  <Label htmlFor="email">Email Address</Label>
+                  <Label htmlFor="email" className="text-sm font-semibold">Email Address</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="admin@ahamgrham.com"
+                    placeholder="admin@123gmail.com"
+                    className="h-11 bg-muted/50 border-border/50 focus:bg-background transition-colors"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -75,7 +76,7 @@ export function LoginForm({
                 </div>
                 <div className="grid gap-2">
                   <div className="flex items-center">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password" name="Password" className="text-sm font-semibold">Password</Label>
                     <Link
                       to="/forgot-password"
                       className="ml-auto text-sm font-medium text-primary hover:underline underline-offset-4"
@@ -88,11 +89,11 @@ export function LoginForm({
                       id="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
+                      className="h-11 bg-muted/50 border-border/50 focus:bg-background transition-colors pr-10"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       disabled={loading}
-                      className="pr-10"
                     />
                     <button
                       type="button"
@@ -108,7 +109,7 @@ export function LoginForm({
                     </button>
                   </div>
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full h-11 text-base font-bold shadow-lg shadow-primary/20" disabled={loading}>
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -119,13 +120,12 @@ export function LoginForm({
                   )}
                 </Button>
               </div>
-
             </div>
           </form>
         </CardContent>
       </Card>
-      <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
-        @copyright ahamgrham
+      <div className="text-balance text-center text-sm text-muted-foreground/60 transition-opacity hover:opacity-100">
+        © copyright ahamgrham
       </div>
     </div>
   )
