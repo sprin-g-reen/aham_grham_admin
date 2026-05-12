@@ -70,11 +70,7 @@ const data = {
       url: "dashboard/testimonials",
       icon: Quote,
     },
-    {
-      title: "Page Content",
-      url: "dashboard/hero",
-      icon: FileText,
-    },
+
     {
       title: "Centers",
       url: "dashboard/centers",
@@ -85,11 +81,7 @@ const data = {
       url: "dashboard/content-controller",
       icon: ShieldCheck,
     },
-    {
-      title: "Footer Section",
-      url: "dashboard/footer",
-      icon: Layout,
-    },
+
     {
       title: "eCommerce",
       url: "#",
