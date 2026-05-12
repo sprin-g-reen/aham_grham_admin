@@ -15,7 +15,7 @@ import {
   Plus
 } from 'lucide-react'
 import { ConfirmDialog } from "@/components/ConfirmDialog"
-import { API_URL, SITE_ORIGIN, UPLOADS_URL } from "@/config"
+import { API_URL, SITE_ORIGIN, UPLOADS_URL, BACKEND_URL } from "@/config"
 
 import { 
   Dialog as ShadcnDialog, 
@@ -211,9 +211,10 @@ const ProgramDetails = () => {
               <div className="flex items-center gap-6 p-6">
                 <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
                   <img 
-                    src={prog.image ? `${SITE_ORIGIN}${prog.image}` : 'https://placehold.co/80x80/2c2c3a/white?text=No+Img'} 
+                    src={prog.image ? (prog.image.startsWith('http') || prog.image.startsWith('data:') ? prog.image : (prog.image.startsWith('/') ? `${BACKEND_URL}${prog.image}` : `${UPLOADS_URL}/${prog.image}`)) : 'https://placehold.co/80x80/2c2c3a/white?text=No+Img'} 
                     alt={prog.name} 
                     className="w-full h-full object-cover"
+                    onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/80x80/2c2c3a/white?text=No+Img' }}
                   />
                 </div>
                 <div className="flex-grow min-w-0">

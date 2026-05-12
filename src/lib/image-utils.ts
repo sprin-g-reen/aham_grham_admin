@@ -25,6 +25,10 @@ export const compressImage = (file: File, maxWidth = 1280, quality = 0.7): Promi
           }
         }, 'image/jpeg', quality);
       };
+      img.onerror = () => {
+        console.error('Image load failed');
+        resolve(file); // Fallback to original file
+      };
     };
   });
 };
