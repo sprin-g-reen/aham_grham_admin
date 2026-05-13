@@ -54,6 +54,7 @@ export default function AddProduct() {
     stock: "",
     stockStatus: "",
     offer: "",
+    features: [""],
   })
 
   const validate = () => {
@@ -113,6 +114,7 @@ export default function AddProduct() {
         stock: "",
         stockStatus: "",
         offer: "",
+        features: [""],
       })
       setSelectedFile(null)
       setErrors({})
@@ -236,6 +238,8 @@ function GeneralInfoCard({ form, setForm, errors, setErrors, categories }: any) 
           )}
         </div>
 
+
+
         <div className="space-y-2 md:col-span-2">
           <Label>Description</Label>
           <Textarea
@@ -244,6 +248,51 @@ function GeneralInfoCard({ form, setForm, errors, setErrors, categories }: any) 
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
           />
+        </div>
+
+        {/* Dynamic Features Points */}
+        <div className="space-y-4 md:col-span-2 pt-2 pb-4">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-semibold">Product Features (Points)</Label>
+            <Button 
+              type="button" 
+              size="sm" 
+              variant="outline" 
+              className="h-8"
+              onClick={() => setForm({ ...form, features: [...form.features, ""] })}
+            >
+              <Plus className="h-3 w-3 mr-1" /> Add Point
+            </Button>
+          </div>
+          <div className="space-y-3">
+            {form.features.map((feature: string, index: number) => (
+              <div key={index} className="flex gap-2 items-center">
+                <span className="text-xs font-bold opacity-30 w-4">{index + 1}</span>
+                <Input
+                  placeholder={`Feature point ${index + 1}`}
+                  value={feature}
+                  onChange={(e) => {
+                    const newFeatures = [...form.features];
+                    newFeatures[index] = e.target.value;
+                    setForm({ ...form, features: newFeatures });
+                  }}
+                />
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8"
+                  onClick={() => {
+                    const newFeatures = form.features.filter((_: any, i: number) => i !== index);
+                    setForm({ ...form, features: newFeatures });
+                  }}
+                  disabled={form.features.length === 1}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="space-y-2 md:col-span-2">
@@ -366,6 +415,7 @@ function InventoryCard({ form, setForm, errors, setErrors }: any) {
     </Card>
   )
 }
+  
 
 
 

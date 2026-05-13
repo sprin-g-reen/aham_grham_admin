@@ -42,6 +42,8 @@ import {
 import {
   MoreVertical,
   Plus,
+  X,
+  Upload,
   ShoppingBag,
   Wallet,
   Users,
@@ -54,6 +56,16 @@ import {
   Search,
   LayoutGrid,
 } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { fileToBase64, compressImage } from "../../lib/image-utils"
 
 // Define a proper interface for the product
 interface Product {
@@ -69,6 +81,7 @@ interface Product {
   sku?: string
   tax?: string
   stockStatus?: string
+  features?: string[]
 }
 
 // Use central UPLOADS_URL instead of local hardcoded one
@@ -79,6 +92,8 @@ export default function ProductList() {
   const [selected, setSelected] = useState<string[]>([])
   const [ordersData, setOrdersData] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   const PAGE_SIZE = 10
 
@@ -130,6 +145,11 @@ export default function ProductList() {
     } catch (error) {
       toast.error("Failed to update service status")
     }
+  }
+
+  const handleEditClick = (product: Product) => {
+    setEditingProduct(product)
+    setIsEditModalOpen(true)
   }
 
   // 🔍 Search filter
@@ -378,7 +398,7 @@ export default function ProductList() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => toast.info("Full update feature coming soon!")}
+                          onClick={() => handleEditClick(product)}
                         >
                           Update
                         </Button>
@@ -424,6 +444,23 @@ export default function ProductList() {
           </div>
         </CardContent>
       </Card>
+
+      {editingProduct && (
+        <EditProductModal
+          key={editingProduct._id}
+          product={editingProduct}
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false)
+            setEditingProduct(null)
+          }}
+          onUpdate={() => {
+            fetchProducts()
+            setIsEditModalOpen(false)
+            setEditingProduct(null)
+          }}
+        />
+      )}
     </div>
   )
 }
@@ -460,5 +497,165 @@ function StatCard({
         <div className="rounded-xl bg-muted p-3">{icon}</div>
       </CardContent>
     </Card>
+  )
+}
+
+
+function EditProductModal({ product, isOpen, onClose, onUpdate }: {
+  product: Product,
+  isOpen: boolean,
+  onClose: () => void,
+  onUpdate: () => void
+}) {
+  const [form, setForm] = useState({
+    name: product.name || "",
+    sku: product.sku || "",
+    category: product.category || "",
+    description: product.description || "",
+    price: product.price?.toString() || "",
+    offer: product.offer || "",
+    features: product.features && product.features.length > 0 ? product.features : [""],
+    tax: product.tax || "none",
+    stockStatus: product.stockStatus || "in",
+  })
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [previewImage, setPreviewImage] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const handleUpdate = async () => {
+    setLoading(true)
+    try {
+      const payload: any = { ...form }
+      if (selectedFile) {
+        const compressed = await compressImage(selectedFile)
+        payload.image = await fileToBase64(compressed)
+      }
+
+      await axios.put(`${API_URL}/products/${product._id}`, payload)
+      toast.success("Product updated successfully")
+      onUpdate()
+    } catch (error) {
+      toast.error("Failed to update product")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const addFeature = () => setForm({ ...form, features: [...form.features, ""] })
+  const removeFeature = (idx: number) => setForm({ ...form, features: form.features.filter((_, i) => i !== idx) })
+  const updateFeature = (idx: number, val: string) => {
+    const next = [...form.features]
+    next[idx] = val
+    setForm({ ...form, features: next })
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Edit Product: {product.name}</DialogTitle>
+        </DialogHeader>
+
+        <div className="grid gap-6 py-4 md:grid-cols-2">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Product Name</Label>
+              <Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>SKU / ID</Label>
+                <Input value={form.sku} onChange={e => setForm({ ...form, sku: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Price (₹)</Label>
+                <Input value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Category</Label>
+              <Input value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Textarea rows={4} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Any Offer</Label>
+              <Input value={form.offer} onChange={e => setForm({ ...form, offer: e.target.value })} />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-widest opacity-50">Existing Features (In Database)</Label>
+              <div className="p-3 bg-muted/30 rounded-lg border border-dashed min-h-[40px]">
+                {product.features && product.features.length > 0 ? (
+                  <ul className="list-disc list-inside space-y-1">
+                    {product.features.map((f, i) => (
+                      <li key={i} className="text-xs text-muted-foreground">{f}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-xs text-muted-foreground italic">No features saved yet.</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="flex justify-between items-center text-xs font-bold uppercase tracking-widest opacity-70">
+                Edit Features (Points)
+                <Button variant="ghost" size="sm" onClick={addFeature} className="h-6 px-2"><Plus className="h-3 w-3" /></Button>
+              </Label>
+              <div className="space-y-2">
+                {form.features.map((f, i) => (
+                  <div key={i} className="flex gap-2 items-center">
+                    <Input value={f} onChange={e => updateFeature(i, e.target.value)} />
+                    <Button variant="ghost" size="icon" onClick={() => removeFeature(i)} className="h-8 w-8" disabled={form.features.length === 1}><X className="h-4 w-4" /></Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Product Image</Label>
+              <div className="border rounded-lg p-4 text-center space-y-4">
+                {(previewImage || product.image) && (
+                  <img 
+                    src={previewImage || (product.image?.startsWith('http') || product.image?.startsWith('data:') ? product.image : `${UPLOADS_URL}/${product.image}`)} 
+                    className="h-32 mx-auto rounded object-cover" 
+                  />
+                )}
+                <div className="flex justify-center">
+                  <Button variant="outline" size="sm" onClick={() => document.getElementById('edit-img-input')?.click()}>
+                    <Upload className="h-4 w-4 mr-2" /> Change Image
+                  </Button>
+                </div>
+                <input 
+                  id="edit-img-input" 
+                  type="file" 
+                  className="hidden" 
+                  accept="image/*" 
+                  onChange={e => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      setSelectedFile(file)
+                      setPreviewImage(URL.createObjectURL(file))
+                    }
+                  }} 
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button onClick={handleUpdate} disabled={loading}>
+            {loading ? "Updating..." : "Save Changes"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
