@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Trash2, Plus, RefreshCw, UploadCloud, Search, Check, X, Edit, ExternalLink, Download, FileUp, User } from "lucide-react"
-import { API_URL, SITE_ORIGIN } from "../../config"
+import { API_URL, SITE_ORIGIN, BACKEND_URL } from "../../config"
 import {
   Dialog,
   DialogContent,
@@ -286,7 +286,7 @@ const TestimonialsPage = () => {
                   <div className="shrink-0">
                     {t.image ? (
                       <img
-                        src={t.image.startsWith('http') ? t.image : `${SITE_ORIGIN}${t.image}`}
+                        src={t.image ? (t.image.startsWith('http') || t.image.startsWith('data:') ? t.image : (t.image.startsWith('/') ? `${BACKEND_URL}${t.image}` : `${BACKEND_URL}/uploads/${t.image}`)) : ''}
                         alt={t.name}
                         className="w-16 h-16 rounded-full object-cover border-2 border-primary/10"
                       />

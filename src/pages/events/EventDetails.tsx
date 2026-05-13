@@ -114,7 +114,7 @@ const EventDetails = () => {
       bookingPrice: event.bookingPrice.toString(),
       description: event.description || '',
       about: event.about || '',
-      category: event.category || 'Main Event'
+      category: event.category || 'Regularly Happening'
     })
     setEditFile(null)
   }
@@ -178,7 +178,7 @@ const EventDetails = () => {
 
       await axios.post(`${API_URL}/events`, payload)
       toast.success("Event added successfully")
-      setAddForm({ name: '', bookingPrice: '', description: '', about: '', category: '', isBlog: false })
+      setAddForm({ name: '', bookingPrice: '', description: '', about: '', category: 'Regularly Happening', isBlog: false })
       setAddFile(null)
       setIsAddOpen(false)
       fetchData()
@@ -348,8 +348,8 @@ const EventDetails = () => {
                   value={editForm.category}
                   onChange={(e) => setEditForm({...editForm, category: e.target.value})}
                 >
-                  <option value="Main Event">Main Event</option>
-                  <option value="Workshop">Workshop</option>
+                  <option value="Regularly Happening">Regularly Happening</option>
+                  <option value="Regular events">Regular events</option>
                   <option value="Highlight">Highlight</option>
                   <option value="Upcoming Event">Upcoming Event</option>
                 </select>
@@ -445,8 +445,8 @@ const EventDetails = () => {
                   required
                 >
                   <option value="" disabled>Select Category</option>
-                  <option value="Main Event">Main Event</option>
-                  <option value="Workshop">Workshop</option>
+                  <option value="Regularly Happening">Regularly Happening</option>
+                  <option value="Regular events">Regular events</option>
                   <option value="Highlight">Highlight</option>
                   <option value="Upcoming Event">Upcoming Event</option>
                 </select>

@@ -485,7 +485,7 @@ const PageContentManagement = () => {
             <div className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <Card className="border-primary/20 shadow-md">
-                  <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><Calendar className="w-5 h-5 text-primary" /><CardTitle>Main Events Section</CardTitle></CardHeader>
+                  <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><Calendar className="w-5 h-5 text-primary" /><CardTitle>Regularly Happening</CardTitle></CardHeader>
                   <CardContent className="space-y-4 pt-6">
                     <div className="space-y-2"><Label className="text-sm font-bold">Header</Label><Input value={heroData.sections?.mainEvents?.title || ''} onChange={(e) => updateSection('mainEvents.title', e.target.value)} /></div>
                     <div className="space-y-2"><Label className="text-sm font-bold">Description</Label><Textarea value={heroData.sections?.mainEvents?.description || ''} onChange={(e) => updateSection('mainEvents.description', e.target.value)} /></div>
@@ -501,7 +501,7 @@ const PageContentManagement = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <Card className="border-primary/20 shadow-md">
-                  <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><Zap className="w-5 h-5 text-primary" /><CardTitle>Regular Events</CardTitle></CardHeader>
+                  <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><Zap className="w-5 h-5 text-primary" /><CardTitle>Regular events</CardTitle></CardHeader>
                   <CardContent className="space-y-4 pt-6">
                     <div className="space-y-2"><Label className="text-sm font-bold">Header</Label><Input value={heroData.sections?.workshop?.title || ''} onChange={(e) => updateSection('workshop.title', e.target.value)} /></div>
                     <div className="space-y-2"><Label className="text-sm font-bold">Description</Label><Textarea value={heroData.sections?.workshop?.description || ''} onChange={(e) => updateSection('workshop.description', e.target.value)} /></div>
