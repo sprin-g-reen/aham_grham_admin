@@ -26,6 +26,8 @@ interface Center {
   description: string;
   status: string;
   image?: string;
+  mapLink?: string;
+  mapIframe?: string;
 }
 
 const CentersPage = () => {
@@ -43,6 +45,8 @@ const CentersPage = () => {
     location: '',
     description: '',
     status: 'opened',
+    mapLink: '',
+    mapIframe: '',
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [fileInputKey, setFileInputKey] = useState(Date.now())
@@ -61,7 +65,7 @@ const CentersPage = () => {
   }
 
   const resetForm = () => {
-    setForm({ name: '', location: '', description: '', status: 'opened' })
+    setForm({ name: '', location: '', description: '', status: 'opened', mapLink: '', mapIframe: '' })
     setSelectedFile(null)
     setFileInputKey(Date.now())
     setSelectedId(null)
@@ -114,6 +118,16 @@ const CentersPage = () => {
       return
     }
 
+    if (!selectedFile && !form.mapIframe && !isUpdateOpen) {
+      toast.error("Please provide either a Center Image or a Map Iframe.")
+      return
+    }
+
+    if (selectedFile && form.mapIframe) {
+      toast.error("Please provide only one: either an Image or a Map Iframe, not both.")
+      return
+    }
+
     setLoading(true)
     try {
       const payload: any = {
@@ -151,6 +165,8 @@ const CentersPage = () => {
       location: center.location,
       description: center.description,
       status: center.status,
+      mapLink: center.mapLink || '',
+      mapIframe: center.mapIframe || '',
     })
     setIsUpdateOpen(true)
   }
@@ -206,13 +222,20 @@ const CentersPage = () => {
         ) : (
           filteredCenters.map((center) => (
             <Card key={center._id} className="group overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300">
-              <div className="aspect-video relative overflow-hidden">
-                <img 
-                  src={center.image ? (center.image.startsWith('http') || center.image.startsWith('data:') ? center.image : (center.image.startsWith('/') ? `${BACKEND_URL}${center.image}` : `${UPLOADS_URL}/${center.image}`)) : '/placeholder-center.jpg'} 
-                  alt={center.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1545208393-2160291ba86e?q=80&w=1000&auto=format&fit=crop' }}
-                />
+              <div className="aspect-video relative overflow-hidden bg-muted">
+                {center.mapIframe ? (
+                  <div 
+                    className="w-full h-full [&>iframe]:w-full [&>iframe]:h-full"
+                    dangerouslySetInnerHTML={{ __html: center.mapIframe }}
+                  />
+                ) : (
+                  <img 
+                    src={center.image ? (center.image.startsWith('http') || center.image.startsWith('data:') ? center.image : (center.image.startsWith('/') ? `${BACKEND_URL}${center.image}` : `${UPLOADS_URL}/${center.image}`)) : '/placeholder-center.jpg'} 
+                    alt={center.name}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1545208393-2160291ba86e?q=80&w=1000&auto=format&fit=crop' }}
+                  />
+                )}
                 <div className="absolute top-3 right-3">
                   <Badge variant={center.status === 'opened' ? 'default' : 'destructive'} className="shadow-lg">
                     {center.status}
@@ -253,7 +276,7 @@ const CentersPage = () => {
           resetForm()
         }
       }}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] max-h-[95vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{isUpdateOpen ? "Update Center" : "Add New Center"}</DialogTitle>
             <DialogDescription>
@@ -298,6 +321,15 @@ const CentersPage = () => {
                 </Select>
               </div>
               <div className="space-y-2">
+                <Label htmlFor="mapLink">Map Link / Location URL</Label>
+                <Input
+                  id="mapLink"
+                  placeholder="e.g. https://maps.google.com/..."
+                  value={form.mapLink}
+                  onChange={(e) => setForm({ ...form, mapLink: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"
@@ -309,13 +341,26 @@ const CentersPage = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="image">Center Image {isUpdateOpen && "(Optional)"}</Label>
+                <Label htmlFor="image">Center Image</Label>
                 <Input
                   id="image"
                   key={fileInputKey}
                   type="file"
                   accept="image/*"
                   onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                  disabled={!!form.mapIframe}
+                />
+                <p className="text-[10px] text-muted-foreground italic">Provide an image OR a map iframe below.</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="mapIframe">Map Iframe (Google Maps Embed)</Label>
+                <Textarea
+                  id="mapIframe"
+                  placeholder='e.g. <iframe src="..." ...></iframe>'
+                  value={form.mapIframe}
+                  onChange={(e) => setForm({ ...form, mapIframe: e.target.value })}
+                  disabled={!!selectedFile}
+                  className="font-mono text-xs"
                 />
               </div>
             </div>

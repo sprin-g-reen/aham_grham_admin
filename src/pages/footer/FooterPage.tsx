@@ -22,7 +22,7 @@ interface SocialMedia {
 }
 
 interface FooterData {
-  centers: string[];
+  centers: { name: string; link: string }[];
   socialMedia: SocialMedia[];
   contact: {
     email: string;
@@ -53,7 +53,18 @@ const FooterPage = () => {
   const fetchFooterData = async () => {
     try {
       const response = await axios.get(`${API_URL}/footer`);
-      setData(response.data);
+      const footer = response.data;
+      
+      // Ensure arrays and objects exist to avoid uncontrolled input warnings
+      setData({
+        centers: footer.centers || [],
+        socialMedia: footer.socialMedia || [],
+        contact: {
+          email: footer.contact?.email || '',
+          phone: footer.contact?.phone || ''
+        },
+        slogan: footer.slogan || ''
+      });
     } catch (error) {
       toast.error("Failed to load footer data");
     } finally {
@@ -110,12 +121,12 @@ const FooterPage = () => {
 
   // Centers logic
   const addCenter = () => {
-    setData({ ...data, centers: [...data.centers, ''] });
+    setData({ ...data, centers: [...data.centers, { name: '', link: '#' }] });
   };
 
-  const updateCenter = (index: number, value: string) => {
+  const updateCenter = (index: number, field: 'name' | 'link', value: string) => {
     const newCenters = [...data.centers];
-    newCenters[index] = value;
+    newCenters[index] = { ...newCenters[index], [field]: value };
     setData({ ...data, centers: newCenters });
   };
 
@@ -175,9 +186,35 @@ const FooterPage = () => {
           </CardHeader>
           <CardContent className="pt-6 space-y-4">
             {data.centers.map((center, index) => (
-              <div key={index} className="flex gap-2 group">
-                <Input value={center} onChange={(e) => updateCenter(index, e.target.value)} placeholder="e.g. Rishikesh, India" className="bg-background border-primary/10" />
-                <Button variant="ghost" size="icon" onClick={() => removeCenter(index)} className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"><Trash2 size={18} /></Button>
+              <div key={index} className="flex flex-col gap-2 p-4 rounded-xl border border-primary/10 bg-muted/30 relative group">
+                <div className="grid grid-cols-2 gap-4 pr-10">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase">Location Name</Label>
+                    <Input 
+                      value={center.name} 
+                      onChange={(e) => updateCenter(index, 'name', e.target.value)} 
+                      placeholder="e.g. Salem, Tamil Nadu" 
+                      className="bg-background h-10" 
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase">Map Link (URL)</Label>
+                    <Input 
+                      value={center.link} 
+                      onChange={(e) => updateCenter(index, 'link', e.target.value)} 
+                      placeholder="https://maps.google.com/..." 
+                      className="bg-background h-10" 
+                    />
+                  </div>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => removeCenter(index)} 
+                  className="absolute right-2 top-[38px] text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 size={16} />
+                </Button>
               </div>
             ))}
           </CardContent>
