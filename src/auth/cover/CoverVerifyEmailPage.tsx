@@ -23,7 +23,7 @@ export default function CoverVerifyEmailPage({
             <div className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-md">
               <GalleryVerticalEnd className="size-5" />
             </div>
-            <span className="text-lg">Acme Inc.</span>
+            <span className="text-lg">Aham Grham</span>
           </div>
 
           {/* Card */}
@@ -105,7 +105,7 @@ export default function CoverVerifyEmailPage({
         </div>
 
         <div className="relative z-10 text-sm text-primary-foreground/80">
-          © {new Date().getFullYear()} Acme Inc. All rights reserved.
+          © {new Date().getFullYear()} Aham Grham All rights reserved.
         </div>
       </div>
     </div>

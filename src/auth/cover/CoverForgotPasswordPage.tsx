@@ -25,7 +25,7 @@ export default function CoverForgotPasswordPage({
             <div className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-md">
               <GalleryVerticalEnd className="size-5" />
             </div>
-            <span className="text-lg">Acme Inc.</span>
+            <span className="text-lg">Aham Grham</span>
           </div>
 
           {/* Form */}
@@ -48,7 +48,7 @@ export default function CoverForgotPasswordPage({
                       <Input
                         id="email"
                         type="email"
-                        placeholder="m@example.com"
+                        placeholder=""
                         required
                       />
                     </div>
@@ -95,7 +95,7 @@ export default function CoverForgotPasswordPage({
         </div>
 
         <div className="relative z-10 text-sm text-primary-foreground/80">
-          © {new Date().getFullYear()} Acme Inc. All rights reserved.
+          © {new Date().getFullYear()} Aham Grham All rights reserved.
         </div>
       </div>
     </div>

@@ -66,7 +66,7 @@ export function LoginForm({
                   <Input
                     id="email"
                     type="email"
-                    placeholder="admin@123gmail.com"
+                    placeholder=""
                     className="h-11 bg-muted/50 border-border/50 focus:bg-background transition-colors"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -88,7 +88,7 @@ export function LoginForm({
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
+                      placeholder=""
                       className="h-11 bg-muted/50 border-border/50 focus:bg-background transition-colors pr-10"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
