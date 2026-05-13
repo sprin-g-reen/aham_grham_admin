@@ -151,7 +151,7 @@ function LastActivityFooter() {
   return (
     <div className="mt-auto px-6 py-3 border-t bg-background/50 flex flex-col md:flex-row justify-between items-center text-[10px] text-muted-foreground gap-2">
       <div className="flex gap-4">
-        <span>@Copyright</span>
+        <span>© {new Date().getFullYear()} Aham Grham</span>
         <span>Powered by Springreen</span>
       </div>
       
