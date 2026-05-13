@@ -132,17 +132,12 @@ const PageContentManagement = () => {
         corePhilosophy: aboutData.corePhilosophy,
         lineageVoice: aboutData.lineageVoice,
         ancientLineage: aboutData.ancientLineage,
-        faculties: aboutData.faculties,
-        cta: aboutData.cta
+        timeline: aboutData.timeline
       }
       
       if (heroImage) {
         const compressed = await compressImage(heroImage);
         payload.heroImage = await fileToBase64(compressed);
-      }
-      if (aboutCtaImage) {
-        const compressed = await compressImage(aboutCtaImage);
-        payload.ctaImage = await fileToBase64(compressed);
       }
 
       await axios.put(`${API_URL}/about`, payload)
@@ -226,8 +221,38 @@ const PageContentManagement = () => {
               <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
                 {aboutData.halfSections?.map((section: any, index: number) => (
                   <div key={index} className="space-y-4 p-4 border rounded-lg bg-muted/20">
-                    <div className="space-y-1"><Label className="text-xs font-bold">{index === 0 ? "Left Box" : "Right Box"} - Title</Label><Input value={section.title} onChange={(e) => { const newSections = aboutData.halfSections.map((s: any, i: number) => i === index ? { ...s, title: e.target.value } : s); setAboutData({...aboutData, halfSections: newSections}); }} /></div>
-                    <div className="space-y-1"><Label className="text-xs font-bold">{index === 0 ? "Left Box" : "Right Box"} - Content</Label><Textarea value={section.content} className="min-h-[120px]" onChange={(e) => { const newSections = aboutData.halfSections.map((s: any, i: number) => i === index ? { ...s, content: e.target.value } : s); setAboutData({...aboutData, halfSections: newSections}); }} /></div>
+                    <div className="space-y-1">
+                      <Label className="text-xs font-bold">{index === 0 ? "Left Box" : "Right Box"} - Kicker (Small Title)</Label>
+                      <Input 
+                        value={section.kicker || ''} 
+                        placeholder="e.g. our goals"
+                        onChange={(e) => { 
+                          const newSections = aboutData.halfSections.map((s: any, i: number) => i === index ? { ...s, kicker: e.target.value } : s); 
+                          setAboutData({...aboutData, halfSections: newSections}); 
+                        }} 
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs font-bold">{index === 0 ? "Left Box" : "Right Box"} - Title</Label>
+                      <Input 
+                        value={section.title} 
+                        onChange={(e) => { 
+                          const newSections = aboutData.halfSections.map((s: any, i: number) => i === index ? { ...s, title: e.target.value } : s); 
+                          setAboutData({...aboutData, halfSections: newSections}); 
+                        }} 
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs font-bold">{index === 0 ? "Left Box" : "Right Box"} - Content</Label>
+                      <Textarea 
+                        value={section.content} 
+                        className="min-h-[120px]" 
+                        onChange={(e) => { 
+                          const newSections = aboutData.halfSections.map((s: any, i: number) => i === index ? { ...s, content: e.target.value } : s); 
+                          setAboutData({...aboutData, halfSections: newSections}); 
+                        }} 
+                      />
+                    </div>
                   </div>
                 ))}
               </CardContent>
@@ -242,33 +267,117 @@ const PageContentManagement = () => {
             </Card>
 
             <Card className="border-primary/20 shadow-sm">
-              <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><Users className="w-5 h-5 text-primary" /><div><CardTitle>Our Faculties</CardTitle></div></CardHeader>
+              <CardHeader className="flex flex-row items-center gap-3 bg-primary/5">
+                <Calendar className="w-5 h-5 text-primary" />
+                <div className="flex justify-between items-center w-full">
+                  <div>
+                    <CardTitle>Timeline Map</CardTitle>
+                    <CardDescription>Chronological milestones of Aham Grham.</CardDescription>
+                  </div>
+                  <Button type="button" variant="outline" size="sm" onClick={() => {
+                    const newTimeline = [...(aboutData.timeline || []), { year: '', title: '', description: '', image: 'lotus-2026-01-05-00-53-39-utc.jpg' }];
+                    setAboutData({ ...aboutData, timeline: newTimeline });
+                  }}>Add Milestone</Button>
+                </div>
+              </CardHeader>
               <CardContent className="space-y-6 pt-6">
-                <div className="flex justify-between items-center border-b pb-2"><h3 className="text-sm font-bold uppercase tracking-widest text-primary">Faculty Members</h3><Button type="button" variant="outline" size="sm" onClick={() => { const newGuides = [...(aboutData.faculties?.guides || []), { name: '', role: '', bio: '', image: 'placeholder.png' }]; setAboutData({...aboutData, faculties: {...aboutData.faculties, guides: newGuides}}); }}>Add Guide</Button></div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {aboutData.faculties?.guides?.map((guide: any, index: number) => (
-                    <div key={index} className="p-4 border rounded-xl bg-muted/30 space-y-3 relative group">
-                      <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-500" onClick={() => { const newGuides = aboutData.faculties.guides.filter((_: any, i: number) => i !== index); setAboutData({...aboutData, faculties: {...aboutData.faculties, guides: newGuides}}); }}><Trash2 className="w-4 h-4" /></Button>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-1"><Label className="text-[10px] font-bold">Name</Label><Input value={guide.name} onChange={(e) => { const newGuides = aboutData.faculties.guides.map((g: any, i: number) => i === index ? { ...g, name: e.target.value } : g); setAboutData({...aboutData, faculties: {...aboutData.faculties, guides: newGuides}}); }} /></div>
-                        <div className="space-y-1"><Label className="text-[10px] font-bold">Role</Label><Input value={guide.role} onChange={(e) => { const newGuides = aboutData.faculties.guides.map((g: any, i: number) => i === index ? { ...g, role: e.target.value } : g); setAboutData({...aboutData, faculties: {...aboutData.faculties, guides: newGuides}}); }} /></div>
+                <div className="grid grid-cols-1 gap-6">
+                  {aboutData.timeline?.map((item: any, index: number) => (
+                    <div key={index} className="p-4 border rounded-xl bg-muted/30 space-y-4 relative group">
+                      <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="icon" 
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-500" 
+                        onClick={() => { 
+                          const newTimeline = aboutData.timeline.filter((_: any, i: number) => i !== index); 
+                          setAboutData({ ...aboutData, timeline: newTimeline }); 
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="space-y-1">
+                          <Label className="text-[10px] font-bold">Year</Label>
+                          <Input 
+                            value={item.year} 
+                            placeholder="e.g. 2024"
+                            onChange={(e) => { 
+                              const newTimeline = aboutData.timeline.map((it: any, i: number) => i === index ? { ...it, year: e.target.value } : it); 
+                              setAboutData({ ...aboutData, timeline: newTimeline }); 
+                            }} 
+                          />
+                        </div>
+                        <div className="md:col-span-3 space-y-1">
+                          <Label className="text-[10px] font-bold">Event Title</Label>
+                          <Input 
+                            value={item.title} 
+                            placeholder="e.g. Global Expansion"
+                            onChange={(e) => { 
+                              const newTimeline = aboutData.timeline.map((it: any, i: number) => i === index ? { ...it, title: e.target.value } : it); 
+                              setAboutData({ ...aboutData, timeline: newTimeline }); 
+                            }} 
+                          />
+                        </div>
                       </div>
-                      <div className="space-y-1"><Label className="text-[10px] font-bold">Bio</Label><Textarea value={guide.bio} className="h-20" onChange={(e) => { const newGuides = aboutData.faculties.guides.map((g: any, i: number) => i === index ? { ...g, bio: e.target.value } : g); setAboutData({...aboutData, faculties: {...aboutData.faculties, guides: newGuides}}); }} /></div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="md:col-span-2 space-y-1">
+                          <Label className="text-[10px] font-bold">Description</Label>
+                          <Textarea 
+                            value={item.description} 
+                            className="h-28" 
+                            placeholder="Describe this milestone..."
+                            onChange={(e) => { 
+                              const newTimeline = aboutData.timeline.map((it: any, i: number) => i === index ? { ...it, description: e.target.value } : it); 
+                              setAboutData({ ...aboutData, timeline: newTimeline }); 
+                            }} 
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-bold uppercase tracking-widest opacity-70">Milestone Image</Label>
+                          <div className="relative aspect-video rounded-lg overflow-hidden bg-black/40 border border-primary/20 hover:border-primary/50 transition-all group cursor-pointer">
+                            <img 
+                              src={item.image?.startsWith('data:') || item.image?.startsWith('http') 
+                                ? item.image 
+                                : `http://${window.location.hostname}:3000/assets/AhamGraham-Web/${item.image}`} 
+                              alt="Preview" 
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = 'https://placehold.co/600x400?text=No+Image+Found';
+                              }}
+                            />
+                            <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 pointer-events-none">
+                              <div className="bg-primary p-2 rounded-full shadow-lg">
+                                <Sparkles className="w-5 h-5 text-white" />
+                              </div>
+                              <span className="text-[10px] font-bold text-white uppercase tracking-tighter drop-shadow-md">Click to Change</span>
+                            </div>
+                            <input 
+                              type="file" 
+                              className="absolute inset-0 opacity-0 cursor-pointer z-[100] w-full h-full" 
+                              accept="image/*"
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const compressed = await compressImage(file, 800, 0.6);
+                                  const base64 = await fileToBase64(compressed);
+                                  const newTimeline = aboutData.timeline.map((it: any, i: number) => i === index ? { ...it, image: base64 } : it);
+                                  setAboutData({ ...aboutData, timeline: newTimeline });
+                                }
+                              }}
+                            />
+                          </div>
+                          <p className="text-[9px] text-muted-foreground truncate">File: {item.image?.startsWith('data:') ? 'New Upload' : item.image}</p>
+                        </div>
+                      </div>
                     </div>
                   ))}
+                  {(!aboutData.timeline || aboutData.timeline.length === 0) && (
+                    <div className="text-center py-10 border-2 border-dashed rounded-xl text-muted-foreground">
+                      No milestones added. Click "Add Milestone" to begin.
+                    </div>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-primary/20 shadow-sm">
-              <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><Sparkles className="w-5 h-5 text-primary" /><div><CardTitle>Bottom CTA</CardTitle></div></CardHeader>
-              <CardContent className="space-y-4 pt-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1"><Label className="text-xs font-bold">Title</Label><Input value={aboutData.cta?.title} onChange={(e) => setAboutData({...aboutData, cta: {...aboutData.cta, title: e.target.value}})} /></div>
-                  <div className="space-y-1"><Label className="text-xs font-bold">Button Text</Label><Input value={aboutData.cta?.buttonText} onChange={(e) => setAboutData({...aboutData, cta: {...aboutData.cta, buttonText: e.target.value}})} /></div>
-                </div>
-                <div className="space-y-1"><Label className="text-xs font-bold">Subtitle</Label><Textarea value={aboutData.cta?.subtitle} onChange={(e) => setAboutData({...aboutData, cta: {...aboutData.cta, subtitle: e.target.value}})} /></div>
-                <div className="space-y-1"><Label className="text-xs font-bold">CTA Background Image</Label><Input type="file" onChange={(e) => setHeroImage(e.target.files?.[0] || null)} /></div>
               </CardContent>
             </Card>
 
