@@ -327,7 +327,7 @@ export default function ProductList() {
                   <TableHead>Product ID</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Price</TableHead>
-                  <TableHead>Featured</TableHead>
+
                   <TableHead>Services</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -365,11 +365,7 @@ export default function ProductList() {
                     <TableCell>{product.category}</TableCell>
                     <TableCell>₹{product.price}</TableCell>
 
-                    <TableCell>
-                      <Badge className={product.isMostSelling ? "bg-blue-100 text-blue-600 dark:bg-blue-500/20" : "bg-muted text-muted-foreground"} variant="outline">
-                        {product.isMostSelling ? "Most Selling" : "Normal"}
-                      </Badge>
-                    </TableCell>
+
 
                     <TableCell>
                       <Badge className={product.isServicePage ? "bg-purple-100 text-purple-600 dark:bg-purple-500/20" : "bg-muted text-muted-foreground"} variant="outline">
@@ -379,14 +375,7 @@ export default function ProductList() {
 
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button
-                          variant={product.isMostSelling ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => toggleMostSelling(product)}
-                          className={product.isMostSelling ? "bg-orange-500 hover:bg-orange-600 text-white" : ""}
-                        >
-                          {product.isMostSelling ? "Featured" : "Feature"}
-                        </Button>
+
                         <Button
                           variant={product.isServicePage ? "default" : "outline"}
                           size="sm"
