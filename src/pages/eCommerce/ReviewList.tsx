@@ -33,6 +33,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Star, MessageSquare, Plus, X, Trash2, CheckCircle, Clock } from "lucide-react"
 import { API_URL } from "@/config"
 import axios from "axios"
+import { toast } from "sonner"
 
 interface Product {
   _id: string
@@ -99,18 +100,7 @@ const ReviewList = ({ mode }: { mode?: 'says' | 'reviews' }) => {
     setSelectedProduct(products.find(p => p._id === id) || null)
   }
 
-  const handleUpdateAISummary = async () => {
-    if (!selectedProduct) return
-    try {
-      await axios.patch(`${API_URL}/products/${selectedProduct._id}`, {
-        aiReviewSummary: selectedProduct.aiReviewSummary,
-        reviewKeywords: selectedProduct.reviewKeywords
-      })
-      toast.success("Summary updated successfully!")
-    } catch (err) {
-      toast.error("Failed to update Summary")
-    }
-  }
+
 
   const toggleReviewStatus = async (reviewId: string, currentStatus: boolean) => {
     try {
@@ -148,80 +138,13 @@ const ReviewList = ({ mode }: { mode?: 'says' | 'reviews' }) => {
       </div>
 
       {selectedProduct && (
-        <Accordion type="multiple" defaultValue={mode === 'says' ? ["customers-say"] : (mode === 'reviews' ? ["individual-reviews"] : ["customers-say", "individual-reviews"])} className="space-y-4">
+        <div className="space-y-4">
           
-          {/* Section 1: Customers Says (AI Summary) */}
-          <AccordionItem value="customers-say" className="border rounded-xl bg-card overflow-hidden">
-            <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/10 transition-all">
-              <div className="flex items-center gap-3">
-                <div className="bg-primary/10 p-2 rounded-lg">
-                  <MessageSquare className="h-5 w-5 text-primary" />
-                </div>
-                <span className="text-lg font-bold">Customer Says</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-6 pb-6 pt-2 space-y-6 border-t border-muted">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Customer Says Summary</Label>
-                  <Textarea 
-                    rows={5}
-                    value={selectedProduct.aiReviewSummary}
-                    onChange={(e) => setSelectedProduct({ ...selectedProduct, aiReviewSummary: e.target.value })}
-                    placeholder="Enter what customers are saying about this product... (This will reflect on the website)"
-                  />
-                </div>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label>Review Keywords / Tags</Label>
-                    <Button variant="outline" size="sm" onClick={() => {
-                      const next = { ...selectedProduct, reviewKeywords: [...selectedProduct.reviewKeywords, { label: "", count: 0, trend: "up" }] }
-                      setSelectedProduct(next)
-                    }}>
-                      <Plus className="h-4 w-4 mr-2" /> Add Tag
-                    </Button>
-                  </div>
-                  <div className="grid gap-3">
-                    {selectedProduct.reviewKeywords.map((tag, i) => (
-                      <div key={i} className="flex gap-2">
-                        <Input 
-                          placeholder="Label" 
-                          value={tag.label}
-                          onChange={(e) => {
-                            const next = [...selectedProduct.reviewKeywords]
-                            next[i].label = e.target.value
-                            setSelectedProduct({ ...selectedProduct, reviewKeywords: next })
-                          }}
-                        />
-                        <Input 
-                          type="number" className="w-24"
-                          value={tag.count}
-                          onChange={(e) => {
-                            const next = [...selectedProduct.reviewKeywords]
-                            next[i].count = parseInt(e.target.value)
-                            setSelectedProduct({ ...selectedProduct, reviewKeywords: next })
-                          }}
-                        />
-                        <Button variant="ghost" size="icon" onClick={() => {
-                          const next = selectedProduct.reviewKeywords.filter((_, idx) => idx !== i)
-                          setSelectedProduct({ ...selectedProduct, reviewKeywords: next })
-                        }}>
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
 
-                <Button onClick={handleUpdateAISummary} className="w-full">Update Website Summary</Button>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
 
           {/* Section 2: Customer Review (Individual Reviews) */}
-          <AccordionItem value="individual-reviews" className="border rounded-xl bg-card overflow-hidden">
-            <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/10 transition-all">
+          <Card className="rounded-xl bg-card overflow-hidden">
+            <div className="px-6 py-4 border-b">
               <div className="flex items-center gap-3">
                 <div className="bg-accent-blue/10 p-2 rounded-lg">
                   <Star className="h-5 w-5 text-accent-blue" />
@@ -229,8 +152,8 @@ const ReviewList = ({ mode }: { mode?: 'says' | 'reviews' }) => {
                 <span className="text-lg font-bold">Customer Review (Individual)</span>
                 <Badge variant="secondary" className="ml-2">{reviews.length} reviews</Badge>
               </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-6 pb-6 pt-2 border-t border-muted">
+            </div>
+            <div className="px-6 pb-6 pt-2">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -281,8 +204,9 @@ const ReviewList = ({ mode }: { mode?: 'says' | 'reviews' }) => {
                   )}
                 </TableBody>
               </Table>
-            </AccordionContent>
-          </AccordionItem>
+            </div>
+          </Card>
+        </div>
 
         </Accordion>
       )}

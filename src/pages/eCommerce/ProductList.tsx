@@ -550,10 +550,9 @@ function EditProductModal({ product, isOpen, onClose, onUpdate }: {
         </DialogHeader>
 
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="general">General Info</TabsTrigger>
             <TabsTrigger value="media">Media & Banners</TabsTrigger>
-            <TabsTrigger value="reviews">Review Insights</TabsTrigger>
           </TabsList>
 
           <TabsContent value="general" className="space-y-4 py-4">
@@ -661,70 +660,7 @@ function EditProductModal({ product, isOpen, onClose, onUpdate }: {
             </div>
           </TabsContent>
 
-          <TabsContent value="reviews" className="space-y-4 py-4">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Customer Says Summary</Label>
-                <Textarea 
-                  rows={6} 
-                  value={form.aiReviewSummary} 
-                  onChange={e => setForm({ ...form, aiReviewSummary: e.target.value })} 
-                  placeholder="Summarize customer feedback..."
-                />
-              </div>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <Label>Review Keywords / Tags</Label>
-                  <Button variant="outline" size="sm" onClick={() => setForm({ ...form, reviewKeywords: [...form.reviewKeywords, { label: "", count: 0, trend: "up" }] })}>
-                    <Plus className="h-3 w-3 mr-2" /> Add Tag
-                  </Button>
-                </div>
-                <div className="grid gap-3">
-                  {form.reviewKeywords.map((tag: any, i: number) => (
-                    <div key={i} className="flex gap-2 items-center">
-                      <Input 
-                        placeholder="Tag" 
-                        value={tag.label} 
-                        onChange={e => {
-                          const next = [...form.reviewKeywords]
-                          next[i].label = e.target.value
-                          setForm({ ...form, reviewKeywords: next })
-                        }} 
-                      />
-                      <Input 
-                        type="number" 
-                        className="w-24" 
-                        value={tag.count} 
-                        onChange={e => {
-                          const next = [...form.reviewKeywords]
-                          next[i].count = parseInt(e.target.value)
-                          setForm({ ...form, reviewKeywords: next })
-                        }} 
-                      />
-                      <Select 
-                        value={tag.trend} 
-                        onValueChange={val => {
-                          const next = [...form.reviewKeywords]
-                          next[i].trend = val
-                          setForm({ ...form, reviewKeywords: next })
-                        }}
-                      >
-                        <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="up">Up</SelectItem>
-                          <SelectItem value="neutral">Neutral</SelectItem>
-                          <SelectItem value="down">Down</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Button variant="ghost" size="icon" onClick={() => setForm({ ...form, reviewKeywords: form.reviewKeywords.filter((_: any, idx: number) => idx !== i) })}>
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </TabsContent>
+
         </Tabs>
 
         <DialogFooter>

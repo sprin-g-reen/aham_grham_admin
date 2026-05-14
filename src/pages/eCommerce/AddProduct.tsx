@@ -121,6 +121,9 @@ export default function AddProduct() {
         stockStatus: "",
         offer: "",
         features: [""],
+        bannerImages: [],
+        aiReviewSummary: "",
+        reviewKeywords: [],
       })
       setSelectedFile(null)
       setErrors({})
@@ -134,8 +137,7 @@ export default function AddProduct() {
 
 
 
-  // State for published status
-  const [published, setPublished] = useState(true)
+  // State for published status (unused)
 
   return (
     <div className="space-y-6">
@@ -162,21 +164,12 @@ export default function AddProduct() {
       </div>
 
       <div className="mt-6 space-y-6">
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* LEFT COLUMN */}
-          <div className="space-y-6 lg:col-span-2">
-            <GeneralInfoCard form={form} setForm={setForm} errors={errors} setErrors={setErrors} categories={categoriesData} />
-            <PricingCard form={form} setForm={setForm} errors={errors} setErrors={setErrors} />
-            <InventoryCard form={form} setForm={setForm} errors={errors} setErrors={setErrors} />
-            <ProductImageUploader key={uploaderKey} onFileSelect={setSelectedFile} />
-            <BannerImagesUploader form={form} setForm={setForm} />
-            <ReviewInsightsCard form={form} setForm={setForm} />
-          </div>
-          {/* RIGHT SIDEBAR */}
-          <div className="space-y-6">
-            <StatusCard published={published} setPublished={setPublished} />
-            <SeoCard form={form} setForm={setForm} />
-          </div>
+        <div className="max-w-4xl mx-auto space-y-6">
+          <GeneralInfoCard form={form} setForm={setForm} errors={errors} setErrors={setErrors} categories={categoriesData} />
+          <PricingCard form={form} setForm={setForm} errors={errors} setErrors={setErrors} />
+          <InventoryCard form={form} setForm={setForm} errors={errors} setErrors={setErrors} />
+          <ProductImageUploader key={uploaderKey} onFileSelect={setSelectedFile} />
+          <BannerImagesUploader form={form} setForm={setForm} />
         </div>
       </div>
     </div>
@@ -427,56 +420,7 @@ function InventoryCard({ form, setForm, errors, setErrors }: any) {
 
 
 
-function StatusCard({ published, setPublished }: any) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Status</CardTitle>
-      </CardHeader>
-      <CardContent className="flex items-center gap-3">
-        <Switch
-          checked={published}
-          onCheckedChange={setPublished}
-        />
-        <span className="text-sm text-muted-foreground">
-          {published ? "Published" : "Draft"}
-        </span>
-      </CardContent>
-    </Card>
-  )
-}
 
-function SeoCard({ form, setForm }: any) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Search Engine Listing</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label>SEO Title</Label>
-          <Input placeholder="SEO title" />
-        </div>
-
-        <div className="space-y-2">
-          <Label>Slug</Label>
-          <Input placeholder="product-slug" />
-        </div>
-
-        <div className="space-y-2">
-          <Label>Meta Description</Label>
-          <Textarea
-            rows={3}
-            value={form.metaDescription}
-            onChange={(e) =>
-              setForm({ ...form, metaDescription: e.target.value })
-            }
-          />
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
 
 // Separate component for image uploading and preview
 function ProductImageUploader({ onFileSelect }: { onFileSelect?: (file: File | null) => void }) {
@@ -601,7 +545,7 @@ function BannerImagesUploader({ form, setForm }: any) {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {form.bannerImages.length === 0 ? (
+        {(form.bannerImages || []).length === 0 ? (
           <div
             onClick={() => inputRef.current?.click()}
             onDragOver={(e) => e.preventDefault()}
@@ -622,7 +566,7 @@ function BannerImagesUploader({ form, setForm }: any) {
           </div>
         ) : (
           <div className="flex flex-col gap-6">
-            {form.bannerImages.map((src: string, index: number) => (
+            {(form.bannerImages || []).map((src: string, index: number) => (
               <div
                 key={index}
                 className="group relative aspect-video overflow-hidden rounded-xl border-2 border-dashed border-primary/20 hover:border-primary/40 transition-all"
@@ -674,87 +618,5 @@ function BannerImagesUploader({ form, setForm }: any) {
   )
 }
 
-function ReviewInsightsCard({ form, setForm }: any) {
-  const addKeyword = () => {
-    setForm({
-      ...form,
-      reviewKeywords: [...form.reviewKeywords, { label: "", count: 0, trend: "up" }]
-    })
-  }
 
-  const removeKeyword = (index: number) => {
-    const next = form.reviewKeywords.filter((_: any, i: number) => i !== index)
-    setForm({ ...form, reviewKeywords: next })
-  }
-
-  const updateKeyword = (index: number, field: string, value: any) => {
-    const next = [...form.reviewKeywords]
-    next[index] = { ...next[index], [field]: value }
-    setForm({ ...form, reviewKeywords: next })
-  }
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Customer Says</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-2">
-          <Label>Customer Says Summary</Label>
-          <Textarea 
-            placeholder="Summarize what customers are saying about this product..." 
-            rows={5}
-            value={form.aiReviewSummary}
-            onChange={(e) => setForm({ ...form, aiReviewSummary: e.target.value })}
-          />
-        </div>
-
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label>Review Keywords / Tags</Label>
-            <Button type="button" size="sm" variant="outline" onClick={addKeyword}>
-              <Plus className="h-4 w-4 mr-2" /> Add Tag
-            </Button>
-          </div>
-          
-          <div className="space-y-3">
-            {form.reviewKeywords.map((tag: any, index: number) => (
-              <div key={index} className="flex gap-3 items-center">
-                <Input 
-                  placeholder="Keyword (e.g. Quality)" 
-                  className="flex-[2]"
-                  value={tag.label}
-                  onChange={(e) => updateKeyword(index, 'label', e.target.value)}
-                />
-                <Input 
-                  type="number"
-                  placeholder="Count" 
-                  className="flex-1"
-                  value={tag.count}
-                  onChange={(e) => updateKeyword(index, 'count', parseInt(e.target.value))}
-                />
-                <Select 
-                  value={tag.trend} 
-                  onValueChange={(val) => updateKeyword(index, 'trend', val)}
-                >
-                  <SelectTrigger className="flex-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="up">Up</SelectItem>
-                    <SelectItem value="neutral">Neutral</SelectItem>
-                    <SelectItem value="down">Down</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button variant="ghost" size="icon" onClick={() => removeKeyword(index)}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
 
