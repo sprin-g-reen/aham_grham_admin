@@ -82,6 +82,7 @@ interface Product {
   tax?: string
   stockStatus?: string
   features?: string[]
+  bannerImages?: string[]
 }
 
 // Use central UPLOADS_URL instead of local hardcoded one
@@ -506,6 +507,9 @@ function EditProductModal({ product, isOpen, onClose, onUpdate }: {
     features: product.features && product.features.length > 0 ? product.features : [""],
     tax: product.tax || "none",
     stockStatus: product.stockStatus || "in",
+    bannerImages: product.bannerImages || [],
+    aiReviewSummary: product.aiReviewSummary || "",
+    reviewKeywords: product.reviewKeywords || [],
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewImage, setPreviewImage] = useState<string | null>(null)
@@ -545,98 +549,183 @@ function EditProductModal({ product, isOpen, onClose, onUpdate }: {
           <DialogTitle>Edit Product: {product.name}</DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-6 py-4 md:grid-cols-2">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Product Name</Label>
-              <Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>SKU / ID</Label>
-                <Input value={form.sku} onChange={e => setForm({ ...form, sku: e.target.value })} />
-              </div>
-              <div className="space-y-2">
-                <Label>Price (₹)</Label>
-                <Input value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Category</Label>
-              <Input value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} />
-            </div>
-            <div className="space-y-2">
-              <Label>Description</Label>
-              <Textarea rows={4} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
-            </div>
-            <div className="space-y-2">
-              <Label>Any Offer</Label>
-              <Input value={form.offer} onChange={e => setForm({ ...form, offer: e.target.value })} />
-            </div>
-          </div>
+        <Tabs defaultValue="general" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="general">General Info</TabsTrigger>
+            <TabsTrigger value="media">Media & Banners</TabsTrigger>
+            <TabsTrigger value="reviews">Review Insights</TabsTrigger>
+          </TabsList>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase tracking-widest opacity-50">Existing Features (In Database)</Label>
-              <div className="p-3 bg-muted/30 rounded-lg border border-dashed min-h-[40px]">
-                {product.features && product.features.length > 0 ? (
-                  <ul className="list-disc list-inside space-y-1">
-                    {product.features.map((f, i) => (
-                      <li key={i} className="text-xs text-muted-foreground">{f}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-xs text-muted-foreground italic">No features saved yet.</p>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="flex justify-between items-center text-xs font-bold uppercase tracking-widest opacity-70">
-                Edit Features (Points)
-                <Button variant="ghost" size="sm" onClick={addFeature} className="h-6 px-2"><Plus className="h-3 w-3" /></Button>
-              </Label>
-              <div className="space-y-2">
-                {form.features.map((f, i) => (
-                  <div key={i} className="flex gap-2 items-center">
-                    <Input value={f} onChange={e => updateFeature(i, e.target.value)} />
-                    <Button variant="ghost" size="icon" onClick={() => removeFeature(i)} className="h-8 w-8" disabled={form.features.length === 1}><X className="h-4 w-4" /></Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Product Image</Label>
-              <div className="border rounded-lg p-4 text-center space-y-4">
-                {(previewImage || product.image) && (
-                  <img 
-                    src={previewImage || (product.image?.startsWith('http') || product.image?.startsWith('data:') ? product.image : `${UPLOADS_URL}/${product.image}`)} 
-                    className="h-32 mx-auto rounded object-cover" 
-                  />
-                )}
-                <div className="flex justify-center">
-                  <Button variant="outline" size="sm" onClick={() => document.getElementById('edit-img-input')?.click()}>
-                    <Upload className="h-4 w-4 mr-2" /> Change Image
-                  </Button>
+          <TabsContent value="general" className="space-y-4 py-4">
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Product Name</Label>
+                  <Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
                 </div>
-                <input 
-                  id="edit-img-input" 
-                  type="file" 
-                  className="hidden" 
-                  accept="image/*" 
-                  onChange={e => {
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>SKU / ID</Label>
+                    <Input value={form.sku} onChange={e => setForm({ ...form, sku: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Price (₹)</Label>
+                    <Input value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Category</Label>
+                  <Input value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Description</Label>
+                  <Textarea rows={4} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="flex justify-between items-center text-xs font-bold uppercase tracking-widest opacity-70">
+                    Edit Features (Points)
+                    <Button variant="ghost" size="sm" onClick={addFeature} className="h-6 px-2"><Plus className="h-3 w-3" /></Button>
+                  </Label>
+                  <div className="space-y-2">
+                    {form.features.map((f, i) => (
+                      <div key={i} className="flex gap-2 items-center">
+                        <Input value={f} onChange={e => updateFeature(i, e.target.value)} />
+                        <Button variant="ghost" size="icon" onClick={() => removeFeature(i)} className="h-8 w-8" disabled={form.features.length === 1}><X className="h-4 w-4" /></Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="media" className="space-y-4 py-4">
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-4">
+                <Label>Main Product Image</Label>
+                <div className="border rounded-lg p-4 text-center space-y-4">
+                  {(previewImage || product.image) && (
+                    <img 
+                      src={previewImage || (product.image?.startsWith('http') || product.image?.startsWith('data:') ? product.image : `${UPLOADS_URL}/${product.image}`)} 
+                      className="h-32 mx-auto rounded object-cover" 
+                    />
+                  )}
+                  <div className="flex justify-center">
+                    <Button variant="outline" size="sm" onClick={() => document.getElementById('edit-img-input')?.click()}>
+                      <Upload className="h-4 w-4 mr-2" /> Change Image
+                    </Button>
+                  </div>
+                  <input id="edit-img-input" type="file" className="hidden" accept="image/*" onChange={e => {
                     const file = e.target.files?.[0]
                     if (file) {
                       setSelectedFile(file)
                       setPreviewImage(URL.createObjectURL(file))
                     }
-                  }} 
-                />
+                  }} />
+                </div>
+              </div>
+              <div className="space-y-4">
+                <Label className="flex justify-between items-center">
+                  Banner Images
+                  <Button variant="ghost" size="sm" onClick={() => document.getElementById('edit-banner-input')?.click()}><Plus className="h-3 w-3" /></Button>
+                </Label>
+                <div className="flex flex-col gap-4">
+                  {form.bannerImages.map((src, i) => (
+                    <div key={i} className="relative group aspect-video border rounded-xl overflow-hidden">
+                      <img src={src.startsWith('data:') ? src : (src.startsWith('http') ? src : `${UPLOADS_URL}/${src}`)} className="w-full h-full object-cover" />
+                      <Button variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => {
+                        const next = form.bannerImages.filter((_, idx) => idx !== i)
+                        setForm({ ...form, bannerImages: next })
+                      }}><X className="h-4 w-4" /></Button>
+                    </div>
+                  ))}
+                  <Button type="button" variant="outline" className="h-20 border-dashed" onClick={() => document.getElementById('edit-banner-input')?.click()}>
+                    <Plus className="h-4 w-4 mr-2" /> Add Banner
+                  </Button>
+                </div>
+                <input id="edit-banner-input" type="file" multiple className="hidden" accept="image/*" onChange={async e => {
+                  const files = e.target.files
+                  if (files) {
+                    const newImages: string[] = []
+                    for (let i = 0; i < files.length; i++) {
+                      const compressed = await compressImage(files[i])
+                      const base64 = await fileToBase64(compressed)
+                      newImages.push(base64)
+                    }
+                    setForm({ ...form, bannerImages: [...form.bannerImages, ...newImages] })
+                  }
+                }} />
               </div>
             </div>
-          </div>
-        </div>
+          </TabsContent>
+
+          <TabsContent value="reviews" className="space-y-4 py-4">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Customer Says Summary</Label>
+                <Textarea 
+                  rows={6} 
+                  value={form.aiReviewSummary} 
+                  onChange={e => setForm({ ...form, aiReviewSummary: e.target.value })} 
+                  placeholder="Summarize customer feedback..."
+                />
+              </div>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <Label>Review Keywords / Tags</Label>
+                  <Button variant="outline" size="sm" onClick={() => setForm({ ...form, reviewKeywords: [...form.reviewKeywords, { label: "", count: 0, trend: "up" }] })}>
+                    <Plus className="h-3 w-3 mr-2" /> Add Tag
+                  </Button>
+                </div>
+                <div className="grid gap-3">
+                  {form.reviewKeywords.map((tag: any, i: number) => (
+                    <div key={i} className="flex gap-2 items-center">
+                      <Input 
+                        placeholder="Tag" 
+                        value={tag.label} 
+                        onChange={e => {
+                          const next = [...form.reviewKeywords]
+                          next[i].label = e.target.value
+                          setForm({ ...form, reviewKeywords: next })
+                        }} 
+                      />
+                      <Input 
+                        type="number" 
+                        className="w-24" 
+                        value={tag.count} 
+                        onChange={e => {
+                          const next = [...form.reviewKeywords]
+                          next[i].count = parseInt(e.target.value)
+                          setForm({ ...form, reviewKeywords: next })
+                        }} 
+                      />
+                      <Select 
+                        value={tag.trend} 
+                        onValueChange={val => {
+                          const next = [...form.reviewKeywords]
+                          next[i].trend = val
+                          setForm({ ...form, reviewKeywords: next })
+                        }}
+                      >
+                        <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="up">Up</SelectItem>
+                          <SelectItem value="neutral">Neutral</SelectItem>
+                          <SelectItem value="down">Down</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button variant="ghost" size="icon" onClick={() => setForm({ ...form, reviewKeywords: form.reviewKeywords.filter((_: any, idx: number) => idx !== i) })}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Cancel</Button>

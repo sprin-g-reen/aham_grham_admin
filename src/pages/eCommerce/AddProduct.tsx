@@ -55,6 +55,9 @@ export default function AddProduct() {
     stockStatus: "",
     offer: "",
     features: [""],
+    bannerImages: [] as string[],
+    aiReviewSummary: "",
+    reviewKeywords: [] as { label: string; count: number; trend: string }[],
   })
 
   const validate = () => {
@@ -97,6 +100,9 @@ export default function AddProduct() {
         const compressed = await compressImage(selectedFile);
         payload.image = await fileToBase64(compressed);
       }
+
+      // Banner images are already in base64 if they were just uploaded
+      // or URLs if we were editing (but this is AddProduct, so mostly base64)
 
       await axios.post(`${API_URL}/products`, payload);
 
@@ -163,6 +169,8 @@ export default function AddProduct() {
             <PricingCard form={form} setForm={setForm} errors={errors} setErrors={setErrors} />
             <InventoryCard form={form} setForm={setForm} errors={errors} setErrors={setErrors} />
             <ProductImageUploader key={uploaderKey} onFileSelect={setSelectedFile} />
+            <BannerImagesUploader form={form} setForm={setForm} />
+            <ReviewInsightsCard form={form} setForm={setForm} />
           </div>
           {/* RIGHT SIDEBAR */}
           <div className="space-y-6">
@@ -559,6 +567,192 @@ function ProductImageUploader({ onFileSelect }: { onFileSelect?: (file: File | n
             ))}
           </div>
         )}
+      </CardContent>
+    </Card>
+  )
+}
+
+function BannerImagesUploader({ form, setForm }: any) {
+  const inputRef = useRef<HTMLInputElement | null>(null)
+
+  const handleFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return
+
+    const newImages: string[] = []
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      const compressed = await compressImage(file)
+      const base64 = await fileToBase64(compressed)
+      newImages.push(base64)
+    }
+
+    setForm({ ...form, bannerImages: [...form.bannerImages, ...newImages] })
+  }
+
+  const removeImage = (index: number) => {
+    const next = form.bannerImages.filter((_: any, i: number) => i !== index)
+    setForm({ ...form, bannerImages: next })
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Product Banner Images (Very Big Images)</CardTitle>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        {form.bannerImages.length === 0 ? (
+          <div
+            onClick={() => inputRef.current?.click()}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault()
+              handleFiles(e.dataTransfer.files)
+            }}
+            className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-12 text-center text-sm text-muted-foreground hover:bg-muted/40 transition-all border-primary/20 hover:border-primary/40"
+          >
+            <Upload className="mb-3 h-8 w-8 text-primary/40" />
+            <p className="font-medium text-primary/60">
+              Drag & drop banner images here or{" "}
+              <span className="text-primary underline underline-offset-4">
+                click to upload
+              </span>
+            </p>
+            <p className="text-xs mt-2 opacity-50 uppercase tracking-widest">Recommended: 1920x1080 or larger</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-6">
+            {form.bannerImages.map((src: string, index: number) => (
+              <div
+                key={index}
+                className="group relative aspect-video overflow-hidden rounded-xl border-2 border-dashed border-primary/20 hover:border-primary/40 transition-all"
+              >
+                <img
+                  src={src}
+                  alt={`Banner ${index + 1}`}
+                  className="h-full w-full object-cover"
+                />
+
+                <Button
+                  size="icon"
+                  variant="destructive"
+                  className="absolute right-4 top-4 h-8 w-8 opacity-0 group-hover:opacity-100 shadow-xl"
+                  onClick={() => removeImage(index)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+                
+                <div className="absolute left-4 top-4 bg-black/50 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest">
+                  Banner ${index + 1}
+                </div>
+              </div>
+            ))}
+            
+            {/* Prominent + Button at the end */}
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="w-full h-32 border-2 border-dashed border-primary/20 hover:border-primary/40 hover:bg-primary/5 flex flex-col gap-2 rounded-xl transition-all"
+              onClick={() => inputRef.current?.click()}
+            >
+              <Plus className="h-8 w-8 text-primary/40" />
+              <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">Add Another Banner Image</span>
+            </Button>
+          </div>
+        )}
+
+        <input
+          ref={inputRef}
+          type="file"
+          multiple
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => handleFiles(e.target.files)}
+        />
+      </CardContent>
+    </Card>
+  )
+}
+
+function ReviewInsightsCard({ form, setForm }: any) {
+  const addKeyword = () => {
+    setForm({
+      ...form,
+      reviewKeywords: [...form.reviewKeywords, { label: "", count: 0, trend: "up" }]
+    })
+  }
+
+  const removeKeyword = (index: number) => {
+    const next = form.reviewKeywords.filter((_: any, i: number) => i !== index)
+    setForm({ ...form, reviewKeywords: next })
+  }
+
+  const updateKeyword = (index: number, field: string, value: any) => {
+    const next = [...form.reviewKeywords]
+    next[index] = { ...next[index], [field]: value }
+    setForm({ ...form, reviewKeywords: next })
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Customer Says</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="space-y-2">
+          <Label>Customer Says Summary</Label>
+          <Textarea 
+            placeholder="Summarize what customers are saying about this product..." 
+            rows={5}
+            value={form.aiReviewSummary}
+            onChange={(e) => setForm({ ...form, aiReviewSummary: e.target.value })}
+          />
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Label>Review Keywords / Tags</Label>
+            <Button type="button" size="sm" variant="outline" onClick={addKeyword}>
+              <Plus className="h-4 w-4 mr-2" /> Add Tag
+            </Button>
+          </div>
+          
+          <div className="space-y-3">
+            {form.reviewKeywords.map((tag: any, index: number) => (
+              <div key={index} className="flex gap-3 items-center">
+                <Input 
+                  placeholder="Keyword (e.g. Quality)" 
+                  className="flex-[2]"
+                  value={tag.label}
+                  onChange={(e) => updateKeyword(index, 'label', e.target.value)}
+                />
+                <Input 
+                  type="number"
+                  placeholder="Count" 
+                  className="flex-1"
+                  value={tag.count}
+                  onChange={(e) => updateKeyword(index, 'count', parseInt(e.target.value))}
+                />
+                <Select 
+                  value={tag.trend} 
+                  onValueChange={(val) => updateKeyword(index, 'trend', val)}
+                >
+                  <SelectTrigger className="flex-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="up">Up</SelectItem>
+                    <SelectItem value="neutral">Neutral</SelectItem>
+                    <SelectItem value="down">Down</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button variant="ghost" size="icon" onClick={() => removeKeyword(index)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
       </CardContent>
     </Card>
   )

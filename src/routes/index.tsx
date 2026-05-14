@@ -34,6 +34,7 @@ import InvoicePage from "@/pages/eCommerce/Invoice"
 import InvoiceCard from "@/pages/eCommerce/InvoiceCard"
 import CustomerList from "@/pages/eCommerce/CustomerList"
 import CustomerDetails from "@/pages/eCommerce/CustomerDetails"
+import ReviewList from "@/pages/eCommerce/ReviewList"
 import ChatBox from "@/pages/apps/Chatbox"
 import CalendarPage from "@/pages/apps/CalendarPage"
 import FileManagerPage from "@/pages/apps/FileManager"
@@ -162,6 +163,8 @@ export const router = createBrowserRouter(
         { path: "eCommerce/order-details/:id", element: <OrderDetails /> },
         { path: "eCommerce/customer-list", element: <CustomerList /> },
         { path: "eCommerce/customer-details/:id", element: <CustomerDetails /> },
+        { path: "eCommerce/customer-says", element: <ReviewList mode="says" /> },
+        { path: "eCommerce/customer-reviews", element: <ReviewList mode="reviews" /> },
         { path: "eCommerce/invoice/:id", element: <InvoicePage /> },
 
         // application routes

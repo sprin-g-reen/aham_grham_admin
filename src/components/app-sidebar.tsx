@@ -103,6 +103,20 @@ const data = {
           title: "Customers",
           url: "eCommerce/customer-list",
         },
+        {
+          title: "Reviews",
+          url: "#",
+          items: [
+            {
+              title: "Customer Says",
+              url: "eCommerce/customer-says",
+            },
+            {
+              title: "Customer Reviews",
+              url: "eCommerce/customer-reviews",
+            },
+          ],
+        },
       ],
     },
     {

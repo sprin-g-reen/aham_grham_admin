@@ -18,8 +18,8 @@ export const SITE_ORIGIN = isLocalhost
 export const BACKEND_URL = isLocalhost ? `http://${window.location.hostname}:5000` : (import.meta.env.VITE_BACKEND_URL || DEFAULT_BACKEND_URL);
 export const API_URL = isLocalhost
   ? `${BACKEND_URL}/api`
-  : (import.meta.env.VITE_API_URL || `${SITE_ORIGIN}/api`);
+  : (import.meta.env.VITE_API_URL || `${BACKEND_URL}/api`);
 
 export const UPLOADS_URL = isLocalhost
   ? `http://${window.location.hostname}:5000/uploads`
-  : (import.meta.env.VITE_UPLOADS_URL || `${SITE_ORIGIN}/uploads`);
+  : (import.meta.env.VITE_UPLOADS_URL || `${BACKEND_URL}/uploads`);
