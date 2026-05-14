@@ -533,7 +533,7 @@ const PageContentManagement = () => {
               <Card className="border-primary/20 shadow-md">
                 <CardHeader className="flex flex-row items-center gap-3 bg-primary/5"><Activity className="w-5 h-5 text-primary" /><CardTitle>Live Stats (Numbers only)</CardTitle></CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6">
-                   <div className="space-y-2 p-4 border rounded-xl bg-muted/10 text-center"><Label className="text-xs font-bold uppercase text-primary">Active Portals</Label><Input className="text-center text-xl font-bold" value={heroData.sections?.stats?.active || ''} onChange={(e) => updateSection('stats.active', e.target.value)} /></div>
+                   <div className="space-y-2 p-4 border rounded-xl bg-muted/10 text-center"><Label className="text-xs font-bold uppercase text-primary">Active Branches</Label><Input className="text-center text-xl font-bold" value={heroData.sections?.stats?.active || ''} onChange={(e) => updateSection('stats.active', e.target.value)} /></div>
                    <div className="space-y-2 p-4 border rounded-xl bg-muted/10 text-center"><Label className="text-xs font-bold uppercase text-primary">Opening Soon</Label><Input className="text-center text-xl font-bold" value={heroData.sections?.stats?.soon || ''} onChange={(e) => updateSection('stats.soon', e.target.value)} /></div>
                 </CardContent>
               </Card>
