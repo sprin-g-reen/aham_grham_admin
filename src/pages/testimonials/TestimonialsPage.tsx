@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Trash2, Plus, RefreshCw, UploadCloud, Search, Check, X, Edit, ExternalLink, Download, FileUp, User } from "lucide-react"
 import { API_URL, SITE_ORIGIN, BACKEND_URL } from "../../config"
+import { compressImage, fileToBase64 } from "../../lib/image-utils"
 import {
   Dialog,
   DialogContent,
@@ -156,14 +157,19 @@ const TestimonialsPage = () => {
 
     setLoading(true)
     try {
-      const formData = new FormData()
-      formData.append('name', addForm.name)
-      formData.append('role', addForm.role)
-      formData.append('content', addForm.content)
-      formData.append('rating', '5')
-      if (addFile) formData.append('image', addFile)
+      const payload: any = {
+        name: addForm.name,
+        role: addForm.role,
+        content: addForm.content,
+        rating: '5'
+      }
 
-      await axios.post(`${API_URL}/testimonials`, formData)
+      if (addFile) {
+        const compressed = await compressImage(addFile);
+        payload.image = await fileToBase64(compressed);
+      }
+
+      await axios.post(`${API_URL}/testimonials`, payload)
       toast.success("Testimonial added successfully")
       setAddForm({ name: '', role: '', content: '' })
       setAddFile(null)
@@ -193,15 +199,20 @@ const TestimonialsPage = () => {
     e.preventDefault()
     setLoading(true)
     try {
-      const formData = new FormData()
-      formData.append('name', updateForm.name)
-      formData.append('testimonialId', updateForm.testimonialId)
-      formData.append('role', updateForm.role)
-      formData.append('content', updateForm.content)
-      formData.append('rating', '5')
-      if (updateFile) formData.append('image', updateFile)
+      const payload: any = {
+        name: updateForm.name,
+        testimonialId: updateForm.testimonialId,
+        role: updateForm.role,
+        content: updateForm.content,
+        rating: '5'
+      }
 
-      await axios.put(`${API_URL}/testimonials/${updateId}`, formData)
+      if (updateFile) {
+        const compressed = await compressImage(updateFile);
+        payload.image = await fileToBase64(compressed);
+      }
+
+      await axios.put(`${API_URL}/testimonials/${updateId}`, payload)
       toast.success("Testimonial updated successfully")
       setIsUpdateOpen(false)
       fetchTestimonials()
