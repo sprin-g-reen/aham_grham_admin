@@ -38,6 +38,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
 
 import {
   MoreVertical,
@@ -83,6 +89,8 @@ interface Product {
   stockStatus?: string
   features?: string[]
   bannerImages?: string[]
+  aiReviewSummary?: string
+  reviewKeywords?: string[]
 }
 
 // Use central UPLOADS_URL instead of local hardcoded one

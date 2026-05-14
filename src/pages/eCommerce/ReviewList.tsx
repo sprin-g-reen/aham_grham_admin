@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react"
 import {
   Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 import {
   Table,
@@ -20,17 +17,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Star, MessageSquare, Plus, X, Trash2, CheckCircle, Clock } from "lucide-react"
+import { Star, Trash2 } from "lucide-react"
 import { API_URL } from "@/config"
 import axios from "axios"
 import { toast } from "sonner"
@@ -207,8 +196,6 @@ const ReviewList = ({ mode }: { mode?: 'says' | 'reviews' }) => {
             </div>
           </Card>
         </div>
-
-        </Accordion>
       )}
     </div>
   )
