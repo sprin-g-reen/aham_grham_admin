@@ -272,43 +272,7 @@ export default function UserProfile() {
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardContent className="p-6">
-                            <h5 className="mb-4 text-lg font-semibold">Skills</h5>
-                             <div className="flex flex-wrap gap-2">
-                                <Badge variant="secondary" className="px-3 py-1.5 rounded-full">
-                                    JavaScript
-                                </Badge>
-                                <Badge variant="secondary" className="px-3 py-1.5 rounded-full">
-                                    React
-                                </Badge>
-                                <Badge variant="secondary" className="px-3 py-1.5 rounded-full">
-                                    Node.js
-                                </Badge>
-                                <Badge variant="secondary" className="px-3 py-1.5 rounded-full">
-                                    CSS
-                                </Badge>
-                                <Badge variant="secondary" className="px-3 py-1.5 rounded-full">
-                                    UI/UX Design
-                                </Badge>
-                                <Badge variant="secondary" className="px-3 py-1.5 rounded-full">
-                                    Project Management
-                                </Badge>
-                                <Badge variant="secondary" className="px-3 py-1.5 rounded-full">
-                                    Agile Methodologies
-                                </Badge>
-                                <Badge variant="secondary" className="px-3 py-1.5 rounded-full">
-                                    Git
-                                </Badge>
-                                <Badge variant="secondary" className="px-3 py-1.5 rounded-full">
-                                    Docker
-                                </Badge>
-                                <Badge variant="secondary" className="px-3 py-1.5 rounded-full">
-                                    Kubernetes
-                                </Badge>
-                            </div>
-                        </CardContent>
-                    </Card>
+
 
                 </div>
 
