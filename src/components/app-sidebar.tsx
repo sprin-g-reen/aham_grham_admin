@@ -126,10 +126,7 @@ const data = {
           title: "Password Setting",
           url: "account/password-setting",
         },
-        {
-          title: "Noitifications",
-          url: "account/notifications",
-        },
+
       ],
     },
     {
