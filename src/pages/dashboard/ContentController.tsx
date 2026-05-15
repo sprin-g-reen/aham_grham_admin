@@ -115,19 +115,7 @@ const ContentController = () => {
         ))}
       </div>
 
-      <Card className="border-dashed border-2 bg-muted/20">
-        <CardContent className="py-10 flex flex-col items-center text-center space-y-4">
-          <div className="w-16 h-16 rounded-full bg-primary/5 flex items-center justify-center">
-            <Sparkles className="w-8 h-8 text-primary/40" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold">New Feature Coming Soon</h3>
-            <p className="text-sm text-muted-foreground max-w-md">
-              We are working on a drag-and-drop page builder to give you full control over site layouts.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+
     </div>
   );
 };
