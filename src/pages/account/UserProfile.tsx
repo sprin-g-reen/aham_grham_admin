@@ -5,9 +5,66 @@ import { Switch } from "@/components/ui/switch"
 import { Phone, MessageCircle, User, HelpCircle, Code2, Flag, Clock,
          FileText, Users, Rocket, ShieldCheck, AlertTriangle,
          Send, Home, CheckCircle2, Briefcase, BarChart3,
-        Facebook, Twitter, Instagram, Linkedin, Youtube, Music, Pin, PenTool, Cloud, Shield } from "lucide-react"
+        Facebook, Twitter, Instagram, Linkedin, Youtube, Music, Pin, PenTool, Cloud, Shield, ShoppingBag, ClipboardList } from "lucide-react"
+
+import { useEffect, useState } from "react"
+import axios from "axios"
+import { API_URL } from "@/config"
 
 export default function UserProfile() {
+    const [taskCount, setTaskCount] = useState<string | number>("...")
+    const [activities, setActivities] = useState<any[]>([])
+
+    const timeAgo = (date: string) => {
+        const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
+        if (seconds < 60) return `${seconds} seconds ago`;
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes} min ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours} hours ago`;
+        return new Date(date).toLocaleDateString();
+    };
+
+    const getIcon = (module: string) => {
+        switch (module.toLowerCase()) {
+            case 'customer': return <Users className="w-4 h-4" />;
+            case 'product': return <ShoppingBag className="w-4 h-4" />;
+            case 'order': return <ClipboardList className="w-4 h-4" />;
+            default: return <FileText className="w-4 h-4" />;
+        }
+    };
+
+    const getColor = (action: string) => {
+        switch (action.toLowerCase()) {
+            case 'create': return 'bg-emerald-500';
+            case 'delete': return 'bg-red-500';
+            case 'update': return 'bg-sky-500';
+            default: return 'bg-primary';
+        }
+    };
+
+    const formatAction = (action: string) => {
+        switch (action.toUpperCase()) {
+            case 'LOGIN': return 'LOGGED IN';
+            case 'LOGOUT': return 'LOGGED OUT';
+            default: return `${action.toUpperCase()}D`;
+        }
+    };
+
+    useEffect(() => {
+        const fetchActivityData = async () => {
+            try {
+                const { data } = await axios.get(`${API_URL}/activities`)
+                setTaskCount(data.length)
+                setActivities(data.slice(0, 5))
+            } catch (error) {
+                console.error("Failed to fetch activities")
+                setTaskCount(0)
+            }
+        }
+        fetchActivityData()
+    }, [])
+
     return (
         <div className="user-profile-page">
 
@@ -22,29 +79,21 @@ export default function UserProfile() {
 
                             {/* Profile Image */}
                             <div className="relative -mt-16 flex flex-shrink-0 mt-0">
-                                <img
-                                    src="https://randomuser.me/api/portraits/men/34.jpg"
-                                    alt="John Doe"
-                                    className="w-28 h-28 rounded-full border-4 border-background shadow-lg"
-                                />
+                                <div className="w-28 h-28 rounded-full border-4 border-background shadow-lg bg-muted flex items-center justify-center">
+                                    <User className="w-12 h-12 text-muted-foreground" />
+                                </div>
                             </div>
 
                             {/* Profile Info */}
                             <div>
-                                <h4 className="text-xl font-semibold">John Doe</h4>
+                                <h4 className="text-xl font-semibold uppercase">admin</h4>
                                 <p className="text-muted-foreground text-sm font-medium">
-                                    UX Designer • Vatican City • Joined April 2021
+                                    System Administrator • Aham Grham • Joined May 2026
                                 </p>
 
                                 <div className="flex flex-wrap gap-2 mt-3">
                                     <Badge className="bg-primary text-primary-foreground">
-                                        13.5k Tasks
-                                    </Badge>
-                                    <Badge variant="secondary">
-                                        146 Projects
-                                    </Badge>
-                                    <Badge className="bg-green-600 hover:bg-green-700 text-white">
-                                        897 Connections
+                                        {taskCount} Tasks
                                     </Badge>
                                 </div>
                             </div>
@@ -75,7 +124,7 @@ export default function UserProfile() {
 
                                 <div className="flex items-center gap-3">
                                     <User className="w-4 h-4 text-muted-foreground" />
-                                    <span><span className="font-medium">Full Name:</span> Emily Carter</span>
+                                    <span><span className="font-medium">Full Name:</span> admin</span>
                                 </div>
 
                                 <div className="flex items-center gap-3">
@@ -269,77 +318,23 @@ export default function UserProfile() {
 
                             <h5 className="mb-6 text-lg font-semibold">Activity Timeline</h5>
 
-                            <div className="relative space-y-8 pl-10">
-
-                                {/* Monthly Report */}
-                                <div className="relative">
-                                    <span className="absolute -left-[40px] flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white">
-                                        <FileText className="w-4 h-4" />
-                                    </span>
-                                    <h6 className="font-semibold">Monthly Report Uploaded</h6>
-                                    <p className="text-sm text-muted-foreground">
-                                        The finance team submitted the September report
-                                    </p>
-                                    <Badge variant="secondary" className="mt-2 rounded-md">
-                                        report-sept.pdf
-                                    </Badge>
-                                    <p className="text-xs text-muted-foreground mt-2">10 min ago</p>
-                                </div>
-
-                                {/* Standup */}
-                                <div className="relative">
-                                    <span className="absolute -left-[40px] flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md">
-                                        <Users className="w-4 h-4" />
-                                    </span>
-                                    <h6 className="font-semibold">Team Standup Completed</h6>
-                                    <p className="text-sm text-muted-foreground">
-                                        Daily sync with the product team wrapped up
-                                    </p>
-                                    <p className="text-xs text-muted-foreground mt-2">35 min ago</p>
-                                </div>
-
-                                {/* Feature Deploy */}
-                                <div className="relative">
-                                    <span className="absolute -left-[40px] flex h-8 w-8 items-center justify-center rounded-full bg-sky-500 text-white shadow-md">
-                                        <Rocket className="w-4 h-4" />
-                                    </span>
-                                    <h6 className="font-semibold">New Feature Deployed</h6>
-                                    <p className="text-sm text-muted-foreground">
-                                        Dark mode toggle added to dashboard settings
-                                    </p>
-                                    <p className="text-xs text-muted-foreground mt-2">1 day ago</p>
-                                </div>
-
-                                {/* Security Patch */}
-                                <div className="relative">
-                                    <span className="absolute -left-[40px] flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 text-white shadow-md">
-                                        <ShieldCheck className="w-4 h-4" />
-                                    </span>
-                                    <h6 className="font-semibold">Security Patch Released</h6>
-                                    <p className="text-sm text-muted-foreground">
-                                        Critical update applied to authentication module
-                                    </p>
-                                    <Badge variant="secondary" className="mt-2 rounded-md">
-                                        auth-patch.log
-                                    </Badge>
-                                    <p className="text-xs text-muted-foreground mt-2">2 hours ago</p>
-                                </div>
-
-                                {/* Suspensions */}
-                                <div className="relative">
-                                    <span className="absolute -left-[40px] flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white shadow-md">
-                                        <AlertTriangle className="w-4 h-4" />
-                                    </span>
-                                    <h6 className="font-semibold">Account Suspensions</h6>
-                                    <p className="text-sm text-muted-foreground">
-                                        3 user accounts flagged for suspicious activity
-                                    </p>
-                                    <Badge variant="secondary" className="mt-2 rounded-md">
-                                        suspensions.csv
-                                    </Badge>
-                                    <p className="text-xs text-muted-foreground mt-2">25 min ago</p>
-                                </div>
-
+                            <div className="relative space-y-8 pl-10 border-l ml-4 py-2">
+                                {activities.length === 0 ? (
+                                    <p className="text-sm text-muted-foreground italic">No recent activity found.</p>
+                                ) : (
+                                    activities.map((act) => (
+                                        <div key={act._id} className="relative">
+                                            <span className={`absolute -left-[56px] flex h-8 w-8 items-center justify-center rounded-full text-white shadow-md ${getColor(act.action)}`}>
+                                                {getIcon(act.module)}
+                                            </span>
+                                            <h6 className="font-semibold">{act.module} {formatAction(act.action)}</h6>
+                                            <p className="text-sm text-muted-foreground">
+                                                Performed {act.action} action on {act.module} module.
+                                            </p>
+                                            <p className="text-xs text-muted-foreground mt-2">{timeAgo(act.createdAt)}</p>
+                                        </div>
+                                    ))
+                                )}
                             </div>
 
                         </CardContent>
@@ -347,88 +342,8 @@ export default function UserProfile() {
 
                     <div className="grid grid-cols-12 gap-6">
 
-                        <div className="col-span-12 xl:col-span-6">
-                            <Card>
-                                <CardContent className="p-6">
 
-                                    <h5 className="mb-6 text-lg font-semibold">Connections</h5>
-
-                                    <div className="space-y-5">
-
-                                        {/* Facebook */}
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600/10 text-blue-600">
-                                                <Facebook className="w-5 h-5" />
-                                            </div>
-                                            <span className="font-medium">Facebook</span>
-                                            <Switch className="ml-auto" />
-                                        </div>
-
-                                        {/* Twitter */}
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/10 text-black dark:text-white">
-                                                <Twitter className="w-5 h-5" />
-                                            </div>
-                                            <span className="font-medium">Twitter</span>
-                                            <Switch className="ml-auto" />
-                                        </div>
-
-                                        {/* Instagram */}
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pink-600/10 text-pink-600">
-                                                <Instagram className="w-5 h-5" />
-                                            </div>
-                                            <span className="font-medium">Instagram</span>
-                                            <Switch className="ml-auto" />
-                                        </div>
-
-                                        {/* LinkedIn */}
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-700/10 text-blue-700">
-                                                <Linkedin className="w-5 h-5" />
-                                            </div>
-                                            <span className="font-medium">LinkedIn</span>
-                                            <Switch className="ml-auto" />
-                                        </div>
-
-                                        {/* YouTube */}
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-600/10 text-red-600">
-                                                <Youtube className="w-5 h-5" />
-                                            </div>
-                                            <span className="font-medium">YouTube</span>
-                                            <Switch className="ml-auto" />
-                                        </div>
-
-                                        {/* TikTok */}
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/10 text-black dark:text-white">
-                                                <Music className="w-5 h-5" />
-                                            </div>
-                                            <span className="font-medium">TikTok</span>
-                                            <Switch className="ml-auto" />
-                                        </div>
-
-                                        {/* Pinterest */}
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500/10 text-red-500">
-                                                <Pin className="w-5 h-5" />
-                                            </div>
-                                            <span className="font-medium">Pinterest</span>
-                                            <Switch className="ml-auto" />
-                                        </div>
-
-                                    </div>
-
-                                <Button variant="link" className="mt-6 px-0">
-                                    View all connections
-                                </Button>
-
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    <div className="col-span-12 xl:col-span-6">
+                    <div className="col-span-12 xl:col-span-12">
                         <Card>
                             <CardContent className="p-6">
 

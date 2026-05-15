@@ -14,6 +14,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   login: (userData: User) => void;
+  updateUser: (userData: Partial<User>) => void;
   logout: () => void;
   loading: boolean;
 }
@@ -37,6 +38,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('user', JSON.stringify(userData));
   };
 
+  const updateUser = (userData: Partial<User>) => {
+    setUser(prev => prev ? { ...prev, ...userData } : null);
+    const stored = localStorage.getItem('user');
+    if (stored) {
+        localStorage.setItem('user', JSON.stringify({ ...JSON.parse(stored), ...userData }));
+    }
+  };
+
   const logout = async () => {
     try {
       if (user) {
@@ -54,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, updateUser, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
