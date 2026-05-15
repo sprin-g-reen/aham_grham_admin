@@ -162,7 +162,7 @@ export const router = createBrowserRouter(
         { path: "eCommerce/order-list", element: <OrderList /> },
         { path: "eCommerce/order-details/:id", element: <OrderDetails /> },
         { path: "eCommerce/customer-list", element: <CustomerList /> },
-        { path: "eCommerce/customer-details/:id", element: <CustomerDetails /> },
+        { path: "eCommerce/customer_details/:id", element: <CustomerDetails /> },
         { path: "eCommerce/customer-says", element: <ReviewList mode="says" /> },
         { path: "eCommerce/customer-reviews", element: <ReviewList mode="reviews" /> },
         { path: "eCommerce/invoice/:id", element: <InvoicePage /> },

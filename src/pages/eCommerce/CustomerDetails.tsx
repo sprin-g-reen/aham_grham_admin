@@ -1,5 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
+import axios from "axios"
+import { API_URL } from "@/config"
 import { cn } from "@/lib/utils"
 import {
   Card,
@@ -31,170 +33,79 @@ import {
   Edit2,
   Trash2,
   Search,
+  User,
+  Loader2,
+  Home,
+  Navigation
 } from "lucide-react"
 
-const countryData: { [key: string]: { name: string; code: string } } = {
-  pk: { name: "Pakistan", code: "pk" },
-  ca: { name: "Canada", code: "ca" },
-  it: { name: "Italy", code: "it" },
-  de: { name: "Germany", code: "de" },
-  cn: { name: "China", code: "cn" },
-  us: { name: "United States", code: "us" },
-  uk: { name: "United Kingdom", code: "gb" },
-  fr: { name: "France", code: "fr" },
-  au: { name: "Australia", code: "au" },
-  jp: { name: "Japan", code: "jp" },
-}
+// Keep dummy data for UI placeholders if needed
+const dummyOrders = [
+  { id: "ORD-001", date: "2024-02-05", status: "Completed", items: 3, total: "$156.00" },
+  { id: "ORD-002", date: "2024-01-28", status: "Completed", items: 2, total: "$89.50" },
+  { id: "ORD-003", date: "2024-01-15", status: "Completed", items: 3, total: "$245.75" },
+];
 
-interface Order {
-  id: string;
-  date: string;
-  status: string;
-  items: number;
-  total: string;
-}
-
-interface ActivityItem {
-  date: string;
-  action: string;
-}
-
-// Mock data list (usually this would come from an API or shared state)
-const customerList = [
-  {
-    id: 1,
-    name: "John Doe",
-    image: "https://randomuser.me/api/portraits/men/1.jpg",
-    email: "john@example.com",
-    phone: "+1 (555) 123-4567",
-    country: "us",
-    joinDate: "2024-01-15",
-    totalOrders: 8,
-    totalSpent: "$1,250.50",
-    status: "Active",
-    recentOrders: [
-      { id: "ORD-001", date: "2024-02-05", status: "Completed", items: 3, total: "$156.00" },
-      { id: "ORD-002", date: "2024-01-28", status: "Completed", items: 2, total: "$89.50" },
-      { id: "ORD-003", date: "2024-01-15", status: "Completed", items: 3, total: "$245.75" },
-    ],
-    activity: [
-      { date: "2024-02-05", action: "Placed order ORD-001" },
-      { date: "2024-01-28", action: "Placed order ORD-002" },
-      { date: "2024-01-15", action: "Account created & joined" },
-    ],
-  },
-  {
-    id: 2,
-    name: "Sarah Smith",
-    image: "https://randomuser.me/api/portraits/women/2.jpg",
-    email: "sarah@example.com",
-    phone: "+1 (555) 234-5678",
-    country: "ca",
-    joinDate: "2024-01-20",
-    totalOrders: 5,
-    totalSpent: "$890.00",
-    status: "Active",
-    recentOrders: [
-      { id: "ORD-004", date: "2024-02-01", status: "Processing", items: 1, total: "$120.00" },
-    ],
-    activity: [
-      { date: "2024-02-01", action: "Placed order ORD-004" },
-      { date: "2024-01-20", action: "Account created" },
-    ],
-  },
-  {
-    id: 3,
-    name: "Michael Brown",
-    image: "https://randomuser.me/api/portraits/men/3.jpg",
-    email: "michael@example.com",
-    phone: "+1 (555) 345-6789",
-    country: "it",
-    joinDate: "2024-01-10",
-    totalOrders: 12,
-    totalSpent: "$2,150.75",
-    status: "Active",
-    recentOrders: [
-      { id: "ORD-005", date: "2024-02-10", status: "Completed", items: 5, total: "$450.00" },
-    ],
-    activity: [
-      { date: "2024-02-10", action: "Placed order ORD-005" },
-      { date: "2024-01-10", action: "Account created" },
-    ],
-  },
-  {
-    id: 4,
-    name: "Emily Davis",
-    image: "https://randomuser.me/api/portraits/women/4.jpg",
-    email: "emily@example.com",
-    phone: "+1 (555) 456-7890",
-    country: "de",
-    joinDate: "2024-02-01",
-    totalOrders: 3,
-    totalSpent: "$425.00",
-    status: "Inactive",
-    recentOrders: [],
-    activity: [
-      { date: "2024-02-01", action: "Account created" },
-    ],
-  },
-  {
-    id: 5,
-    name: "Robert Wilson",
-    image: "https://randomuser.me/api/portraits/men/5.jpg",
-    email: "robert@example.com",
-    phone: "+1 (555) 567-8901",
-    country: "it",
-    joinDate: "2023-12-20",
-    totalOrders: 15,
-    totalSpent: "$3,200.25",
-    status: "Active",
-    recentOrders: [],
-    activity: [],
-  }
-]
+const dummyActivity = [
+  { date: "2024-02-05", action: "Placed order ORD-001" },
+  { date: "2024-01-28", action: "Placed order ORD-002" },
+  { date: "2024-01-15", action: "Account created & joined" },
+];
 
 const statusClass = (status: string) => {
-  switch (status) {
-    case "Active":
-      return "bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400"
-    case "Inactive":
-      return "bg-gray-100 text-gray-600 dark:bg-gray-500/20 dark:text-gray-400"
-    case "Suspended":
-      return "bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400"
-    default:
-      return "bg-muted text-muted-foreground"
-  }
+  return "bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400"
 }
 
 const orderStatusClass = (status: string) => {
-  switch (status) {
-    case "Completed":
-      return "bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400"
-    case "Pending":
-      return "bg-yellow-100 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400"
-    case "Processing":
-      return "bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400"
-    default:
-      return "bg-muted text-muted-foreground"
-  }
+  return "bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400"
 }
 
 export default function CustomerDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [customer, setCustomer] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    const fetchCustomer = async () => {
+      try {
+        setLoading(true)
+        const response = await axios.get(`${API_URL}/customers`)
+        // Filter by ID since we don't have a specific GET /id yet in backend (optional but robust)
+        const found = response.data.find((c: any) => c._id === id)
+        if (found) {
+          setCustomer(found)
+        } else {
+          setError("Customer not found")
+        }
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch customer details")
+      } finally {
+        setLoading(false)
+      }
+    }
+
     if (id) {
-      const found = customerList.find(c => c.id === parseInt(id))
-      setCustomer(found || null)
+      fetchCustomer()
     }
   }, [id])
 
-  if (!customer) {
+  if (loading) {
     return (
-      <div className="flex h-[60vh] flex-col items-center justify-center space-y-4">
-        <h2 className="text-xl font-semibold">Customer not found</h2>
+      <div className="flex h-[60vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  if (error || !customer) {
+    return (
+      <div className="flex h-[60vh] flex-col items-center justify-center space-y-4 text-center">
+        <div className="h-16 w-16 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center mb-2">
+           <Trash2 className="h-8 w-8 text-red-600" />
+        </div>
+        <h2 className="text-xl font-semibold">{error || "Customer not found"}</h2>
         <Button onClick={() => navigate("/ecommerce/customer-list")}>
           Back to Customer List
         </Button>
@@ -202,7 +113,6 @@ export default function CustomerDetails() {
     )
   }
 
-  const customerDetails = customer // alias for easier replacement
   return (
     <div className="space-y-6">
       {/* Search and Navigation */}
@@ -214,64 +124,40 @@ export default function CustomerDetails() {
             className="pl-9 h-10"
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                const term = e.currentTarget.value.toLowerCase()
-                const found = customerList.find(c => c.name.toLowerCase().includes(term))
-                if (found) navigate(`/ecommerce/customer-details/${found.id}`)
+                navigate("/ecommerce/customer-list?search=" + e.currentTarget.value)
               }
             }}
           />
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-muted-foreground mr-2">MOST RECENT:</span>
-          {customerList.slice(0, 3).map(recent => (
-            <Button 
-              key={recent.id}
-              variant="outline" 
-              size="sm" 
-              className={cn(
-                "h-9 gap-2",
-                customer.id === recent.id && "bg-primary/10 border-primary/50 text-primary"
-              )}
-              onClick={() => navigate(`/ecommerce/customer-details/${recent.id}`)}
-            >
-              <img src={recent.image} alt={recent.name} className="h-5 w-5 rounded-full" />
-              <span className="text-xs">{recent.name}</span>
-            </Button>
-          ))}
+          <Button variant="ghost" size="sm" onClick={() => navigate("/ecommerce/customer-list")}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to List
+          </Button>
         </div>
       </div>
 
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="icon" onClick={() => navigate("/ecommerce/customer-list")}>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
+          <div className="h-12 w-12 rounded-full border bg-muted/50 flex items-center justify-center">
+            <User className="h-6 w-6 text-muted-foreground" />
+          </div>
 
           <div>
             <h2 className="text-2xl font-semibold">
-              {customerDetails.name}
+              {customer.name}
             </h2>
-            <p className="text-sm text-muted-foreground">
-              Customer ID: #{customerDetails.id}
+            <p className="text-sm text-muted-foreground uppercase tracking-wider">
+              ID: {customer._id.slice(-6)}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm">
-            <Edit2 className="mr-1 h-4 w-4" />
-            Edit
-          </Button>
-
-          <Button variant="destructive" size="sm">
-            <Trash2 className="mr-1 h-4 w-4" />
-            Delete
-          </Button>
-
-          <Badge className={statusClass(customerDetails.status)} variant="outline">
-            {customerDetails.status}
+          <Badge className={statusClass("Active")} variant="outline">
+            Active Member
           </Badge>
         </div>
       </div>
@@ -297,7 +183,7 @@ export default function CustomerDetails() {
                 </TableHeader>
 
                 <TableBody>
-                  {customerDetails.recentOrders.map((order: Order) => (
+                  {dummyOrders.map((order) => (
                     <TableRow key={order.id}>
                       <TableCell className="font-medium">{order.id}</TableCell>
                       <TableCell>{order.date}</TableCell>
@@ -321,11 +207,11 @@ export default function CustomerDetails() {
               <CardTitle>Activity Timeline</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {customerDetails.activity.map((item: ActivityItem, idx: number) => (
+              {dummyActivity.map((item, idx) => (
                 <div key={idx} className="flex gap-4 pb-4 last:pb-0">
                   <div className="relative">
-                    <div className="h-3 w-3 rounded-full bg-green-600 mt-1.5" />
-                    {idx !== customerDetails.activity.length - 1 && (
+                    <div className="h-3 w-3 rounded-full bg-blue-600 mt-1.5" />
+                    {idx !== dummyActivity.length - 1 && (
                       <div className="absolute top-3 left-1.5 h-12 w-0.5 bg-border" />
                     )}
                   </div>
@@ -335,6 +221,13 @@ export default function CustomerDetails() {
                   </div>
                 </div>
               ))}
+              <div className="flex gap-4">
+                  <div className="h-3 w-3 rounded-full bg-green-600 mt-1.5" />
+                  <div>
+                    <p className="text-sm font-medium">Customer registered</p>
+                    <p className="text-xs text-muted-foreground">{new Date(customer.createdAt).toLocaleDateString()}</p>
+                  </div>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -347,14 +240,12 @@ export default function CustomerDetails() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-center">
-                <img
-                  src={customerDetails.image}
-                  alt={customerDetails.name}
-                  className="h-24 w-24 rounded-full border-2 object-cover"
-                />
+                <div className="h-24 w-24 rounded-full border-2 bg-muted/30 flex items-center justify-center">
+                  <User className="h-12 w-12 text-muted-foreground" />
+                </div>
               </div>
               <div className="text-center">
-                <p className="font-semibold text-lg">{customerDetails.name}</p>
+                <p className="font-semibold text-lg">{customer.name}</p>
                 <p className="text-sm text-muted-foreground">Active Customer</p>
               </div>
             </CardContent>
@@ -370,32 +261,39 @@ export default function CustomerDetails() {
                 <Mail className="h-4 w-4 text-muted-foreground" />
                 <div>
                   <p className="text-xs text-muted-foreground">Email</p>
-                  <p className="text-sm font-medium">{customerDetails.email}</p>
+                  <p className="text-sm font-medium">{customer.email}</p>
                 </div>
               </div>
               <Separator />
               <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-muted-foreground" />
                 <div>
-                  <p className="text-xs text-muted-foreground">Phone</p>
-                  <p className="text-sm font-medium">{customerDetails.phone}</p>
+                  <p className="text-xs text-muted-foreground">Mobile No</p>
+                  <p className="text-sm font-medium">{customer.phone}</p>
+                </div>
+              </div>
+              <Separator />
+              <div className="flex items-center gap-3">
+                <Navigation className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Location</p>
+                  <p className="text-sm font-medium">{customer.city}, {customer.state}</p>
+                </div>
+              </div>
+              <Separator />
+              <div className="flex items-center gap-3">
+                <Home className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Address</p>
+                  <p className="text-sm font-medium">{customer.address}</p>
                 </div>
               </div>
               <Separator />
               <div className="flex items-center gap-3">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
                 <div>
-                  <p className="text-xs text-muted-foreground">Country</p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <img
-                      src={`https://flagcdn.com/24x18/${customerDetails.country}.png`}
-                      alt={countryData[customerDetails.country]?.name}
-                      className="h-4 w-6 rounded-sm"
-                    />
-                    <p className="text-sm font-medium">
-                      {countryData[customerDetails.country]?.name}
-                    </p>
-                  </div>
+                  <p className="text-xs text-muted-foreground">Pincode</p>
+                  <p className="text-sm font-medium">{customer.pincode}</p>
                 </div>
               </div>
             </CardContent>
@@ -408,17 +306,17 @@ export default function CustomerDetails() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Join Date</p>
+                <p className="text-xs text-muted-foreground mb-1">Registration Date</p>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <p className="text-sm font-medium">{customerDetails.joinDate}</p>
+                  <p className="text-sm font-medium">{new Date(customer.createdAt).toLocaleDateString()}</p>
                 </div>
               </div>
               <Separator />
               <div>
                 <p className="text-xs text-muted-foreground mb-1">Account Status</p>
-                <Badge className={statusClass(customerDetails.status)} variant="outline">
-                  {customerDetails.status}
+                <Badge className={statusClass("Active")} variant="outline">
+                  Active
                 </Badge>
               </div>
             </CardContent>
@@ -435,7 +333,7 @@ export default function CustomerDetails() {
                   <ShoppingBag className="h-4 w-4 text-amber-600" />
                   <span className="text-sm text-muted-foreground">Total Orders</span>
                 </div>
-                <p className="font-semibold text-lg">{customerDetails.totalOrders}</p>
+                <p className="font-semibold text-lg">3</p>
               </div>
               <Separator />
               <div className="flex justify-between items-center">
@@ -443,17 +341,15 @@ export default function CustomerDetails() {
                   <DollarSign className="h-4 w-4 text-green-600" />
                   <span className="text-sm text-muted-foreground">Total Spent</span>
                 </div>
-                <p className="font-semibold text-lg">{customerDetails.totalSpent}</p>
+                <p className="font-semibold text-lg">$491.25</p>
               </div>
               <Separator />
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <MessageSquare className="h-4 w-4 text-blue-600" />
-                  <span className="text-sm text-muted-foreground">Avg. Order</span>
+                  <span className="text-sm text-muted-foreground">Status</span>
                 </div>
-                <p className="font-semibold text-lg">
-                  ${(parseFloat(customerDetails.totalSpent.replace('$', '')) / customerDetails.totalOrders).toFixed(2)}
-                </p>
+                <p className="font-semibold text-sm text-green-600">Premium</p>
               </div>
             </CardContent>
           </Card>
