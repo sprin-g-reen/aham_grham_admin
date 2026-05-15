@@ -1,4 +1,5 @@
-import { Outlet } from "react-router-dom"
+import { Outlet, useLocation } from "react-router-dom"
+import React from "react"
 import { AppSidebar } from "@/components/app-sidebar"
 import { NotificationDropdown } from "@/components/notification-dropdown"
 import axios from "axios"
@@ -31,6 +32,41 @@ import { cn } from "@/lib/utils"
 export default function AppLayout() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(true)
+  const location = useLocation()
+
+  // Dynamic breadcrumb logic
+  const pathSegments = location.pathname.split('/').filter(Boolean)
+
+  const getBreadcrumbName = (segment: string) => {
+    const map: Record<string, string> = {
+      "dashboard": "Dashboard",
+      "eCommerce": "eCommerce",
+      "account": "Account",
+      "overview": "Overview",
+      "activity": "Activity",
+      "program-details": "Programs",
+      "event-details": "Events",
+      "testimonials": "Testimonials",
+      "centers": "Centers",
+      "content-controller": "Content Controller",
+      "product-list": "Products",
+      "categories": "Categories",
+      "order-list": "Orders",
+      "customer-list": "Customers",
+      "customer-reviews": "Reviews",
+      "profile": "Profile",
+      "edit-profile": "Edit Profile",
+      "password-setting": "Password Setting",
+      "docs": "Documentation"
+    }
+
+    if (map[segment]) return map[segment]
+
+    return segment
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+  }
 
   useEffect(() => {
     const onScroll = () => {
@@ -75,13 +111,23 @@ export default function AppLayout() {
 
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">Dashboard</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Overview</BreadcrumbPage>
-                </BreadcrumbItem>
+                {pathSegments.map((segment, index) => {
+                  const isLast = index === pathSegments.length - 1
+                  const name = getBreadcrumbName(segment)
+
+                  return (
+                    <React.Fragment key={segment}>
+                      <BreadcrumbItem className={cn(!isLast && "hidden md:block")}>
+                        {isLast ? (
+                          <BreadcrumbPage>{name}</BreadcrumbPage>
+                        ) : (
+                          <BreadcrumbLink href="#">{name}</BreadcrumbLink>
+                        )}
+                      </BreadcrumbItem>
+                      {!isLast && <BreadcrumbSeparator className="hidden md:block" />}
+                    </React.Fragment>
+                  )
+                })}
               </BreadcrumbList>
             </Breadcrumb>
           </div>
