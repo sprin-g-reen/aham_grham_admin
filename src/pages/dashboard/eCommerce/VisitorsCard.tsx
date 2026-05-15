@@ -45,14 +45,15 @@ export default function VisitorsCard() {
     <Card className="overflow-hidden">
       <CardContent className="p-6">
         <div className="mb-3">
-          <p className="text-md text-muted-foreground">Visitors</p>
+          <p className="text-md text-muted-foreground uppercase font-medium tracking-wider">Visitors</p>
           <h2 className="text-3xl font-semibold">{data.totalVisitors.toLocaleString()}</h2>
         </div>
 
         <p className="text-sm flex gap-2 mb-5">
-          <span className="text-green-600 font-semibold">+ Real-time</span>
-          tracking active
+          <span className="text-green-600 font-bold tracking-tight">REAL-TIME</span>
+          <span className="text-muted-foreground opacity-80 italic">tracking active</span>
         </p>
+
 
         <ChartContainer config={chartConfig} className="h-14 w-full">
           <AreaChart

@@ -9,10 +9,8 @@ const VisitorsCard = lazy(() => import("./VisitorsCard"))
 const ConversionRateCard = lazy(() => import("./ConversionRateCard"))
 const SalesAnalysisCard = lazy(() => import("./SalesAnalysisCard"))
 const RecentOrdersCard = lazy(() => import("./RecentOrdersCard"))
-
 const OrderStatus = lazy(() => import("./OrderStatus"))
-
-const PopularProductsCard = lazy(() => import("./PopularProductsCard"))
+const TopPagesCard = lazy(() => import("./TopPagesCard"))
 
 // Reusable Skeleton
 function CardSkeleton({ height = 250 }: { height?: number }) {
@@ -70,15 +68,12 @@ export default function EcommerceDashboard() {
           </Suspense>
         </div>
 
-
-
-
-
         <div className="col-span-12 xl:col-span-12">
-          <Suspense fallback={<CardSkeleton height={300} />}>
-            <PopularProductsCard />
+          <Suspense fallback={<CardSkeleton height={400} />}>
+            <TopPagesCard />
           </Suspense>
         </div>
+
 
       </div>
 
